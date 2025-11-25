@@ -19,6 +19,7 @@ gradle.properties/
 common/build/
 fabric/build/
 forge/build/
+neoforge/build/
 
 # IDE/tooling output
 bin/
