@@ -4,11 +4,13 @@ import com.leon.saintsdragons.platform.NetworkHelper;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
-import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
 import net.fabricmc.fabric.api.networking.v1.PlayerLookup;
+import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.level.ServerLevel;
@@ -24,13 +26,28 @@ public final class FabricNetworkHelper implements NetworkHelper {
         CLIENTBOUND
     }
 
+    private static final class PayloadWrapper<T> implements CustomPacketPayload {
+        private final Type<PayloadWrapper<T>> type;
+        private final T message;
+
+        private PayloadWrapper(Type<PayloadWrapper<T>> type, T message) {
+            this.type = type;
+            this.message = message;
+        }
+
+        @Override
+        public Type<? extends CustomPacketPayload> type() {
+            return type;
+        }
+    }
+
     private static final class Binding<T> {
-        final ResourceLocation id;
+        final CustomPacketPayload.Type<PayloadWrapper<T>> type;
         final PacketEncoder<T> encoder;
         final Direction direction;
 
-        Binding(ResourceLocation id, PacketEncoder<T> encoder, Direction direction) {
-            this.id = id;
+        Binding(CustomPacketPayload.Type<PayloadWrapper<T>> type, PacketEncoder<T> encoder, Direction direction) {
+            this.type = type;
             this.encoder = encoder;
             this.direction = direction;
         }
@@ -44,11 +61,19 @@ public final class FabricNetworkHelper implements NetworkHelper {
                                         PacketEncoder<T> encoder,
                                         PacketDecoder<T> decoder,
                                         ServerboundHandler<T> handler) {
-        bindings.put(type, new Binding<>(id, encoder, Direction.SERVERBOUND));
-        ServerPlayNetworking.registerGlobalReceiver(id, (server, player, handlerAccessor, buf, responseSender) -> {
-            T message = decoder.decode(buf);
-            server.execute(() -> handler.handle(message, player));
-        });
+        CustomPacketPayload.Type<PayloadWrapper<T>> payloadType = new CustomPacketPayload.Type<>(id);
+        bindings.put(type, new Binding<>(payloadType, encoder, Direction.SERVERBOUND));
+
+        StreamCodec<FriendlyByteBuf, PayloadWrapper<T>> codec = StreamCodec.of(
+            (buf, wrapper) -> encoder.encode(wrapper.message, buf),
+            buf -> new PayloadWrapper<>(payloadType, decoder.decode(buf))
+        );
+
+        // Register payload type/codec before wiring handlers so Fabric knows about the channel
+        PayloadTypeRegistry.playC2S().register(payloadType, codec);
+
+        ServerPlayNetworking.registerGlobalReceiver(payloadType,
+            (payload, context) -> context.server().execute(() -> handler.handle(payload.message, context.player())));
     }
 
     @Override
@@ -57,9 +82,19 @@ public final class FabricNetworkHelper implements NetworkHelper {
                                         PacketEncoder<T> encoder,
                                         PacketDecoder<T> decoder,
                                         ClientboundHandler<T> handler) {
-        bindings.put(type, new Binding<>(id, encoder, Direction.CLIENTBOUND));
+        CustomPacketPayload.Type<PayloadWrapper<T>> payloadType = new CustomPacketPayload.Type<>(id);
+        bindings.put(type, new Binding<>(payloadType, encoder, Direction.CLIENTBOUND));
+
+        StreamCodec<FriendlyByteBuf, PayloadWrapper<T>> codec = StreamCodec.of(
+            (buf, wrapper) -> encoder.encode(wrapper.message, buf),
+            buf -> new PayloadWrapper<>(payloadType, decoder.decode(buf))
+        );
+
+        // Must be registered on both logical sides
+        PayloadTypeRegistry.playS2C().register(payloadType, codec);
+
         if (FabricLoader.getInstance().getEnvironmentType() == EnvType.CLIENT) {
-            ClientAccess.register(id, decoder, handler);
+            ClientAccess.register(payloadType, handler);
         }
     }
 
@@ -72,8 +107,7 @@ public final class FabricNetworkHelper implements NetworkHelper {
         if (binding.direction != Direction.SERVERBOUND) {
             throw new IllegalStateException("Attempted to send clientbound packet to server: " + message.getClass());
         }
-        FriendlyByteBuf buffer = createBuffer(binding, message);
-        ClientAccess.send(binding.id, buffer);
+        ClientAccess.send(new PayloadWrapper<>(binding.type, message));
     }
 
     @Override
@@ -82,8 +116,7 @@ public final class FabricNetworkHelper implements NetworkHelper {
         if (binding.direction != Direction.CLIENTBOUND) {
             throw new IllegalStateException("Attempted to send serverbound packet to player: " + message.getClass());
         }
-        FriendlyByteBuf buffer = createBuffer(binding, message);
-        ServerPlayNetworking.send(player, binding.id, buffer);
+        ServerPlayNetworking.send(player, new PayloadWrapper<>(binding.type, message));
     }
 
     @Override
@@ -92,9 +125,9 @@ public final class FabricNetworkHelper implements NetworkHelper {
         if (binding.direction != Direction.CLIENTBOUND) {
             throw new IllegalStateException("Attempted to send serverbound packet to tracking players: " + message.getClass());
         }
+        PayloadWrapper<Object> payload = new PayloadWrapper<>(binding.type, message);
         for (ServerPlayer tracking : PlayerLookup.tracking(entity)) {
-            FriendlyByteBuf buffer = createBuffer(binding, message);
-            ServerPlayNetworking.send(tracking, binding.id, buffer);
+            ServerPlayNetworking.send(tracking, payload);
         }
     }
 
@@ -107,9 +140,9 @@ public final class FabricNetworkHelper implements NetworkHelper {
         if (binding.direction != Direction.CLIENTBOUND) {
             throw new IllegalStateException("Attempted to send serverbound packet to dimension: " + message.getClass());
         }
+        PayloadWrapper<Object> payload = new PayloadWrapper<>(binding.type, message);
         for (ServerPlayer player : PlayerLookup.world(serverLevel)) {
-            FriendlyByteBuf buffer = createBuffer(binding, message);
-            ServerPlayNetworking.send(player, binding.id, buffer);
+            ServerPlayNetworking.send(player, payload);
         }
     }
 
@@ -123,29 +156,18 @@ public final class FabricNetworkHelper implements NetworkHelper {
         return binding;
     }
 
-    private FriendlyByteBuf createBuffer(Binding<Object> binding, Object message) {
-        FriendlyByteBuf buffer = PacketByteBufs.create();
-        @SuppressWarnings("unchecked")
-        PacketEncoder<Object> encoder = (PacketEncoder<Object>) binding.encoder;
-        encoder.encode(message, buffer);
-        return buffer;
-    }
-
     @Environment(EnvType.CLIENT)
     private static final class ClientAccess {
         private ClientAccess() {}
 
-        private static <T> void register(ResourceLocation id,
-                                         PacketDecoder<T> decoder,
+        private static <T> void register(CustomPacketPayload.Type<PayloadWrapper<T>> payloadType,
                                          ClientboundHandler<T> handler) {
-            ClientPlayNetworking.registerGlobalReceiver(id, (client, handlerAccessor, buf, responseSender) -> {
-                T message = decoder.decode(buf);
-                client.execute(() -> handler.handle(message));
-            });
+            ClientPlayNetworking.registerGlobalReceiver(payloadType,
+                (payload, context) -> context.client().execute(() -> handler.handle(payload.message)));
         }
 
-        private static void send(ResourceLocation id, FriendlyByteBuf buffer) {
-            ClientPlayNetworking.send(id, buffer);
+        private static void send(CustomPacketPayload payload) {
+            ClientPlayNetworking.send(payload);
         }
     }
 }

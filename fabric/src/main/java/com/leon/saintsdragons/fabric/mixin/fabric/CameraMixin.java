@@ -13,22 +13,15 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 public abstract class CameraMixin implements CameraAccessor {
 
     @Shadow
-    protected abstract void move(double distance, double yaw, double pitch);
-
-    @Shadow
-    protected abstract double getMaxZoom(double distance);
+    protected abstract void move(float x, float y, float z);
 
     /**
      * Accessor methods for other parts of the mod to call.
      */
     @Override
-    public void saintsdragons$invokeMove(double distance, double yaw, double pitch) {
-        this.move(distance, yaw, pitch);
-    }
-
-    @Override
-    public double saintsdragons$invokeGetMaxZoom(double distance) {
-        return this.getMaxZoom(distance);
+    public void saintsdragons$invokeMove(double x, double y, double z) {
+        // Vanilla signature uses floats; cast the higher precision inputs.
+        this.move((float) x, (float) y, (float) z);
     }
 
     /**

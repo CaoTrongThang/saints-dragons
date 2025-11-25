@@ -117,8 +117,7 @@ public class FabricClientEventHandler {
 
             // Apply the smoothed zoom and lateral shift using the mixin accessor
             CameraAccessor cameraAccessor = (CameraAccessor) camera;
-            double maxZoom = cameraAccessor.saintsdragons$invokeGetMaxZoom(raevyxCameraZoom);
-            cameraAccessor.saintsdragons$invokeMove(-maxZoom, 0, 0);
+            cameraAccessor.saintsdragons$invokeMove(-raevyxCameraZoom, 0, 0);
             // Apply lateral and vertical shifts
             cameraAccessor.saintsdragons$invokeMove(0, verticalCameraShift, raevyxCameraShift);
         } else {
@@ -174,10 +173,8 @@ public class FabricClientEventHandler {
 
             // Apply the smoothed zoom and lateral shift using the mixin accessor
             CameraAccessor cameraAccessor = (CameraAccessor) camera;
-            double maxZoom = cameraAccessor.saintsdragons$invokeGetMaxZoom(cindervaneCameraZoom);
-
             // Move camera: back (zoom), no vertical, lateral shift based on banking
-            cameraAccessor.saintsdragons$invokeMove(-maxZoom, 0, 0);
+            cameraAccessor.saintsdragons$invokeMove(-cindervaneCameraZoom, 0, 0);
             // Apply lateral and vertical shifts
             cameraAccessor.saintsdragons$invokeMove(0, verticalCameraShift, cindervaneCameraShift);
         } else if (!(player.getVehicle() instanceof Cindervane)) {
@@ -233,8 +230,7 @@ public class FabricClientEventHandler {
 
             // Apply the smoothed zoom using the mixin accessor
             CameraAccessor cameraAccessor = (CameraAccessor) camera;
-            double maxZoom = cameraAccessor.saintsdragons$invokeGetMaxZoom(ignivorusCameraZoom);
-            cameraAccessor.saintsdragons$invokeMove(-maxZoom, 0, 0);
+            cameraAccessor.saintsdragons$invokeMove(-ignivorusCameraZoom, 0, 0);
             // Apply lateral and vertical shifts
             cameraAccessor.saintsdragons$invokeMove(0, verticalCameraShift, ignivorusCameraShift);
         } else if (!(player.getVehicle() instanceof Ignivorus)) {
@@ -248,8 +244,7 @@ public class FabricClientEventHandler {
         // Nulljaw camera zoom
         if (player.isPassenger() && player.getVehicle() instanceof Nulljaw && camera.isDetached()) {
             CameraAccessor cameraAccessor = (CameraAccessor) camera;
-            double maxZoom = cameraAccessor.saintsdragons$invokeGetMaxZoom(15F);
-            cameraAccessor.saintsdragons$invokeMove(-maxZoom, 0, 0);
+            cameraAccessor.saintsdragons$invokeMove(-15F, 0, 0);
         }
 
         // Screen shake detection and application
