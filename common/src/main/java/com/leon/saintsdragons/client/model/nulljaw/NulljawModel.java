@@ -7,10 +7,15 @@ import net.minecraft.util.Mth;
 import software.bernie.geckolib.cache.object.GeoBone;
 import software.bernie.geckolib.constant.DataTickets;
 import software.bernie.geckolib.animation.AnimationState;
-import software.bernie.geckolib.model.GeoModel;
+import software.bernie.geckolib.model.DefaultedEntityGeoModel;
 import software.bernie.geckolib.model.data.EntityModelData;
 
-public class NulljawModel extends GeoModel<Nulljaw> {
+public class NulljawModel extends DefaultedEntityGeoModel<Nulljaw> {
+
+    public NulljawModel() {
+        super(SaintsDragonsCommon.rl("nulljaw"));
+    }
+
     private static final ResourceLocation MODEL = SaintsDragonsCommon.rl("geo/entity/nulljaw.geo.json");
     private static final ResourceLocation ANIM = SaintsDragonsCommon.rl("animations/entity/nulljaw.animation.json");
     private static final ResourceLocation MALE_TEXTURE = SaintsDragonsCommon.rl("textures/entity/nulljaw/nulljaw.png");

@@ -1398,9 +1398,6 @@ public class Nulljaw extends RideableDragonBase implements AquaticDragon, Shakes
     /**
      * Check if the drake is dying (health below 10%)
      */
-    public boolean isDying() {
-        return this.getHealth() < this.getMaxHealth() * 0.1f;
-    }
     
     // Required methods for RideableDragon interface
     @Override
@@ -2039,7 +2036,7 @@ public class Nulljaw extends RideableDragonBase implements AquaticDragon, Shakes
     @Override
     public boolean hurt(@javax.annotation.Nonnull net.minecraft.world.damagesource.DamageSource damageSource, float amount) {
         // During dying sequence, ignore all damage (entity is already dead, playing death animation)
-        if (isDying()) {
+        if (super.isDying()) {
             return false;
         }
         // Wake if sleeping and suppress re-entry on damage
