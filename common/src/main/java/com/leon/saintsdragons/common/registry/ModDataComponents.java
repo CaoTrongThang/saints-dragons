@@ -20,8 +20,7 @@ public final class ModDataComponents {
     }
 
     public static void register() {
-        // Trigger class loading to ensure static initializers run.
-        BINDER_DATA.get();
+        // No-op; registration is handled via platform helpers during static init.
     }
 
     private static <T> Supplier<DataComponentType<T>> register(String name, DataComponentType.Builder<T> builder) {

@@ -18,6 +18,15 @@ subprojects {
     apply plugin: 'architectury-plugin'
     apply plugin: 'maven-publish'
 
+    configurations.configureEach {
+        resolutionStrategy.eachDependency { details ->
+            if (details.requested.group == "dev.architectury"
+                    && details.requested.name == "architectury-transformer") {
+                details.useVersion "5.2.88"
+            }
+        }
+    }
+
     base {
         // Set up a suffixed format for the mod jar names, e.g. `example-fabric`.
         archivesName = "$rootProject.mod_id-$project.name"

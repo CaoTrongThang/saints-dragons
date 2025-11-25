@@ -13,15 +13,15 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 public abstract class CameraMixin implements CameraAccessor {
 
     @Shadow
-    protected abstract void move(float x, float y, float z);
+    protected abstract void move(double x, double y, double z);
 
     /**
      * Accessor methods for other parts of the mod to call.
      */
     @Override
     public void saintsdragons$invokeMove(double x, double y, double z) {
-        // Vanilla signature uses floats; cast the higher precision inputs.
-        this.move((float) x, (float) y, (float) z);
+        // In 1.21.1, Camera.move uses doubles
+        this.move(x, y, z);
     }
 
     /**

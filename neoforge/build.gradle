@@ -37,6 +37,7 @@ dependencies {
     mappings loom.officialMojangMappings()
 
     neoForge("net.neoforged:neoforge:${project.properties["neoforge_version"]}")
+    modImplementation "dev.architectury:architectury-neoforge:${rootProject.architectury_api_version}"
     modApi "software.bernie.geckolib:geckolib-neoforge-${minecraft_version}:${geckolib_version}"
 
     common(project(path: ':common', configuration: 'namedElements')) { transitive false }

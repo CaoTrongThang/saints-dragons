@@ -21,12 +21,14 @@ dependencies {
     // Mappings
     mappings loom.officialMojangMappings()
 
+    modImplementation "dev.architectury:architectury:${rootProject.architectury_api_version}"
+
     // We depend on fabric loader here to use the fabric @Environment annotations and get the mixin dependencies
     // Do NOT use other classes from fabric loader
-    modCompileOnly "net.fabricmc:fabric-loader:${rootProject.fabric_loader_version}"
+    compileOnly "net.fabricmc:fabric-loader:${rootProject.fabric_loader_version}"
 
-    // GeckoLib common - use compileOnly to prevent Fabric mappings from leaking to NeoForge
-    modCompileOnly "software.bernie.geckolib:geckolib-fabric-${rootProject.minecraft_version}:${rootProject.geckolib_version}"
+    // GeckoLib common (Mojang-mapped; includes main entrypoint)
+    compileOnly "software.bernie.geckolib:geckolib-neoforge-${rootProject.minecraft_version}:${rootProject.geckolib_version}"
 
     // JSR305 for @Nullable/@Nonnull annotations
     compileOnly "com.google.code.findbugs:jsr305:3.0.2"

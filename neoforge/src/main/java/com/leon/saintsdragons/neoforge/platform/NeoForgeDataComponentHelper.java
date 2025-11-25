@@ -1,5 +1,7 @@
 package com.leon.saintsdragons.neoforge.platform;
 
+import com.leon.saintsdragons.common.SaintsDragonsCommon;
+import com.leon.saintsdragons.neoforge.NeoForgeModContext;
 import com.leon.saintsdragons.platform.DataComponentHelper;
 import net.minecraft.core.component.DataComponentType;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -10,11 +12,11 @@ import java.util.function.Supplier;
 
 public final class NeoForgeDataComponentHelper implements DataComponentHelper {
     private final DeferredRegister<DataComponentType<?>> deferred =
-            DeferredRegister.create(BuiltInRegistries.DATA_COMPONENT_TYPE, com.leon.saintsdragons.common.SaintsDragonsCommon.MOD_ID);
+            DeferredRegister.create(BuiltInRegistries.DATA_COMPONENT_TYPE, SaintsDragonsCommon.MOD_ID);
 
     public NeoForgeDataComponentHelper() {
-        // Register deferred data components onto the mod event bus once.
-        com.leon.saintsdragons.neoforge.NeoForgeModContext.getModEventBus().register(deferred);
+        // Attach the deferred register to the mod event bus.
+        deferred.register(NeoForgeModContext.getModEventBus());
     }
 
     @Override
