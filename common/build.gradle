@@ -23,10 +23,10 @@ dependencies {
 
     // We depend on fabric loader here to use the fabric @Environment annotations and get the mixin dependencies
     // Do NOT use other classes from fabric loader
-    modImplementation "net.fabricmc:fabric-loader:${rootProject.fabric_loader_version}"
+    modCompileOnly "net.fabricmc:fabric-loader:${rootProject.fabric_loader_version}"
 
-    // GeckoLib common
-    modImplementation "software.bernie.geckolib:geckolib-fabric-${rootProject.minecraft_version}:${rootProject.geckolib_version}"
+    // GeckoLib common - use compileOnly to prevent Fabric mappings from leaking to NeoForge
+    modCompileOnly "software.bernie.geckolib:geckolib-fabric-${rootProject.minecraft_version}:${rootProject.geckolib_version}"
 
     // JSR305 for @Nullable/@Nonnull annotations
     compileOnly "com.google.code.findbugs:jsr305:3.0.2"

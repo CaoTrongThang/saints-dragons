@@ -1,29 +1,23 @@
 package com.leon.saintsdragons.neoforge.platform;
 
 import com.leon.saintsdragons.common.SaintsDragonsCommon;
+import com.leon.saintsdragons.neoforge.NeoForgeModContext;
 import com.leon.saintsdragons.platform.NetworkHelper;
 import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.Level;
 import net.neoforged.neoforge.network.PacketDistributor;
-import net.neoforged.neoforge.network.SimpleChannel;
-import net.neoforged.neoforge.network.registration.NetworkRegistry;
+import net.neoforged.neoforge.network.event.RegisterPayloadHandlersEvent;
+import net.neoforged.neoforge.network.registration.PayloadRegistrar;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.atomic.AtomicInteger;
 
 public final class NeoForgeNetworkHelper implements NetworkHelper {
-    private static final String PROTOCOL_VERSION = "1";
-    private static final SimpleChannel CHANNEL = NetworkRegistry.ChannelBuilder
-            .named(new ResourceLocation(SaintsDragonsCommon.MOD_ID, "main"))
-            .networkProtocolVersion(() -> PROTOCOL_VERSION)
-            .clientAcceptedVersions(s -> true)
-            .serverAcceptedVersions(s -> true)
-            .simpleChannel();
-
     private enum Direction { SERVERBOUND, CLIENTBOUND }
 
     private static final class Binding<T> {
@@ -39,7 +33,16 @@ public final class NeoForgeNetworkHelper implements NetworkHelper {
     }
 
     private final Map<Class<?>, Binding<?>> bindings = new ConcurrentHashMap<>();
-    private final AtomicInteger discriminator = new AtomicInteger();
+    private PayloadRegistrar registrar;
+
+    public NeoForgeNetworkHelper() {
+        // Register payload handlers on the mod event bus
+        NeoForgeModContext.getModEventBus().addListener(this::onRegisterPayloads);
+    }
+
+    private void onRegisterPayloads(RegisterPayloadHandlersEvent event) {
+        this.registrar = event.registrar(SaintsDragonsCommon.MOD_ID);
+    }
 
     @Override
     public <T> void registerServerbound(Class<T> type,
@@ -48,16 +51,29 @@ public final class NeoForgeNetworkHelper implements NetworkHelper {
                                         PacketDecoder<T> decoder,
                                         ServerboundHandler<T> handler) {
         bindings.put(type, new Binding<>(id, encoder, Direction.SERVERBOUND));
-        CHANNEL.messageBuilder(type, discriminator.getAndIncrement(), net.neoforged.neoforge.network.registration.NetworkDirection.PLAY_TO_SERVER)
-            .encoder(encoder::encode)
-            .decoder(buffer -> decoder.decode(buffer))
-            .consumerNetworkThread((message, context) -> {
-                ServerPlayer player = context.getSender();
-                if (player != null) {
-                    handler.handle(message, player);
-                }
-            })
-            .add();
+
+        // Create a wrapper payload type
+        CustomPacketPayload.Type<PayloadWrapper<T>> payloadType = new CustomPacketPayload.Type<>(id);
+
+        // Create the stream codec
+        StreamCodec<FriendlyByteBuf, PayloadWrapper<T>> codec = StreamCodec.of(
+            (buf, wrapper) -> encoder.encode(wrapper.message, buf),
+            buf -> new PayloadWrapper<>(payloadType, decoder.decode(buf))
+        );
+
+        // Register using the deferred approach to ensure registrar is available
+        NeoForgeModContext.getModEventBus().addListener((RegisterPayloadHandlersEvent e) -> {
+            PayloadRegistrar r = e.registrar(SaintsDragonsCommon.MOD_ID);
+            r.playToServer(
+                payloadType,
+                codec,
+                (wrapper, context) -> context.enqueueWork(() -> {
+                    if (context.player() instanceof ServerPlayer player) {
+                        handler.handle(wrapper.message, player);
+                    }
+                })
+            );
+        });
     }
 
     @Override
@@ -67,11 +83,25 @@ public final class NeoForgeNetworkHelper implements NetworkHelper {
                                         PacketDecoder<T> decoder,
                                         ClientboundHandler<T> handler) {
         bindings.put(type, new Binding<>(id, encoder, Direction.CLIENTBOUND));
-        CHANNEL.messageBuilder(type, discriminator.getAndIncrement(), net.neoforged.neoforge.network.registration.NetworkDirection.PLAY_TO_CLIENT)
-            .encoder(encoder::encode)
-            .decoder(buffer -> decoder.decode(buffer))
-            .consumerMainThread((message, context) -> handler.handle(message))
-            .add();
+
+        // Create a wrapper payload type
+        CustomPacketPayload.Type<PayloadWrapper<T>> payloadType = new CustomPacketPayload.Type<>(id);
+
+        // Create the stream codec
+        StreamCodec<FriendlyByteBuf, PayloadWrapper<T>> codec = StreamCodec.of(
+            (buf, wrapper) -> encoder.encode(wrapper.message, buf),
+            buf -> new PayloadWrapper<>(payloadType, decoder.decode(buf))
+        );
+
+        // Register using the deferred approach to ensure registrar is available
+        NeoForgeModContext.getModEventBus().addListener((RegisterPayloadHandlersEvent e) -> {
+            PayloadRegistrar r = e.registrar(SaintsDragonsCommon.MOD_ID);
+            r.playToClient(
+                payloadType,
+                codec,
+                (wrapper, context) -> context.enqueueWork(() -> handler.handle(wrapper.message))
+            );
+        });
     }
 
     @Override
@@ -80,7 +110,9 @@ public final class NeoForgeNetworkHelper implements NetworkHelper {
         if (binding.direction != Direction.SERVERBOUND) {
             throw new IllegalStateException("Attempted to send clientbound packet to server: " + message.getClass());
         }
-        CHANNEL.sendToServer(message);
+        CustomPacketPayload.Type<PayloadWrapper<Object>> type = new CustomPacketPayload.Type<>(binding.id);
+        PayloadWrapper<Object> wrapper = new PayloadWrapper<>(type, message);
+        PacketDistributor.sendToServer(wrapper);
     }
 
     @Override
@@ -89,7 +121,9 @@ public final class NeoForgeNetworkHelper implements NetworkHelper {
         if (binding.direction != Direction.CLIENTBOUND) {
             throw new IllegalStateException("Attempted to send serverbound packet to player: " + message.getClass());
         }
-        CHANNEL.send(PacketDistributor.PLAYER.with(player), message);
+        CustomPacketPayload.Type<PayloadWrapper<Object>> type = new CustomPacketPayload.Type<>(binding.id);
+        PayloadWrapper<Object> wrapper = new PayloadWrapper<>(type, message);
+        PacketDistributor.sendToPlayer(player, wrapper);
     }
 
     @Override
@@ -98,7 +132,9 @@ public final class NeoForgeNetworkHelper implements NetworkHelper {
         if (binding.direction != Direction.CLIENTBOUND) {
             throw new IllegalStateException("Attempted to send serverbound packet to tracking players: " + message.getClass());
         }
-        CHANNEL.send(PacketDistributor.TRACKING_ENTITY.with(entity), message);
+        CustomPacketPayload.Type<PayloadWrapper<Object>> type = new CustomPacketPayload.Type<>(binding.id);
+        PayloadWrapper<Object> wrapper = new PayloadWrapper<>(type, message);
+        PacketDistributor.sendToPlayersTrackingEntity(entity, wrapper);
     }
 
     @Override
@@ -107,7 +143,11 @@ public final class NeoForgeNetworkHelper implements NetworkHelper {
         if (binding.direction != Direction.CLIENTBOUND) {
             throw new IllegalStateException("Attempted to send serverbound packet to dimension: " + message.getClass());
         }
-        CHANNEL.send(PacketDistributor.DIMENSION.with(level.dimension()), message);
+        CustomPacketPayload.Type<PayloadWrapper<Object>> type = new CustomPacketPayload.Type<>(binding.id);
+        PayloadWrapper<Object> wrapper = new PayloadWrapper<>(type, message);
+        if (level instanceof net.minecraft.server.level.ServerLevel serverLevel) {
+            PacketDistributor.sendToPlayersInDimension(serverLevel, wrapper);
+        }
     }
 
     private Binding<Object> bindingFor(Object message) {
@@ -117,5 +157,21 @@ public final class NeoForgeNetworkHelper implements NetworkHelper {
             throw new IllegalStateException("No network binding registered for " + message.getClass().getName());
         }
         return binding;
+    }
+
+    // Wrapper class that implements CustomPacketPayload
+    private static final class PayloadWrapper<T> implements CustomPacketPayload {
+        private final Type<PayloadWrapper<T>> type;
+        private final T message;
+
+        PayloadWrapper(Type<PayloadWrapper<T>> type, T message) {
+            this.type = type;
+            this.message = message;
+        }
+
+        @Override
+        public Type<? extends CustomPacketPayload> type() {
+            return type;
+        }
     }
 }

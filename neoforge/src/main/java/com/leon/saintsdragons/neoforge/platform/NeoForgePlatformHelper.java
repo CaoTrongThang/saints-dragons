@@ -9,8 +9,10 @@ import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.SpawnEggItem;
-import net.neoforged.fml.loading.FMLEnvironment;
+import net.neoforged.api.distmarker.Dist;
 import net.neoforged.fml.loading.FMLLoader;
+import net.neoforged.fml.loading.FMLPaths;
+import net.neoforged.fml.ModList;
 
 import java.nio.file.Path;
 import java.util.function.Supplier;
@@ -55,14 +57,14 @@ public final class NeoForgePlatformHelper implements PlatformHelper {
 
     @Override
     public void runOnClient(Runnable runnable) {
-        if (FMLEnvironment.dist.isClient()) {
+        if (FMLLoader.getDist() == Dist.CLIENT) {
             runnable.run();
         }
     }
 
     @Override
     public <T> T callOnClient(Supplier<T> supplier) {
-        if (FMLEnvironment.dist.isClient()) {
+        if (FMLLoader.getDist() == Dist.CLIENT) {
             return supplier.get();
         }
         return null;
@@ -75,7 +77,7 @@ public final class NeoForgePlatformHelper implements PlatformHelper {
 
     @Override
     public boolean isModLoaded(String modId) {
-        return FMLLoader.getLoadingModList().getModFileById(modId) != null;
+        return ModList.get().isLoaded(modId);
     }
 
     @Override
@@ -99,6 +101,6 @@ public final class NeoForgePlatformHelper implements PlatformHelper {
 
     @Override
     public Path getConfigDirectory() {
-        return FMLLoader.getGamePath().resolve("config");
+        return FMLPaths.CONFIGDIR.get();
     }
 }

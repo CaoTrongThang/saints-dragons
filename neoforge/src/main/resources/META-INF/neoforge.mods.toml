@@ -1,5 +1,5 @@
 modLoader = "javafml"
-loaderVersion = "${neoforge_version_range}"
+loaderVersion = "[4,)"
 license = "LGPLv3"
 issueTrackerURL = "https://github.com/LilRicefield/saints-dragons/issues"
 
@@ -22,4 +22,11 @@ modId = "minecraft"
 type = "required"
 versionRange = "${minecraft_version_range}"
 ordering = "NONE"
+side = "BOTH"
+
+[[dependencies.saintsdragons]]
+modId = "geckolib"
+type = "required"
+versionRange = "[4.8.2,)"
+ordering = "AFTER"
 side = "BOTH"

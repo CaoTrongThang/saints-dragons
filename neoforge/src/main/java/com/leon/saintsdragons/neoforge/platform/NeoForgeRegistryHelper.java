@@ -1,9 +1,9 @@
 package com.leon.saintsdragons.neoforge.platform;
 
+import com.leon.saintsdragons.neoforge.NeoForgeModContext;
 import com.leon.saintsdragons.platform.RegistryHelper;
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceKey;
-import net.neoforged.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.neoforged.neoforge.registries.DeferredRegister;
 
 import java.util.function.Supplier;
@@ -30,7 +30,7 @@ public final class NeoForgeRegistryHelper implements RegistryHelper {
 
         @Override
         public void register() {
-            deferredRegister.register(FMLJavaModLoadingContext.get().getModEventBus());
+            deferredRegister.register(NeoForgeModContext.getModEventBus());
         }
     }
 }
