@@ -80,7 +80,7 @@ public class NeoForgeClientEventHandler {
 
                 // Convert bank angle to shift
                 // Scale: at 45° bank with full velocity, shift ~5.5 blocks (more aggressive than Cindervane)
-                targetCameraShift = -(bankAngle / 45.0) * 5.5 * velocityFactor;
+                targetCameraShift = (bankAngle / 45.0) * 5.5 * velocityFactor;
             }
 
             // Smooth the camera shift for gradual, natural movement
@@ -135,7 +135,7 @@ public class NeoForgeClientEventHandler {
                 double velocity = cindervane.getDeltaMovement().horizontalDistance();
                 double velocityFactor = Math.min(velocity * 2.0, 1.5); // Cap at 1.5x
 
-                targetCameraShift = -(bankAngle / 45.0) * 5.5 * velocityFactor;
+                targetCameraShift = (bankAngle / 45.0) * 5.5 * velocityFactor;
             }
 
             // Smooth the camera shift for gradual, natural movement
@@ -191,7 +191,7 @@ public class NeoForgeClientEventHandler {
 
                 // Convert bank angle to shift
                 // Scale: at 45° bank with full velocity, shift ~4.5 blocks (between Cindervane and Raevyx)
-                targetCameraShift = -(bankAngle / 45.0) * 6.5 * velocityFactor;
+                targetCameraShift = (bankAngle / 45.0) * 6.5 * velocityFactor;
             }
 
             // Smooth the camera shift for gradual, natural movement
