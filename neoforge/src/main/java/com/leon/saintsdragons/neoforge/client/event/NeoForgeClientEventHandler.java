@@ -50,9 +50,9 @@ public class NeoForgeClientEventHandler {
     }
 
     /**
-     * Called from ViewportEvent.ComputeCameraAngles to apply camera adjustments.
+     * Called from CameraMixin at the end of Camera.setup() to apply camera adjustments.
      */
-    public static void onComputeCamera(Camera camera, float partialTicks) {
+    public static void onCameraSetup(Camera camera, float partialTicks) {
         Entity player = Minecraft.getInstance().getCameraEntity();
         if (player == null) return;
 

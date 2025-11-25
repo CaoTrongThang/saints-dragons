@@ -21,8 +21,6 @@ public final class NeoForgeClientGameEvents {
         }
     }
 
-    @SubscribeEvent
-    public static void onComputeCameraAngles(ViewportEvent.ComputeCameraAngles event) {
-        NeoForgeClientEventHandler.onComputeCamera(event.getCamera(), (float) event.getPartialTick());
-    }
+    // Removed - using mixin instead for proper timing
+    // ViewportEvent fires too late, camera position is already locked
 }

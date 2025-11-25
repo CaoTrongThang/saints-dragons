@@ -10,6 +10,9 @@ displayName = "Saint's Dragons"
 authors = "Leon Saint"
 description = "Adds animated, AI-driven dragons or wyverns to Minecraft."
 
+[[mixins]]
+config = "saintsdragons-neoforge.mixins.json"
+
 [[dependencies.saintsdragons]]
 modId = "neoforge"
 type = "required"
