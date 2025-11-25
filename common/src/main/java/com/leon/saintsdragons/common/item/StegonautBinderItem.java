@@ -159,7 +159,7 @@ public class StegonautBinderItem extends Item {
             newDrake.tame(player);
         }
 
-        data.customName().ifPresent(newDrake::setCustomName);
+        data.customNameComponent().ifPresent(newDrake::setCustomName);
 
         serverLevel.addFreshEntity(newDrake);
 

@@ -159,7 +159,7 @@ public class NulljawBinderItem extends Item {
             newDragon.tame(player);
         }
 
-        data.customName().ifPresent(newDragon::setCustomName);
+        data.customNameComponent().ifPresent(newDragon::setCustomName);
 
         serverLevel.addFreshEntity(newDragon);
 

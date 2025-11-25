@@ -1,0 +1,25 @@
+modLoader = "javafml"
+loaderVersion = "${neoforge_version_range}"
+license = "LGPLv3"
+issueTrackerURL = "https://github.com/LilRicefield/saints-dragons/issues"
+
+[[mods]]
+modId = "saintsdragons"
+version = "${version}"
+displayName = "Saint's Dragons"
+authors = "Leon Saint"
+description = "Adds animated, AI-driven dragons or wyverns to Minecraft."
+
+[[dependencies.saintsdragons]]
+modId = "neoforge"
+type = "required"
+versionRange = "${neoforge_version_range}"
+ordering = "NONE"
+side = "BOTH"
+
+[[dependencies.saintsdragons]]
+modId = "minecraft"
+type = "required"
+versionRange = "${minecraft_version_range}"
+ordering = "NONE"
+side = "BOTH"
