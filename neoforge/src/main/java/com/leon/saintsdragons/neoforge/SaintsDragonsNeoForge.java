@@ -48,10 +48,17 @@ public class SaintsDragonsNeoForge {
         // Register built-in config screen (accessible via Mods menu → Select Saints Dragons → Config button)
         modContainer.registerExtensionPoint(IConfigScreenFactory.class, ConfigurationScreen::new);
 
-        // Listen for config reloads and sync to DragonAttributeConfigLoader
+        // Listen for config load and reload events to sync to DragonAttributeConfigLoader
+        modEventBus.addListener(this::onConfigLoad);
         modEventBus.addListener(this::onConfigReload);
 
         SaintsDragonsCommon.init();
+    }
+
+    private void onConfigLoad(ModConfigEvent.Loading event) {
+        if (event.getConfig().getType() == ModConfig.Type.COMMON) {
+            syncConfigToAttributeLoader();
+        }
     }
 
     private void onConfigReload(ModConfigEvent.Reloading event) {
@@ -69,6 +76,7 @@ public class SaintsDragonsNeoForge {
         loader.overwriteConfig(DragonAttributeConfigLoader.RAEVYX_ID, createRaevyxConfig());
         loader.overwriteConfig(DragonAttributeConfigLoader.NULLJAW_ID, createNulljawConfig());
         loader.overwriteConfig(DragonAttributeConfigLoader.IGNIVORUS_ID, createIgnivorusConfig());
+        loader.overwriteConfig(DragonAttributeConfigLoader.STEGONAUT_ID, createStegonautConfig());
     }
 
     private DragonAttributeConfig createCindervaneConfig() {
@@ -147,6 +155,23 @@ public class SaintsDragonsNeoForge {
                 Map.of(
                         "legacy_taming", SaintsDragonsNeoForgeConfig.IGNIVORUS_LEGACY_TAMING.get()
                 )
+        );
+    }
+
+    private DragonAttributeConfig createStegonautConfig() {
+        DragonAttributeConfig defaults = DragonAttributeConfigLoader.getInstance().getDefaultConfig(DragonAttributeConfigLoader.STEGONAUT_ID);
+        return new DragonAttributeConfig(
+                SaintsDragonsNeoForgeConfig.STEGONAUT_MAX_HEALTH.get(),
+                SaintsDragonsNeoForgeConfig.STEGONAUT_ATTACK_DAMAGE.get(),
+                0.0D,  // Movement speed not configurable
+                0.0D,  // No flying speed
+                defaults.abilities(),  // Keep existing abilities
+                Map.of(
+                        "run_speed", defaults.extraDouble("run_speed", 0.27D),
+                        "walk_speed", defaults.extraDouble("walk_speed", 0.18D),
+                        "armor", SaintsDragonsNeoForgeConfig.STEGONAUT_ARMOR.get()
+                ),
+                defaults.extraBooleans()  // Keep existing booleans
         );
     }
 }
