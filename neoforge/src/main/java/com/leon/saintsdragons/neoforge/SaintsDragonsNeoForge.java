@@ -56,13 +56,18 @@ public class SaintsDragonsNeoForge {
     }
 
     private void onConfigLoad(ModConfigEvent.Loading event) {
-        if (event.getConfig().getType() == ModConfig.Type.COMMON) {
+        // Only sync when the attributes config (saintsdragons-common.toml) is loaded
+        // Not when the spawn config (saintsdragonsspawning.toml) is loaded
+        if (event.getConfig().getType() == ModConfig.Type.COMMON
+                && event.getConfig().getFileName().equals("saintsdragons-common.toml")) {
             syncConfigToAttributeLoader();
         }
     }
 
     private void onConfigReload(ModConfigEvent.Reloading event) {
-        if (event.getConfig().getType() == ModConfig.Type.COMMON) {
+        // Only sync when the attributes config (saintsdragons-common.toml) is reloaded
+        if (event.getConfig().getType() == ModConfig.Type.COMMON
+                && event.getConfig().getFileName().equals("saintsdragons-common.toml")) {
             syncConfigToAttributeLoader();
         }
     }
