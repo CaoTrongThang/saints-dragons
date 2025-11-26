@@ -32,6 +32,7 @@ public final class DragonAttributeConfigLoader extends SimpleJsonResourceReloadL
     public static final ResourceLocation RAEVYX_ID = SaintsDragonsCommon.rl("raevyx");
     public static final ResourceLocation NULLJAW_ID = SaintsDragonsCommon.rl("nulljaw");
     public static final ResourceLocation IGNIVORUS_ID = SaintsDragonsCommon.rl("ignivorus");
+    public static final ResourceLocation STEGONAUT_ID = SaintsDragonsCommon.rl("stegonaut");
 
     private static final DragonAttributeConfigLoader INSTANCE = new DragonAttributeConfigLoader();
 
@@ -49,16 +50,35 @@ public final class DragonAttributeConfigLoader extends SimpleJsonResourceReloadL
         base.put(RAEVYX_ID, raevyxDefaults());
         base.put(NULLJAW_ID, nulljawDefaults());
         base.put(IGNIVORUS_ID, ignivorusDefaults());
+        base.put(STEGONAUT_ID, stegonautDefaults());
         this.defaults = ImmutableMap.copyOf(base);
         this.configs = this.defaults;
     }
 
     private static DragonAttributeConfig cindervaneDefaults() {
+        double maxHealth = 80.0D;
+        double armor = 4.0D;
+        double flyingSpeed = 0.60D;
+        double tamingChanceBase = 4.0D;
+        double tamingChanceHearty = 2.0D;
+
+        // NeoForge config override (if available)
+        try {
+            Class<?> configClass = Class.forName("com.leon.saintsdragons.neoforge.config.SaintsDragonsNeoForgeConfig");
+            maxHealth = (double) configClass.getField("CINDERVANE_MAX_HEALTH").get(null).getClass().getMethod("get").invoke(configClass.getField("CINDERVANE_MAX_HEALTH").get(null));
+            armor = (double) configClass.getField("CINDERVANE_ATTACK_DAMAGE").get(null).getClass().getMethod("get").invoke(configClass.getField("CINDERVANE_ATTACK_DAMAGE").get(null));
+            flyingSpeed = (double) configClass.getField("CINDERVANE_FLYING_SPEED").get(null).getClass().getMethod("get").invoke(configClass.getField("CINDERVANE_FLYING_SPEED").get(null));
+            tamingChanceBase = (double) configClass.getField("CINDERVANE_TAMING_CHANCE_BASE").get(null).getClass().getMethod("get").invoke(configClass.getField("CINDERVANE_TAMING_CHANCE_BASE").get(null));
+            tamingChanceHearty = (double) configClass.getField("CINDERVANE_TAMING_CHANCE_HEARTY").get(null).getClass().getMethod("get").invoke(configClass.getField("CINDERVANE_TAMING_CHANCE_HEARTY").get(null));
+        } catch (Exception ignored) {
+            // NeoForge config not available (Fabric or config not loaded yet)
+        }
+
         return new DragonAttributeConfig(
-                80.0D,
-                4.0D,
-                0.45D,
-                0.60D,
+                maxHealth,
+                armor,
+                0.0D,  // Movement speed not configurable
+                flyingSpeed,
                 Map.of(
                         "bite", DragonAbilityOverride.ofDamage(12.0D),
                         "magma_volley", DragonAbilityOverride.ofDamage(20.0D)
@@ -66,19 +86,39 @@ public final class DragonAttributeConfigLoader extends SimpleJsonResourceReloadL
                 Map.of(
                         "run_speed", 0.27D,
                         "walk_speed", 0.225D,
-                        "taming_chance_base", 4.0D,
-                        "taming_chance_hearty", 2.0D
+                        "taming_chance_base", tamingChanceBase,
+                        "taming_chance_hearty", tamingChanceHearty
                 ),
                 Map.of()
         );
     }
 
     private static DragonAttributeConfig raevyxDefaults() {
+        double maxHealth = 180.0D;
+        double armor = 8.0D;
+        double flyingSpeed = 1.0D;
+        double tamingChanceBase = 5.0D;
+        double tamingChanceHearty = 3.0D;
+        boolean legacyTaming = false;
+
+        // NeoForge config override (if available)
+        try {
+            Class<?> configClass = Class.forName("com.leon.saintsdragons.neoforge.config.SaintsDragonsNeoForgeConfig");
+            maxHealth = (double) configClass.getField("RAEVYX_MAX_HEALTH").get(null).getClass().getMethod("get").invoke(configClass.getField("RAEVYX_MAX_HEALTH").get(null));
+            armor = (double) configClass.getField("RAEVYX_ATTACK_DAMAGE").get(null).getClass().getMethod("get").invoke(configClass.getField("RAEVYX_ATTACK_DAMAGE").get(null));
+            flyingSpeed = (double) configClass.getField("RAEVYX_FLYING_SPEED").get(null).getClass().getMethod("get").invoke(configClass.getField("RAEVYX_FLYING_SPEED").get(null));
+            tamingChanceBase = (double) configClass.getField("RAEVYX_TAMING_CHANCE_BASE").get(null).getClass().getMethod("get").invoke(configClass.getField("RAEVYX_TAMING_CHANCE_BASE").get(null));
+            tamingChanceHearty = (double) configClass.getField("RAEVYX_TAMING_CHANCE_HEARTY").get(null).getClass().getMethod("get").invoke(configClass.getField("RAEVYX_TAMING_CHANCE_HEARTY").get(null));
+            legacyTaming = (boolean) configClass.getField("RAEVYX_LEGACY_TAMING").get(null).getClass().getMethod("get").invoke(configClass.getField("RAEVYX_LEGACY_TAMING").get(null));
+        } catch (Exception ignored) {
+            // NeoForge config not available (Fabric or config not loaded yet)
+        }
+
         return new DragonAttributeConfig(
-                180.0D,
-                8.0D,
-                0.25D,
-                1.0D,
+                maxHealth,
+                armor,
+                0.0D,  // Movement speed not configurable
+                flyingSpeed,
                 Map.of(
                         "bite", DragonAbilityOverride.ofDamage(15.0D),
                         "lightning_beam", DragonAbilityOverride.ofDamage(35.0D),
@@ -87,20 +127,38 @@ public final class DragonAttributeConfigLoader extends SimpleJsonResourceReloadL
                 Map.of(
                         "run_speed", 0.45D,
                         "walk_speed", 0.25D,
-                        "taming_chance_base", 5.0D,
-                        "taming_chance_hearty", 3.0D
+                        "taming_chance_base", tamingChanceBase,
+                        "taming_chance_hearty", tamingChanceHearty
                 ),
                 Map.of(
-                        "legacy_taming", false
+                        "legacy_taming", legacyTaming
                 )
         );
     }
 
     private static DragonAttributeConfig nulljawDefaults() {
+        double maxHealth = 250.0D;
+        double armor = 8.0D;
+        double swimSpeed = 1.45D;
+        double tamingChance = 6.0D;
+        boolean legacyTaming = false;
+
+        // NeoForge config override (if available)
+        try {
+            Class<?> configClass = Class.forName("com.leon.saintsdragons.neoforge.config.SaintsDragonsNeoForgeConfig");
+            maxHealth = (double) configClass.getField("NULLJAW_MAX_HEALTH").get(null).getClass().getMethod("get").invoke(configClass.getField("NULLJAW_MAX_HEALTH").get(null));
+            armor = (double) configClass.getField("NULLJAW_ATTACK_DAMAGE").get(null).getClass().getMethod("get").invoke(configClass.getField("NULLJAW_ATTACK_DAMAGE").get(null));
+            swimSpeed = (double) configClass.getField("NULLJAW_SWIM_SPEED").get(null).getClass().getMethod("get").invoke(configClass.getField("NULLJAW_SWIM_SPEED").get(null));
+            tamingChance = (double) configClass.getField("NULLJAW_TAMING_CHANCE").get(null).getClass().getMethod("get").invoke(configClass.getField("NULLJAW_TAMING_CHANCE").get(null));
+            legacyTaming = (boolean) configClass.getField("NULLJAW_LEGACY_TAMING").get(null).getClass().getMethod("get").invoke(configClass.getField("NULLJAW_LEGACY_TAMING").get(null));
+        } catch (Exception ignored) {
+            // NeoForge config not available (Fabric or config not loaded yet)
+        }
+
         return new DragonAttributeConfig(
-                250.0D,
-                8.0D,
-                0.28D,
+                maxHealth,
+                armor,
+                0.0D,  // Movement speed not configurable
                 0.0D,
                 Map.of(
                         "bite_phase1", DragonAbilityOverride.ofDamage(40.0D),
@@ -111,21 +169,41 @@ public final class DragonAttributeConfigLoader extends SimpleJsonResourceReloadL
                 Map.of(
                         "run_speed", 0.28D,
                         "walk_speed", 0.14D,
-                        "swim_speed", 1.45D,
-                        "taming_chance", 6.0D
+                        "swim_speed", swimSpeed,
+                        "taming_chance", tamingChance
                 ),
                 Map.of(
-                        "legacy_taming", false
+                        "legacy_taming", legacyTaming
                 )
         );
     }
 
     private static DragonAttributeConfig ignivorusDefaults() {
+        double maxHealth = 300.0D;
+        double armor = 4.0D;
+        double flyingSpeed = 0.40D;
+        double tamingChanceBase = 7.0D;
+        double tamingChanceHearty = 4.0D;
+        boolean legacyTaming = false;
+
+        // NeoForge config override (if available)
+        try {
+            Class<?> configClass = Class.forName("com.leon.saintsdragons.neoforge.config.SaintsDragonsNeoForgeConfig");
+            maxHealth = (double) configClass.getField("IGNIVORUS_MAX_HEALTH").get(null).getClass().getMethod("get").invoke(configClass.getField("IGNIVORUS_MAX_HEALTH").get(null));
+            armor = (double) configClass.getField("IGNIVORUS_ATTACK_DAMAGE").get(null).getClass().getMethod("get").invoke(configClass.getField("IGNIVORUS_ATTACK_DAMAGE").get(null));
+            flyingSpeed = (double) configClass.getField("IGNIVORUS_FLYING_SPEED").get(null).getClass().getMethod("get").invoke(configClass.getField("IGNIVORUS_FLYING_SPEED").get(null));
+            tamingChanceBase = (double) configClass.getField("IGNIVORUS_TAMING_CHANCE_BASE").get(null).getClass().getMethod("get").invoke(configClass.getField("IGNIVORUS_TAMING_CHANCE_BASE").get(null));
+            tamingChanceHearty = (double) configClass.getField("IGNIVORUS_TAMING_CHANCE_HEARTY").get(null).getClass().getMethod("get").invoke(configClass.getField("IGNIVORUS_TAMING_CHANCE_HEARTY").get(null));
+            legacyTaming = (boolean) configClass.getField("IGNIVORUS_LEGACY_TAMING").get(null).getClass().getMethod("get").invoke(configClass.getField("IGNIVORUS_LEGACY_TAMING").get(null));
+        } catch (Exception ignored) {
+            // NeoForge config not available (Fabric or config not loaded yet)
+        }
+
         return new DragonAttributeConfig(
-                300.0D,
-                4.0D,
-                0.30D,
-                0.40D,
+                maxHealth,
+                armor,
+                0.0D,  // Movement speed not configurable
+                flyingSpeed,
                 Map.of(
                         "bite", DragonAbilityOverride.ofDamage(50.0D),
                         "body_slam", DragonAbilityOverride.ofDamage(40.0D),
@@ -136,12 +214,44 @@ public final class DragonAttributeConfigLoader extends SimpleJsonResourceReloadL
                         "run_speed", 0.60D,
                         "walk_speed", 0.225D,
                         "ultimate_penalty_health", 50.0D,
-                        "taming_chance_base", 7.0D,
-                        "taming_chance_hearty", 4.0D
+                        "taming_chance_base", tamingChanceBase,
+                        "taming_chance_hearty", tamingChanceHearty
                 ),
                 Map.of(
-                        "legacy_taming", false
+                        "legacy_taming", legacyTaming
                 )
+        );
+    }
+
+    private static DragonAttributeConfig stegonautDefaults() {
+        double maxHealth = 80.0D;
+        double armor = 10.0D;
+
+        // NeoForge config override (if available)
+        try {
+            Class<?> configClass = Class.forName("com.leon.saintsdragons.neoforge.config.SaintsDragonsNeoForgeConfig");
+            maxHealth = (double) configClass.getField("STEGONAUT_MAX_HEALTH").get(null).getClass().getMethod("get").invoke(configClass.getField("STEGONAUT_MAX_HEALTH").get(null));
+            armor = (double) configClass.getField("STEGONAUT_ARMOR").get(null).getClass().getMethod("get").invoke(configClass.getField("STEGONAUT_ARMOR").get(null));
+        } catch (Exception ignored) {
+            // NeoForge config not available (Fabric or config not loaded yet)
+        }
+
+        return new DragonAttributeConfig(
+                maxHealth,
+                armor,
+                0.0D,  // Movement speed not configurable
+                0.0D,  // No flying speed
+                Map.of(
+                        "bite", DragonAbilityOverride.ofDamage(8.0D),
+                        "tail_swipe", DragonAbilityOverride.ofDamage(10.0D)
+                ),
+                Map.of(
+                        "run_speed", 0.25D,
+                        "walk_speed", 0.15D,
+                        "taming_chance_base", 3.0D,
+                        "taming_chance_hearty", 2.0D
+                ),
+                Map.of()
         );
     }
 
@@ -378,6 +488,9 @@ public final class DragonAttributeConfigLoader extends SimpleJsonResourceReloadL
             hints.addProperty("run_speed", "Min 0.05, Max 2.5");
             hints.addProperty("walk_speed", "Min 0.01, Max 1.0");
             hints.addProperty("ultimate_penalty_health", "Typical 1-500");
+        } else if (id.equals(STEGONAUT_ID)) {
+            hints.addProperty("run_speed", "Min 0.01, Max 1.0");
+            hints.addProperty("walk_speed", "Min 0.01, Max 0.8");
         }
         return hints;
     }
