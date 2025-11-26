@@ -14,7 +14,7 @@ import software.bernie.geckolib.model.data.EntityModelData;
 public class IgnivorusModel extends DefaultedEntityGeoModel<Ignivorus> {
 
     public IgnivorusModel() {
-        super(SaintsDragonsCommon.rl("ignivorus"));
+        super(SaintsDragonsCommon.rl("ignivorus"), "headController");
     }
 
     private static final ResourceLocation MODEL = SaintsDragonsCommon.rl("geo/entity/ignivorus.geo.json");
