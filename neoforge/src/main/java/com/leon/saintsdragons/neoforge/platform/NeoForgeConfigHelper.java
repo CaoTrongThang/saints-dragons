@@ -1,51 +1,55 @@
 package com.leon.saintsdragons.neoforge.platform;
 
 import com.leon.saintsdragons.platform.ConfigHelper;
+import net.neoforged.neoforge.common.ModConfigSpec;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
- * NeoForge config helper - minimal implementation since we're using direct ModConfigSpec access.
- * Spawn configuration is handled via JSON biome modifiers, not the config system.
+ * NeoForge config helper - builds spawn configuration using ModConfigSpec.
+ * The spec is built here but registered in SaintsDragonsNeoForge.
  */
 public final class NeoForgeConfigHelper implements ConfigHelper {
+    public static ModConfigSpec SPAWN_SPEC;
+
     @Override
     public ConfigBuilder commonBuilder(String fileName) {
         return new NeoForgeBuilder();
     }
 
     private static final class NeoForgeBuilder implements ConfigBuilder {
+        private final ModConfigSpec.Builder builder = new ModConfigSpec.Builder();
+
         @Override
         public void push(String category) {
-            // No-op - not used
+            builder.push(category);
         }
 
         @Override
         public void pop() {
-            // No-op - not used
+            builder.pop();
         }
 
         @Override
         public void comment(String comment) {
-            // No-op - not used
+            builder.comment(comment);
         }
 
         @Override
         public IntValue defineInt(String key, int defaultValue, int min, int max) {
-            // Return default values - spawn config is not used for NeoForge
-            return () -> defaultValue;
+            ModConfigSpec.IntValue value = builder.defineInRange(key, defaultValue, min, max);
+            return value::get;
         }
 
         @Override
         public ListValue defineList(String key, List<String> defaultValue) {
-            // Return default values - spawn config is not used for NeoForge
-            return () -> new ArrayList<>(defaultValue);
+            ModConfigSpec.ConfigValue<List<? extends String>> value = builder.defineList(key, defaultValue, obj -> obj instanceof String);
+            return () -> (List<String>) value.get();
         }
 
         @Override
         public void build() {
-            // No-op - not used
+            SPAWN_SPEC = builder.build();
         }
     }
 }
