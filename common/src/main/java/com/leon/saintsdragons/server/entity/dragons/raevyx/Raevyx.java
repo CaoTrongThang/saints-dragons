@@ -96,7 +96,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 //Just everything
 public class Raevyx extends RideableDragonBase implements FlyingAnimal, RangedAttackMob,
-        DragonFlightCapable, DragonSleepCapable, ShakesScreen, SoundHandledDragon, ElectricalConductivityCapable {
+        DragonFlightCapable, ShakesScreen, SoundHandledDragon, ElectricalConductivityCapable {
     private static final float TAMING_HEALTH_RATIO = 1.0F / 3.0F;
 
     // ===== CONSTANTS =====
@@ -2974,7 +2974,7 @@ public class Raevyx extends RideableDragonBase implements FlyingAnimal, RangedAt
     protected void registerGoals() {
         this.goalSelector.addGoal(0, new com.leon.saintsdragons.server.ai.goals.base.DragonFloatGoal(this));
         this.goalSelector.addGoal(1, new com.leon.saintsdragons.server.ai.goals.base.DragonWaterEscapeGoal(this));
-        this.goalSelector.addGoal(2, new RaevyxSleepGoal(this));
+        // Sleep is handled by DragonSleepBehavior in base class tick
         this.goalSelector.addGoal(3, new RaevyxAirCombatGoal(this));
         this.goalSelector.addGoal(3, new RaevyxGroundCombatGoal(this));
         this.goalSelector.addGoal(5, new SitWhenOrderedToGoal(this));
@@ -3616,6 +3616,21 @@ public class Raevyx extends RideableDragonBase implements FlyingAnimal, RangedAt
         this.sleepCommandSnapshot = -1;
         this.followFailsafeCooldown = 0;
 
+        // Wild wyverns should never persist sit/sleep suppression after reload; reset fully to allow sleep re-evaluation
+        if (!this.isTame()) {
+            this.setCommandAuto(0);
+            this.setOrderedToSit(false);
+            this.setInSittingPose(false);
+            this.sitProgress = 0f;
+            this.prevSitProgress = 0f;
+            this.entityData.set(DATA_SIT_PROGRESS, 0f);
+            this.isSittingDown = false;
+            this.isStandingUp = false;
+            this.sitTransitionTicks = 0;
+            this.sleepReentryCooldownTicks = 0;
+            this.sleepAmbientCooldownTicks = 0;
+        }
+
         // CRITICAL: Set NoGravity for flying dragons on reload (like Cindervane)
         // This prevents dragons from falling when reloading mid-flight
         boolean shouldHaveNoGravity = isFlying() || isHovering();
@@ -4097,14 +4112,9 @@ public class Raevyx extends RideableDragonBase implements FlyingAnimal, RangedAt
     // Note: Most sleep methods already exist in LightningDragonEntity
     
     @Override
-    public DragonSleepCapable.SleepPreferences getSleepPreferences() {
-        return new DragonSleepCapable.SleepPreferences(
-            false, // canSleepAtNight - wild Lightning Dragons are nocturnal, they sleep during day
-            true,  // canSleepDuringDay - wild Lightning Dragons sleep during day
-            true,  // requiresShelter
-            true,  // avoidsThunderstorms (Lightning Dragons should not sleep in storms like other dragons)
-            true   // sleepsNearOwner
-        );
+    public com.leon.saintsdragons.server.entity.behavior.DragonSleepBehavior.DragonSleepPreferences getSleepPreferences() {
+        // Raevyx are daylight sleepers (avoid thunderstorms)
+        return com.leon.saintsdragons.server.entity.behavior.DragonSleepBehavior.DragonSleepPreferences.DIURNAL();
     }
     
     @Override

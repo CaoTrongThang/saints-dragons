@@ -6,6 +6,7 @@ import com.leon.saintsdragons.common.registry.DragonType;
 import com.leon.saintsdragons.server.entity.ability.DragonAbility;
 import com.leon.saintsdragons.server.entity.ability.DragonAbilityType;
 import com.leon.saintsdragons.server.entity.handler.DragonCombatHandler;
+import com.leon.saintsdragons.server.entity.behavior.DragonSleepBehavior;
 import com.leon.saintsdragons.server.entity.interfaces.DragonSoundProfile;
 import com.leon.saintsdragons.server.entity.handler.DragonAllyManager;
 import com.leon.saintsdragons.common.network.DragonAnimTickets;
@@ -78,6 +79,9 @@ public abstract class DragonEntity extends TamableAnimal implements GeoEntity {
     // Ally manager for handling wyvern allies
     public final DragonAllyManager allyManager;
 
+    // Sleep behavior manager
+    public final DragonSleepBehavior sleepBehavior;
+
     // Sit progress fields
     public float sitProgress = 0f;
     public float prevSitProgress = 0f;
@@ -115,6 +119,7 @@ public abstract class DragonEntity extends TamableAnimal implements GeoEntity {
         super(entityType, level);
         this.combatManager = new DragonCombatHandler(this);
         this.allyManager = new DragonAllyManager(this);
+        this.sleepBehavior = new DragonSleepBehavior(this);
         // Set custom look control (lookControl field is protected in Mob)
         this.lookControl = new com.leon.saintsdragons.server.entity.controller.DragonLookControl<>(this);
     }
@@ -550,13 +555,6 @@ public abstract class DragonEntity extends TamableAnimal implements GeoEntity {
     }
 
     /**
-     * Check if the wyvern is transitioning between sleep states
-     */
-    public boolean isSleepTransitioning() {
-        return false;
-    }
-
-    /**
      * Check if the wyvern is flying
      */
     public boolean isFlying() {
@@ -674,6 +672,11 @@ public abstract class DragonEntity extends TamableAnimal implements GeoEntity {
             skipRespawnTicks--;
         }
         tickAbilities();
+
+        // Tick sleep behavior (server-side only)
+        if (!level().isClientSide) {
+            sleepBehavior.tick();
+        }
 
         // Update body rotation to follow head/movement (prevents neck crunching)
         // CRITICAL: Must run on SERVER to keep yBodyRot synced properly
@@ -1067,6 +1070,64 @@ public abstract class DragonEntity extends TamableAnimal implements GeoEntity {
             return false;
         }
         return state.isSolidRender(level, pos) || state.isFaceSturdy(level, pos, net.minecraft.core.Direction.UP);
+    }
+
+    // ===== SLEEP API (override per-dragon) =====
+
+    /**
+     * Check if the dragon is currently sleeping.
+     */
+    public boolean isSleeping() {
+        return false;
+    }
+
+    /**
+     * Check if the dragon is transitioning between sleep states.
+     */
+    public boolean isSleepTransitioning() {
+        return false;
+    }
+
+    /**
+     * Start the sleep enter sequence (sit down -> fall asleep -> sleep).
+     */
+    public void startSleepEnter() {
+        // Override in dragons that support sleeping
+    }
+
+    /**
+     * Start the sleep exit sequence (wake up -> sit up -> stand).
+     */
+    public void startSleepExit() {
+        // Override in dragons that support sleeping
+    }
+
+    /**
+     * Wake up immediately (e.g., on damage).
+     */
+    public void wakeUpImmediately() {
+        // Override in dragons that support sleeping
+    }
+
+    /**
+     * Check if sleep is temporarily suppressed (combat cooldown, etc.).
+     */
+    public boolean isSleepSuppressed() {
+        return false;
+    }
+
+    /**
+     * Get this dragon's sleep preferences (day/night, weather, etc.).
+     */
+    public DragonSleepBehavior.DragonSleepPreferences getSleepPreferences() {
+        return DragonSleepBehavior.DragonSleepPreferences.FLEXIBLE();
+    }
+
+    /**
+     * Check if dragon can sleep right now (custom per-dragon logic).
+     */
+    public boolean canSleepNow() {
+        return true;
     }
 
     // ===== ABSTRACT METHODS =====
