@@ -34,6 +34,13 @@ public class DragonBodyControl extends BodyRotationControl {
             return;
         }
 
+        // Don't rotate body while sleeping - dragons should be completely still
+        if (this.entity instanceof com.leon.saintsdragons.server.entity.base.DragonEntity dragon) {
+            if (dragon.isSleeping() || dragon.isSleepTransitioning()) {
+                return;
+            }
+        }
+
         // Shift history
         for (int i = this.histPosX.length - 1; i > 0; --i) {
             this.histPosX[i] = this.histPosX[i - 1];
@@ -75,6 +82,13 @@ public class DragonBodyControl extends BodyRotationControl {
         // Skip if ridden (rider controls rotation)
         if (this.entity.isVehicle()) {
             return;
+        }
+
+        // Don't rotate body while sleeping - dragons should be completely still
+        if (this.entity instanceof com.leon.saintsdragons.server.entity.base.DragonEntity dragon) {
+            if (dragon.isSleeping() || dragon.isSleepTransitioning()) {
+                return;
+            }
         }
 
         // Shift history
