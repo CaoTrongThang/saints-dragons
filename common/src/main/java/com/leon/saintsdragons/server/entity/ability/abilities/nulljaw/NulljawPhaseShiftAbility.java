@@ -22,15 +22,13 @@ public class NulljawPhaseShiftAbility extends DragonAbility<Nulljaw> {
     private static final int GROUND_TOTAL_SEQUENCE_TICKS = GROUND_START_TICKS + GROUND_MAIN_TICKS + GROUND_END_TICKS; // 122 ticks
 
     // Underwater phase 2 transition - chaining animations (start + main + stop)
-    // TODO: Update these tick values to match your actual animation lengths
     private static final int UNDERWATER_START_TICKS = 38;  // animation.nulljaw.phase2_underwater_start
     private static final int UNDERWATER_MAIN_TICKS = 67;   // animation.nulljaw.phase2_underwater
     private static final int UNDERWATER_STOP_TICKS = 17;   // animation.nulljaw.phase2_underwater_stop
     private static final int UNDERWATER_TOTAL_SEQUENCE_TICKS = UNDERWATER_START_TICKS + UNDERWATER_MAIN_TICKS + UNDERWATER_STOP_TICKS;
 
-    // Lock slightly longer than animations to ensure client EntityData sync completes before movement controller resumes
     // Network delay can cause client to see old phase value for ~5-10 ticks after server toggles it
-    private static final int LOCK_DURATION = 120;
+    private static final int LOCK_DURATION = 100;
 
     private final boolean enteringPhaseTwo;
     private final boolean isGroundTransition;
