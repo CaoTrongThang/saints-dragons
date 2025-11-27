@@ -7934,7 +7934,7 @@
 		"animation.nulljaw.swimming_up": {
 			"loop": true,
 			"bones": {
-				"body": {
+				"root": {
 					"rotation": {
 						"vector": [-20, 0, 0]
 					}
@@ -7944,7 +7944,7 @@
 		"animation.nulljaw.swimming_down": {
 			"loop": true,
 			"bones": {
-				"body": {
+				"root": {
 					"rotation": {
 						"vector": [20, 0, 0]
 					}
