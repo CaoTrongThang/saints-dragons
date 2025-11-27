@@ -1009,9 +1009,6 @@ public class Nulljaw extends RideableDragonBase implements AquaticDragon, Shakes
         DragonAbilityType<?, ?> type = com.leon.saintsdragons.common.registry.AbilityRegistry.get(abilityName);
         if (type != null) {
             combatManager.tryUseAbility(type);
-        } else {
-            // Debug: log if ability type not found
-            System.out.println("[Nulljaw Debug] Ability '" + abilityName + "' not found in registry!");
         }
     }
 
@@ -2134,6 +2131,9 @@ public class Nulljaw extends RideableDragonBase implements AquaticDragon, Shakes
         if (tag.contains("PhaseTwo")) {
             setPhaseTwoActive(tag.getBoolean("PhaseTwo"), false);
         }
+
+        // Apply config attributes when loading from NBT (NeoForge fix)
+        applyConfiguredAttributes();
     }
 
     @Override

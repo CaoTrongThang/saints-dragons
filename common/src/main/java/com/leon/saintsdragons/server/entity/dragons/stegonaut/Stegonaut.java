@@ -1083,8 +1083,9 @@ public class Stegonaut extends DragonEntity implements SoundHandledDragon {
         this.entityData.set(DATA_SLEEPING, false);
         this.entityData.set(DATA_SLEEPING_ENTERING, false);
         this.entityData.set(DATA_SLEEPING_EXITING, false);
+
     }
-    
+
     // ===== DRAKE BINDER FUNCTIONALITY =====
     
     /**

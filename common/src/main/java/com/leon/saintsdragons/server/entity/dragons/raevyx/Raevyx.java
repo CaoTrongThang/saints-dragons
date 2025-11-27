@@ -3647,6 +3647,9 @@ public class Raevyx extends RideableDragonBase implements FlyingAnimal, RangedAt
             this.setCommandAuto(0);
             this.setOrderedToSit(false);
         }
+
+        // Apply config attributes when loading from NBT (NeoForge fix)
+        applyConfiguredAttributes();
     }
 
     /**
