@@ -40,8 +40,8 @@ public class SaintsDragonsNeoForge {
         // Register config screen for in-game editing
         modContainer.registerExtensionPoint(IConfigScreenFactory.class, ConfigurationScreen::new);
 
-        // Dragon attributes are configured via config/saintsdragons/dragon_attributes/*.json
-        // No TOML config needed - JSONs are the source of truth
+        // Dragon attributes are configured via JSON files in config/saintsdragons/dragon_attributes/*.json
+        // These are managed by DragonAttributeConfigLoader and edited directly as JSON
 
         SaintsDragonsCommon.init();
     }

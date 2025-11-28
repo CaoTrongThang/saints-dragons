@@ -59,15 +59,19 @@ public final class DragonAttributeConfigLoader extends SimpleJsonResourceReloadL
         double maxHealth = 80.0D;
         double armor = 4.0D;
         double flyingSpeed = 0.60D;
+        double biteDamage = 12.0D;
+        double magmaVolleyDamage = 20.0D;
         double tamingChanceBase = 4.0D;
         double tamingChanceHearty = 2.0D;
 
         // NeoForge config override (if available)
         try {
-            Class<?> configClass = Class.forName("com.leon.saintsdragons.neoforge.config.SaintsDragonsNeoForgeConfig");
+            Class<?> configClass = Class.forName("com.leon.saintsdragons.neoforge.platform.NeoForgeDragonAttributesConfig");
             maxHealth = (double) configClass.getField("CINDERVANE_MAX_HEALTH").get(null).getClass().getMethod("get").invoke(configClass.getField("CINDERVANE_MAX_HEALTH").get(null));
-            armor = (double) configClass.getField("CINDERVANE_ATTACK_DAMAGE").get(null).getClass().getMethod("get").invoke(configClass.getField("CINDERVANE_ATTACK_DAMAGE").get(null));
+            armor = (double) configClass.getField("CINDERVANE_ARMOR").get(null).getClass().getMethod("get").invoke(configClass.getField("CINDERVANE_ARMOR").get(null));
             flyingSpeed = (double) configClass.getField("CINDERVANE_FLYING_SPEED").get(null).getClass().getMethod("get").invoke(configClass.getField("CINDERVANE_FLYING_SPEED").get(null));
+            biteDamage = (double) configClass.getField("CINDERVANE_BITE_DAMAGE").get(null).getClass().getMethod("get").invoke(configClass.getField("CINDERVANE_BITE_DAMAGE").get(null));
+            magmaVolleyDamage = (double) configClass.getField("CINDERVANE_MAGMA_VOLLEY_DAMAGE").get(null).getClass().getMethod("get").invoke(configClass.getField("CINDERVANE_MAGMA_VOLLEY_DAMAGE").get(null));
             tamingChanceBase = (double) configClass.getField("CINDERVANE_TAMING_CHANCE_BASE").get(null).getClass().getMethod("get").invoke(configClass.getField("CINDERVANE_TAMING_CHANCE_BASE").get(null));
             tamingChanceHearty = (double) configClass.getField("CINDERVANE_TAMING_CHANCE_HEARTY").get(null).getClass().getMethod("get").invoke(configClass.getField("CINDERVANE_TAMING_CHANCE_HEARTY").get(null));
         } catch (Exception ignored) {
@@ -80,12 +84,12 @@ public final class DragonAttributeConfigLoader extends SimpleJsonResourceReloadL
                 0.0D,  // Movement speed not configurable
                 flyingSpeed,
                 Map.of(
-                        "bite", DragonAbilityOverride.ofDamage(12.0D),
-                        "magma_volley", DragonAbilityOverride.ofDamage(20.0D)
+                        "bite", DragonAbilityOverride.ofDamage(biteDamage),
+                        "magma_volley", DragonAbilityOverride.ofDamage(magmaVolleyDamage)
                 ),
                 Map.of(
-                        "run_speed", 0.27D,
-                        "walk_speed", 0.225D,
+                        "run_speed", 0.27D,  // Hardcoded for AI/rider compatibility
+                        "walk_speed", 0.225D,  // Hardcoded for AI/rider compatibility
                         "taming_chance_base", tamingChanceBase,
                         "taming_chance_hearty", tamingChanceHearty
                 ),
@@ -97,16 +101,22 @@ public final class DragonAttributeConfigLoader extends SimpleJsonResourceReloadL
         double maxHealth = 180.0D;
         double armor = 8.0D;
         double flyingSpeed = 1.0D;
+        double biteDamage = 15.0D;
+        double lightningBeamDamage = 35.0D;
+        double hornGoreDamage = 15.0D;
         double tamingChanceBase = 5.0D;
         double tamingChanceHearty = 3.0D;
         boolean legacyTaming = false;
 
         // NeoForge config override (if available)
         try {
-            Class<?> configClass = Class.forName("com.leon.saintsdragons.neoforge.config.SaintsDragonsNeoForgeConfig");
+            Class<?> configClass = Class.forName("com.leon.saintsdragons.neoforge.platform.NeoForgeDragonAttributesConfig");
             maxHealth = (double) configClass.getField("RAEVYX_MAX_HEALTH").get(null).getClass().getMethod("get").invoke(configClass.getField("RAEVYX_MAX_HEALTH").get(null));
-            armor = (double) configClass.getField("RAEVYX_ATTACK_DAMAGE").get(null).getClass().getMethod("get").invoke(configClass.getField("RAEVYX_ATTACK_DAMAGE").get(null));
+            armor = (double) configClass.getField("RAEVYX_ARMOR").get(null).getClass().getMethod("get").invoke(configClass.getField("RAEVYX_ARMOR").get(null));
             flyingSpeed = (double) configClass.getField("RAEVYX_FLYING_SPEED").get(null).getClass().getMethod("get").invoke(configClass.getField("RAEVYX_FLYING_SPEED").get(null));
+            biteDamage = (double) configClass.getField("RAEVYX_BITE_DAMAGE").get(null).getClass().getMethod("get").invoke(configClass.getField("RAEVYX_BITE_DAMAGE").get(null));
+            lightningBeamDamage = (double) configClass.getField("RAEVYX_LIGHTNING_BEAM_DAMAGE").get(null).getClass().getMethod("get").invoke(configClass.getField("RAEVYX_LIGHTNING_BEAM_DAMAGE").get(null));
+            hornGoreDamage = (double) configClass.getField("RAEVYX_HORN_GORE_DAMAGE").get(null).getClass().getMethod("get").invoke(configClass.getField("RAEVYX_HORN_GORE_DAMAGE").get(null));
             tamingChanceBase = (double) configClass.getField("RAEVYX_TAMING_CHANCE_BASE").get(null).getClass().getMethod("get").invoke(configClass.getField("RAEVYX_TAMING_CHANCE_BASE").get(null));
             tamingChanceHearty = (double) configClass.getField("RAEVYX_TAMING_CHANCE_HEARTY").get(null).getClass().getMethod("get").invoke(configClass.getField("RAEVYX_TAMING_CHANCE_HEARTY").get(null));
             legacyTaming = (boolean) configClass.getField("RAEVYX_LEGACY_TAMING").get(null).getClass().getMethod("get").invoke(configClass.getField("RAEVYX_LEGACY_TAMING").get(null));
@@ -120,13 +130,13 @@ public final class DragonAttributeConfigLoader extends SimpleJsonResourceReloadL
                 0.0D,  // Movement speed not configurable
                 flyingSpeed,
                 Map.of(
-                        "bite", DragonAbilityOverride.ofDamage(15.0D),
-                        "lightning_beam", DragonAbilityOverride.ofDamage(35.0D),
-                        "horn_gore", DragonAbilityOverride.ofDamage(15.0D)
+                        "bite", DragonAbilityOverride.ofDamage(biteDamage),
+                        "lightning_beam", DragonAbilityOverride.ofDamage(lightningBeamDamage),
+                        "horn_gore", DragonAbilityOverride.ofDamage(hornGoreDamage)
                 ),
                 Map.of(
-                        "run_speed", 0.45D,
-                        "walk_speed", 0.25D,
+                        "run_speed", 0.45D,  // Hardcoded for AI/rider compatibility
+                        "walk_speed", 0.25D,  // Hardcoded for AI/rider compatibility
                         "taming_chance_base", tamingChanceBase,
                         "taming_chance_hearty", tamingChanceHearty
                 ),
@@ -139,15 +149,23 @@ public final class DragonAttributeConfigLoader extends SimpleJsonResourceReloadL
     private static DragonAttributeConfig nulljawDefaults() {
         double maxHealth = 250.0D;
         double armor = 8.0D;
+        double bitePhase1Damage = 40.0D;
+        double bitePhase2Damage = 50.0D;
+        double hornPhase1Damage = 16.0D;
+        double hornPhase2Damage = 20.8D;
         double swimSpeed = 1.45D;
         double tamingChance = 6.0D;
         boolean legacyTaming = false;
 
         // NeoForge config override (if available)
         try {
-            Class<?> configClass = Class.forName("com.leon.saintsdragons.neoforge.config.SaintsDragonsNeoForgeConfig");
+            Class<?> configClass = Class.forName("com.leon.saintsdragons.neoforge.platform.NeoForgeDragonAttributesConfig");
             maxHealth = (double) configClass.getField("NULLJAW_MAX_HEALTH").get(null).getClass().getMethod("get").invoke(configClass.getField("NULLJAW_MAX_HEALTH").get(null));
-            armor = (double) configClass.getField("NULLJAW_ATTACK_DAMAGE").get(null).getClass().getMethod("get").invoke(configClass.getField("NULLJAW_ATTACK_DAMAGE").get(null));
+            armor = (double) configClass.getField("NULLJAW_ARMOR").get(null).getClass().getMethod("get").invoke(configClass.getField("NULLJAW_ARMOR").get(null));
+            bitePhase1Damage = (double) configClass.getField("NULLJAW_BITE_PHASE1_DAMAGE").get(null).getClass().getMethod("get").invoke(configClass.getField("NULLJAW_BITE_PHASE1_DAMAGE").get(null));
+            bitePhase2Damage = (double) configClass.getField("NULLJAW_BITE_PHASE2_DAMAGE").get(null).getClass().getMethod("get").invoke(configClass.getField("NULLJAW_BITE_PHASE2_DAMAGE").get(null));
+            hornPhase1Damage = (double) configClass.getField("NULLJAW_HORN_GORE_PHASE1_DAMAGE").get(null).getClass().getMethod("get").invoke(configClass.getField("NULLJAW_HORN_GORE_PHASE1_DAMAGE").get(null));
+            hornPhase2Damage = (double) configClass.getField("NULLJAW_HORN_GORE_PHASE2_DAMAGE").get(null).getClass().getMethod("get").invoke(configClass.getField("NULLJAW_HORN_GORE_PHASE2_DAMAGE").get(null));
             swimSpeed = (double) configClass.getField("NULLJAW_SWIM_SPEED").get(null).getClass().getMethod("get").invoke(configClass.getField("NULLJAW_SWIM_SPEED").get(null));
             tamingChance = (double) configClass.getField("NULLJAW_TAMING_CHANCE").get(null).getClass().getMethod("get").invoke(configClass.getField("NULLJAW_TAMING_CHANCE").get(null));
             legacyTaming = (boolean) configClass.getField("NULLJAW_LEGACY_TAMING").get(null).getClass().getMethod("get").invoke(configClass.getField("NULLJAW_LEGACY_TAMING").get(null));
@@ -161,14 +179,14 @@ public final class DragonAttributeConfigLoader extends SimpleJsonResourceReloadL
                 0.0D,  // Movement speed not configurable
                 0.0D,
                 Map.of(
-                        "bite_phase1", DragonAbilityOverride.ofDamage(40.0D),
-                        "bite_phase2", DragonAbilityOverride.ofDamage(50.0D),
-                        "horn_gore_phase1", DragonAbilityOverride.ofDamage(16.0D),
-                        "horn_gore_phase2", DragonAbilityOverride.ofDamage(20.8D)
+                        "bite_phase1", DragonAbilityOverride.ofDamage(bitePhase1Damage),
+                        "bite_phase2", DragonAbilityOverride.ofDamage(bitePhase2Damage),
+                        "horn_gore_phase1", DragonAbilityOverride.ofDamage(hornPhase1Damage),
+                        "horn_gore_phase2", DragonAbilityOverride.ofDamage(hornPhase2Damage)
                 ),
                 Map.of(
-                        "run_speed", 0.28D,
-                        "walk_speed", 0.14D,
+                        "run_speed", 0.28D,  // Hardcoded for AI/rider compatibility
+                        "walk_speed", 0.14D,  // Hardcoded for AI/rider compatibility
                         "swim_speed", swimSpeed,
                         "taming_chance", tamingChance
                 ),
@@ -182,16 +200,26 @@ public final class DragonAttributeConfigLoader extends SimpleJsonResourceReloadL
         double maxHealth = 300.0D;
         double armor = 4.0D;
         double flyingSpeed = 0.40D;
+        double biteDamage = 50.0D;
+        double bodySlamDamage = 40.0D;
+        double fireBreathDamage = 4.0D;
+        double ultimateDamage = 200.0D;
+        double ultimatePenaltyHealth = 50.0D;
         double tamingChanceBase = 7.0D;
         double tamingChanceHearty = 4.0D;
         boolean legacyTaming = false;
 
         // NeoForge config override (if available)
         try {
-            Class<?> configClass = Class.forName("com.leon.saintsdragons.neoforge.config.SaintsDragonsNeoForgeConfig");
+            Class<?> configClass = Class.forName("com.leon.saintsdragons.neoforge.platform.NeoForgeDragonAttributesConfig");
             maxHealth = (double) configClass.getField("IGNIVORUS_MAX_HEALTH").get(null).getClass().getMethod("get").invoke(configClass.getField("IGNIVORUS_MAX_HEALTH").get(null));
-            armor = (double) configClass.getField("IGNIVORUS_ATTACK_DAMAGE").get(null).getClass().getMethod("get").invoke(configClass.getField("IGNIVORUS_ATTACK_DAMAGE").get(null));
+            armor = (double) configClass.getField("IGNIVORUS_ARMOR").get(null).getClass().getMethod("get").invoke(configClass.getField("IGNIVORUS_ARMOR").get(null));
             flyingSpeed = (double) configClass.getField("IGNIVORUS_FLYING_SPEED").get(null).getClass().getMethod("get").invoke(configClass.getField("IGNIVORUS_FLYING_SPEED").get(null));
+            biteDamage = (double) configClass.getField("IGNIVORUS_BITE_DAMAGE").get(null).getClass().getMethod("get").invoke(configClass.getField("IGNIVORUS_BITE_DAMAGE").get(null));
+            bodySlamDamage = (double) configClass.getField("IGNIVORUS_BODY_SLAM_DAMAGE").get(null).getClass().getMethod("get").invoke(configClass.getField("IGNIVORUS_BODY_SLAM_DAMAGE").get(null));
+            fireBreathDamage = (double) configClass.getField("IGNIVORUS_FIRE_BREATH_DAMAGE").get(null).getClass().getMethod("get").invoke(configClass.getField("IGNIVORUS_FIRE_BREATH_DAMAGE").get(null));
+            ultimateDamage = (double) configClass.getField("IGNIVORUS_ULTIMATE_DAMAGE").get(null).getClass().getMethod("get").invoke(configClass.getField("IGNIVORUS_ULTIMATE_DAMAGE").get(null));
+            ultimatePenaltyHealth = (double) configClass.getField("IGNIVORUS_ULTIMATE_PENALTY_HEALTH").get(null).getClass().getMethod("get").invoke(configClass.getField("IGNIVORUS_ULTIMATE_PENALTY_HEALTH").get(null));
             tamingChanceBase = (double) configClass.getField("IGNIVORUS_TAMING_CHANCE_BASE").get(null).getClass().getMethod("get").invoke(configClass.getField("IGNIVORUS_TAMING_CHANCE_BASE").get(null));
             tamingChanceHearty = (double) configClass.getField("IGNIVORUS_TAMING_CHANCE_HEARTY").get(null).getClass().getMethod("get").invoke(configClass.getField("IGNIVORUS_TAMING_CHANCE_HEARTY").get(null));
             legacyTaming = (boolean) configClass.getField("IGNIVORUS_LEGACY_TAMING").get(null).getClass().getMethod("get").invoke(configClass.getField("IGNIVORUS_LEGACY_TAMING").get(null));
@@ -205,15 +233,15 @@ public final class DragonAttributeConfigLoader extends SimpleJsonResourceReloadL
                 0.0D,  // Movement speed not configurable
                 flyingSpeed,
                 Map.of(
-                        "bite", DragonAbilityOverride.ofDamage(50.0D),
-                        "body_slam", DragonAbilityOverride.ofDamage(40.0D),
-                        "fire_breath", DragonAbilityOverride.ofDamage(4.0D),
-                        "ultimate", DragonAbilityOverride.ofDamage(200.0D)
+                        "bite", DragonAbilityOverride.ofDamage(biteDamage),
+                        "body_slam", DragonAbilityOverride.ofDamage(bodySlamDamage),
+                        "fire_breath", DragonAbilityOverride.ofDamage(fireBreathDamage),
+                        "ultimate", DragonAbilityOverride.ofDamage(ultimateDamage)
                 ),
                 Map.of(
-                        "run_speed", 0.60D,
-                        "walk_speed", 0.225D,
-                        "ultimate_penalty_health", 50.0D,
+                        "run_speed", 0.60D,  // Hardcoded for AI/rider compatibility
+                        "walk_speed", 0.225D,  // Hardcoded for AI/rider compatibility
+                        "ultimate_penalty_health", ultimatePenaltyHealth,
                         "taming_chance_base", tamingChanceBase,
                         "taming_chance_hearty", tamingChanceHearty
                 ),
