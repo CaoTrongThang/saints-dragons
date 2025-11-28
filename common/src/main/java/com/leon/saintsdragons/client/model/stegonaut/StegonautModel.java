@@ -52,7 +52,7 @@ public class StegonautModel extends DefaultedEntityGeoModel<Stegonaut> {
     }
 
     private void applyBodyRotationDeviation(Stegonaut entity, float partialTick) {
-        var rootOpt = getBone("body");
+        var rootOpt = getBone("root");
         if (rootOpt.isEmpty()) {
             return;
         }
