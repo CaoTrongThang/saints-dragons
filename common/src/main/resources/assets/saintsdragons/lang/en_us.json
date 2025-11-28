@@ -407,6 +407,31 @@
   "saintsdragons.configuration.ignivorus_attributes.flyingSpeed": "Flying Speed",
   "saintsdragons.configuration.ignivorus_attributes.tamingChanceBase": "Taming Chance (Base Food)",
   "saintsdragons.configuration.ignivorus_attributes.tamingChanceHearty": "Taming Chance (Hearty Meal)",
-  "saintsdragons.configuration.ignivorus_attributes.legacyTaming": "Legacy Taming"
+  "saintsdragons.configuration.ignivorus_attributes.legacyTaming": "Legacy Taming",
+
+  "saintsdragons.config.raevyxSpawnWeight": "Raevyx Spawn Weight",
+  "saintsdragons.config.raevyxMinGroupSize": "Raevyx Min Group Size",
+  "saintsdragons.config.raevyxMaxGroupSize": "Raevyx Max Group Size",
+  "saintsdragons.config.raevyxAdditionalBiomes": "Raevyx Additional Biomes",
+
+  "saintsdragons.config.stegonautSpawnWeight": "Stegonaut Spawn Weight",
+  "saintsdragons.config.stegonautMinGroupSize": "Stegonaut Min Group Size",
+  "saintsdragons.config.stegonautMaxGroupSize": "Stegonaut Max Group Size",
+  "saintsdragons.config.stegonautAdditionalBiomes": "Stegonaut Additional Biomes",
+
+  "saintsdragons.config.cindervaneSpawnWeight": "Cindervane Spawn Weight",
+  "saintsdragons.config.cindervaneMinGroupSize": "Cindervane Min Group Size",
+  "saintsdragons.config.cindervaneMaxGroupSize": "Cindervane Max Group Size",
+  "saintsdragons.config.cindervaneAdditionalBiomes": "Cindervane Additional Biomes",
+
+  "saintsdragons.config.nulljawSpawnWeight": "Nulljaw Spawn Weight",
+  "saintsdragons.config.nulljawMinGroupSize": "Nulljaw Min Group Size",
+  "saintsdragons.config.nulljawMaxGroupSize": "Nulljaw Max Group Size",
+  "saintsdragons.config.nulljawAdditionalBiomes": "Nulljaw Additional Biomes",
+
+  "saintsdragons.config.ignivorusSpawnWeight": "Ignivorus Spawn Weight",
+  "saintsdragons.config.ignivorusMinGroupSize": "Ignivorus Min Group Size",
+  "saintsdragons.config.ignivorusMaxGroupSize": "Ignivorus Max Group Size",
+  "saintsdragons.config.ignivorusAdditionalBiomes": "Ignivorus Additional Biomes"
 }
 

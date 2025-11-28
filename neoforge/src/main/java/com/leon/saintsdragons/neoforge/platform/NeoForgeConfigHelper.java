@@ -36,6 +36,11 @@ public final class NeoForgeConfigHelper implements ConfigHelper {
         }
 
         @Override
+        public void translation(String translationKey) {
+            builder.translation(translationKey);
+        }
+
+        @Override
         public IntValue defineInt(String key, int defaultValue, int min, int max) {
             ModConfigSpec.IntValue value = builder.defineInRange(key, defaultValue, min, max);
             return value::get;
@@ -43,7 +48,12 @@ public final class NeoForgeConfigHelper implements ConfigHelper {
 
         @Override
         public ListValue defineList(String key, List<String> defaultValue) {
-            ModConfigSpec.ConfigValue<List<? extends String>> value = builder.defineList(key, defaultValue, obj -> obj instanceof String);
+            ModConfigSpec.ConfigValue<List<? extends String>> value = builder.defineListAllowEmpty(
+                    key,
+                    defaultValue,
+                    () -> "",  // Default value when adding new entry - empty string for player to type
+                    obj -> obj instanceof String
+            );
             return () -> (List<String>) value.get();
         }
 

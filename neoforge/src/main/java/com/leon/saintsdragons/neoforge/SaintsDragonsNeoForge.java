@@ -1,6 +1,7 @@
 package com.leon.saintsdragons.neoforge;
 
 import com.leon.saintsdragons.common.SaintsDragonsCommon;
+import com.leon.saintsdragons.common.config.dragon.DragonAttributeConfigLoader;
 import com.leon.saintsdragons.neoforge.world.AddDragonsBiomeModifier;
 import com.mojang.serialization.MapCodec;
 import net.neoforged.bus.api.IEventBus;
@@ -9,7 +10,9 @@ import net.neoforged.fml.common.Mod;
 import net.neoforged.fml.config.ModConfig;
 import net.neoforged.neoforge.client.gui.ConfigurationScreen;
 import net.neoforged.neoforge.client.gui.IConfigScreenFactory;
+import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.common.world.BiomeModifier;
+import net.neoforged.neoforge.event.AddReloadListenerEvent;
 import net.neoforged.neoforge.registries.DeferredRegister;
 import net.neoforged.neoforge.registries.NeoForgeRegistries;
 
@@ -40,9 +43,13 @@ public class SaintsDragonsNeoForge {
         // Register config screen for in-game editing
         modContainer.registerExtensionPoint(IConfigScreenFactory.class, ConfigurationScreen::new);
 
-        // Dragon attributes are configured via JSON files in config/saintsdragons/dragon_attributes/*.json
-        // These are managed by DragonAttributeConfigLoader and edited directly as JSON
+        // Register dragon attributes reload listener
+        NeoForge.EVENT_BUS.addListener(this::onAddReloadListeners);
 
         SaintsDragonsCommon.init();
+    }
+
+    private void onAddReloadListeners(AddReloadListenerEvent event) {
+        event.addListener(DragonAttributeConfigLoader.getInstance());
     }
 }

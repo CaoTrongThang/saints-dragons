@@ -12,6 +12,8 @@ public interface ConfigHelper {
 
         void comment(String comment);
 
+        void translation(String translationKey);
+
         IntValue defineInt(String key, int defaultValue, int min, int max);
 
         ListValue defineList(String key, List<String> defaultValue);

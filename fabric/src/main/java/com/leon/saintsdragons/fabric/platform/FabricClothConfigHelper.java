@@ -60,6 +60,11 @@ final class FabricClothConfigHelper implements ConfigHelper {
         }
 
         @Override
+        public void translation(String translationKey) {
+            // No-op - Fabric uses annotations for translations
+        }
+
+        @Override
         public IntValue defineInt(String key, int defaultValue, int min, int max) {
             IntSupplier supplier = supplierForKey(key, defaultValue);
             return new ClothIntValue(supplier, min, max);

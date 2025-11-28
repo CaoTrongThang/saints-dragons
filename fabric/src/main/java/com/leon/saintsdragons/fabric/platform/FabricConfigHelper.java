@@ -54,6 +54,11 @@ public final class FabricConfigHelper implements ConfigHelper {
             }
 
             @Override
+            public void translation(String translationKey) {
+                // No-op - not needed for default config
+            }
+
+            @Override
             public IntValue defineInt(String key, int defaultValue, int min, int max) {
                 return () -> Math.max(min, Math.min(max, defaultValue));
             }
