@@ -20,10 +20,29 @@ public class DragonBodyControl extends BodyRotationControl {
     private final double[] histPosZ = new double[HISTORY_SIZE];
     private final float turnSpeed;
 
+    // CRITICAL: Max head rotation relative to body (prevents neck-crunching and 360 spins)
+    // When head tries to rotate beyond this, body MUST turn instead
+    private final float maxHeadBodyDiff;
+
+    // Rotation speed parameters
+    private final float headLagSpeed;        // How fast head follows target while standing
+    private final float bodyLagStillSpeed;   // How fast body follows head while standing
+    private final float bodyMaxDelta;        // Max degrees body can rotate per tick
+
     public DragonBodyControl(Mob entity, float turnSpeed) {
+        // Slightly faster standing spin (bodyLagStillSpeed 0.1 -> body catches up quicker when idle)
+        this(entity, turnSpeed, 50.0f, 0.3f, 0.10f, 45.0f);
+    }
+
+    public DragonBodyControl(Mob entity, float turnSpeed, float maxHeadBodyDiff,
+                             float headLagSpeed, float bodyLagStillSpeed, float bodyMaxDelta) {
         super(entity);
         this.entity = entity;
         this.turnSpeed = turnSpeed;
+        this.maxHeadBodyDiff = maxHeadBodyDiff;
+        this.headLagSpeed = headLagSpeed;
+        this.bodyLagStillSpeed = bodyLagStillSpeed;
+        this.bodyMaxDelta = bodyMaxDelta;
     }
 
     @Override
@@ -32,13 +51,6 @@ public class DragonBodyControl extends BodyRotationControl {
         // CRITICAL: Also skip for observers - let vanilla sync handle body rotation!
         if (this.entity.isVehicle()) {
             return;
-        }
-
-        // Don't rotate body while sleeping - dragons should be completely still
-        if (this.entity instanceof com.leon.saintsdragons.server.entity.base.DragonEntity dragon) {
-            if (dragon.isSleeping() || dragon.isSleepTransitioning()) {
-                return;
-            }
         }
 
         // Shift history
@@ -59,18 +71,22 @@ public class DragonBodyControl extends BodyRotationControl {
             // Calculate movement direction
             double moveAngle = Math.toDegrees(Mth.atan2(dz, dx)) - 90.0;
 
-            // ALWAYS align body to movement direction to prevent backwards walking
-            // This forces the dragon to turn around instead of walking backwards with bent neck
-            this.entity.yBodyRot = (float)(this.entity.yBodyRot + Mth.wrapDegrees(moveAngle - this.entity.yBodyRot) * this.turnSpeed);
+            // Gradually turn body toward movement direction (like Naturalist)
+            // This prevents instant snapping while still preventing backwards walking
+            this.entity.yBodyRot = approach((float)moveAngle, this.entity.yBodyRot, this.bodyMaxDelta, this.turnSpeed);
 
             this.targetYawHead = this.entity.yHeadRot;
         }
         // If standing still
         else {
-            // Body gradually follows head
-            this.targetYawHead = smooth(this.targetYawHead, this.entity.yHeadRot, 0.3f);
-            this.entity.yBodyRot = approach(this.targetYawHead, this.entity.yBodyRot, 75.0f);
+            // Body gradually follows head (SLOW for natural behavior)
+            this.targetYawHead = smooth(this.targetYawHead, this.entity.yHeadRot, this.headLagSpeed);
+            this.entity.yBodyRot = approach(this.targetYawHead, this.entity.yBodyRot, this.bodyMaxDelta, this.bodyLagStillSpeed);
         }
+
+        // CRITICAL: Clamp head rotation relative to body to prevent neck-crunching
+        // This forces the body to turn when the head looks too far back
+        clampHeadBodyDifference();
     }
 
     /**
@@ -84,13 +100,6 @@ public class DragonBodyControl extends BodyRotationControl {
             return;
         }
 
-        // Don't rotate body while sleeping - dragons should be completely still
-        if (this.entity instanceof com.leon.saintsdragons.server.entity.base.DragonEntity dragon) {
-            if (dragon.isSleeping() || dragon.isSleepTransitioning()) {
-                return;
-            }
-        }
-
         // Shift history
         for (int i = this.histPosX.length - 1; i > 0; --i) {
             this.histPosX[i] = this.histPosX[i - 1];
@@ -109,18 +118,36 @@ public class DragonBodyControl extends BodyRotationControl {
             // Calculate movement direction
             double moveAngle = Math.toDegrees(Mth.atan2(dz, dx)) - 90.0;
 
-            // ALWAYS align body to movement direction to prevent backwards walking
-            // This forces the dragon to turn around instead of walking backwards with bent neck
-            this.entity.yBodyRot = (float)(this.entity.yBodyRot + Mth.wrapDegrees(moveAngle - this.entity.yBodyRot) * this.turnSpeed);
+            // Gradually turn body toward movement direction (like Naturalist)
+            // This prevents instant snapping while still preventing backwards walking
+            this.entity.yBodyRot = approach((float)moveAngle, this.entity.yBodyRot, this.bodyMaxDelta, this.turnSpeed);
 
             this.targetYawHead = this.entity.yHeadRot;
         }
         // If standing still
         else {
-            // Body gradually follows head
-            this.targetYawHead = smooth(this.targetYawHead, this.entity.yHeadRot, 0.3f);
-            this.entity.yBodyRot = approach(this.targetYawHead, this.entity.yBodyRot, 75.0f);
+            // Body gradually follows head (SLOW for natural behavior)
+            this.targetYawHead = smooth(this.targetYawHead, this.entity.yHeadRot, this.headLagSpeed);
+            this.entity.yBodyRot = approach(this.targetYawHead, this.entity.yBodyRot, this.bodyMaxDelta, this.bodyLagStillSpeed);
         }
+
+        // CRITICAL: Clamp head rotation relative to body to prevent neck-crunching
+        // This forces the body to turn when the head looks too far back
+        clampHeadBodyDifference();
+    }
+
+    /**
+     * CRITICAL FIX: Clamps head rotation relative to body.
+     * Without this, the head can rotate 180° from the body, causing:
+     * 1. Neck bones to "crunch" visually
+     * 2. Body to do a full 360° spin to catch up
+     * With this, when the head reaches maxHeadBodyDiff, the body is FORCED to turn,
+     * preventing the 360 spin and keeping the neck bones natural.
+     */
+    private void clampHeadBodyDifference() {
+        float diff = Mth.wrapDegrees(this.entity.yHeadRot - this.entity.yBodyRot);
+        float clamped = Mth.clamp(diff, -this.maxHeadBodyDiff, this.maxHeadBodyDiff);
+        this.entity.yHeadRot = this.entity.yBodyRot + clamped;
     }
 
     /**
@@ -134,11 +161,12 @@ public class DragonBodyControl extends BodyRotationControl {
      * Calculate mean of 5 consecutive values starting at index.
      */
     private double mean(double[] arr, int start) {
-        double mean = 0.0;
-        for (int i = 0; i < 5; ++i) {
-            mean += arr[i + start];
+        double sum = 0.0;
+        int count = arr.length / 2; // always average 5 entries (half of HISTORY_SIZE)
+        for (int i = 0; i < count; ++i) {
+            sum += arr[i + start];
         }
-        return mean / (double)arr.length;
+        return sum / (double) count;
     }
 
     /**
@@ -149,15 +177,11 @@ public class DragonBodyControl extends BodyRotationControl {
     }
 
     /**
-     * Approach target rotation with a maximum delta limit.
+     * Approach target rotation with a maximum delta limit and speed factor.
      */
-    private static float approach(float target, float current, float limit) {
-        float delta = Mth.wrapDegrees(current - target);
-        if (delta < -limit) {
-            delta = -limit;
-        } else if (delta >= limit) {
-            delta = limit;
-        }
-        return target + delta * 0.55f;
+    private static float approach(float target, float current, float maxDelta, float speed) {
+        float delta = Mth.wrapDegrees(target - current);
+        delta = Mth.clamp(delta, -maxDelta, maxDelta);
+        return current + delta * speed;
     }
 }

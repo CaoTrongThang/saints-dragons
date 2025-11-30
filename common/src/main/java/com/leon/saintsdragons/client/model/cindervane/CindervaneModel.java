@@ -11,6 +11,7 @@ import software.bernie.geckolib.model.DefaultedEntityGeoModel;
 import software.bernie.geckolib.model.data.EntityModelData;
 
 public class CindervaneModel extends DefaultedEntityGeoModel<Cindervane> {
+
     public CindervaneModel() {
         super(SaintsDragonsCommon.rl("cindervane"));
     }
@@ -19,6 +20,7 @@ public class CindervaneModel extends DefaultedEntityGeoModel<Cindervane> {
     private static final ResourceLocation ANIM = SaintsDragonsCommon.rl("animations/entity/cindervane.animation.json");
     private static final ResourceLocation MALE_TEXTURE = SaintsDragonsCommon.rl("textures/entity/cindervane/cindervane.png");
     private static final ResourceLocation FEMALE_TEXTURE = SaintsDragonsCommon.rl("textures/entity/cindervane/cindervane_female.png");
+
 
 
     @Override
@@ -92,9 +94,9 @@ public class CindervaneModel extends DefaultedEntityGeoModel<Cindervane> {
         float bankAngleDeg = entity.getBankAngleDegrees(partialTick);
         float neckLeanRad = -(bankAngleDeg / 45.0f) * 30.0f * Mth.DEG_TO_RAD;
 
-        applyNeckBoneRotation("neck1", neckLeanRad * 0.5f);
-        applyNeckBoneRotation("neck2", neckLeanRad * 1.0f);
-        applyNeckBoneRotation("skull", neckLeanRad * 1.25f);
+        applyNeckBoneRotation("neck1Controller", neckLeanRad * 0.5f);
+        applyNeckBoneRotation("neck2Controller", neckLeanRad * 1.0f);
+        applyNeckBoneRotation("skullController", neckLeanRad * 1.25f);
     }
 
     private void applyGroundNeckTurn(Cindervane entity, float partialTick) {
@@ -108,8 +110,8 @@ public class CindervaneModel extends DefaultedEntityGeoModel<Cindervane> {
 
         float turnRad = (float)(-velocity * Mth.DEG_TO_RAD);
 
-        applyNeckBoneRotation("neck1", turnRad * 0.5f);
-        applyNeckBoneRotation("neck2", turnRad * 1.0f);
+        applyNeckBoneRotation("neck1Controller", turnRad * 0.5f);
+        applyNeckBoneRotation("neck2Controller", turnRad * 1.0f);
     }
 
     private void applyNeckBoneRotation(String boneName, float rotationY) {
@@ -123,16 +125,18 @@ public class CindervaneModel extends DefaultedEntityGeoModel<Cindervane> {
     }
 
     private void applyNeckFollow(Cindervane entity, EntityModelData modelData, float partialTick) {
-        double bodyDeviation = entity.bodyRotDeviation.get(partialTick);
+
         float lookYawRad = modelData.netHeadYaw() * Mth.DEG_TO_RAD;
+        float lookPitchRad = modelData.headPitch() * Mth.DEG_TO_RAD;
+
+        double bodyDeviation = entity.bodyRotDeviation.get(partialTick);
         float structuralYawRad = (float)(bodyDeviation * 2.0 * Mth.DEG_TO_RAD);
         float totalYawRad = lookYawRad + structuralYawRad;
-        totalYawRad = Mth.clamp(totalYawRad, -60.0f * Mth.DEG_TO_RAD, 60.0f * Mth.DEG_TO_RAD);
-        float lookPitchRad = Mth.clamp(modelData.headPitch(), -20.0f, 20.0f) * Mth.DEG_TO_RAD;
-        applyNeckBoneFollow("neck1", lookPitchRad, totalYawRad, 0.35f);
-        applyNeckBoneFollow("neck2", lookPitchRad, totalYawRad, 0.55f);
-        applyNeckBoneFollow("neck3", lookPitchRad, totalYawRad, 0.70f);
-        applyNeckBoneFollow("skull", lookPitchRad, totalYawRad, 0.80f);
+
+        // Distribute rotation across neck segments (DragonBodyControl prevents over-rotation)
+        applyNeckBoneFollow("neck1Controller", lookPitchRad, totalYawRad, 0.35f);
+        applyNeckBoneFollow("neck2Controller", lookPitchRad, totalYawRad, 0.55f);
+        applyNeckBoneFollow("skullController", lookPitchRad, totalYawRad, 0.60f);
     }
 
     private void applyNeckBoneFollow(String boneName, float headDeltaX, float headDeltaY, float weight) {
