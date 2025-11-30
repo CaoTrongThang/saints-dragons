@@ -140,7 +140,17 @@ public record NulljawAnimationHandler(Nulljaw drake) {
 
     public PlayState movementPredicate(AnimationState<Nulljaw> state) {
 
-        if (drake.isDying() || drake.isSleeping() || drake.isSleepingEntering() || drake.isSleepingExiting()) {
+        if (drake.isDying()) {
+            return PlayState.STOP;
+        }
+
+        // Handle sleep: continuous animation for sleep loop, stop for transitions
+        if (drake.isSleeping() && !drake.isSleepingEntering() && !drake.isSleepingExiting()) {
+            state.getController().transitionLength(6);
+            state.setAndContinue(SLEEP_LOOP);
+            return PlayState.CONTINUE;
+        } else if (drake.isSleepingEntering() || drake.isSleepingExiting()) {
+            // Transition animations are triggered, don't interfere
             return PlayState.STOP;
         }
 
@@ -193,10 +203,6 @@ public record NulljawAnimationHandler(Nulljaw drake) {
 
             RawAnimation swimAnim = isSwimmingMoving ? SWIM_CRUISE : SWIM_IDLE;
             state.setAnimation(swimAnim);
-        } else if (drake.isSleeping() || drake.isSleepingEntering() || drake.isSleepingExiting()) {
-            // CRITICAL: Stop movement controller during sleep transitions
-            // This prevents idle/walk animations from competing with sleep animations (flickering)
-            return PlayState.STOP;
         } else if (drake.getSitProgress() > 0.5f) {
             // Drive SIT from our custom progress system only to avoid de-sync
             // Use phase 2 sitting animation when phase 2 is active

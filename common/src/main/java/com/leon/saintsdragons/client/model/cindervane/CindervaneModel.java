@@ -57,7 +57,7 @@ public class CindervaneModel extends DefaultedEntityGeoModel<Cindervane> {
         return ANIM;
     }
     private void applyBodyRotationDeviation(Cindervane entity, float partialTick) {
-        var rootOpt = getBone("root");
+        var rootOpt = getBone("body");
         if (rootOpt.isEmpty()) {
             return;
         }

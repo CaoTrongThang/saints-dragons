@@ -54,7 +54,7 @@ public class NulljawModel extends DefaultedEntityGeoModel<Nulljaw> {
     }
 
     private void applyBodyRotationDeviation(Nulljaw entity, float partialTick) {
-        var rootOpt = getBone("root");
+        var rootOpt = getBone("body");
         if (rootOpt.isEmpty()) {
             return;
         }
