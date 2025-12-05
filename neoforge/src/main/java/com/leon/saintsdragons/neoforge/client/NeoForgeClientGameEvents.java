@@ -13,6 +13,7 @@ import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.client.event.ClientTickEvent;
+import net.neoforged.neoforge.client.event.RenderGuiLayerEvent;
 import net.neoforged.neoforge.client.event.ViewportEvent;
 import net.neoforged.neoforge.event.tick.PlayerTickEvent;
 
@@ -34,8 +35,11 @@ public final class NeoForgeClientGameEvents {
 
     @SubscribeEvent
     public static void onClientTick(ClientTickEvent.Post event) {
+        Minecraft mc = Minecraft.getInstance();
         // Drive client-only sound controllers each tick
-        NeoForgeClientEventHandler.onClientTick(Minecraft.getInstance());
+        NeoForgeClientEventHandler.onClientTick(mc);
+        // Handle dragon UI toggle and updates
+        NeoForgeDragonUI.tick(mc);
     }
 
     @SubscribeEvent
@@ -136,5 +140,11 @@ public final class NeoForgeClientGameEvents {
         } else {
             currentFOVMultiplier = 1.0;
         }
+    }
+
+    @SubscribeEvent
+    public static void onRenderGuiLayer(RenderGuiLayerEvent.Post event) {
+        // Render dragon status UI overlay
+        NeoForgeDragonUI.renderHud(event);
     }
 }
