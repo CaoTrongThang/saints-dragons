@@ -14,13 +14,19 @@ public final class NeoForgeDataComponentHelper implements DataComponentHelper {
     private final DeferredRegister<DataComponentType<?>> deferred =
             DeferredRegister.create(BuiltInRegistries.DATA_COMPONENT_TYPE, SaintsDragonsCommon.MOD_ID);
 
+    private boolean registered = false;
+
     public NeoForgeDataComponentHelper() {
-        // Attach the deferred register to the mod event bus.
-        deferred.register(NeoForgeModContext.getModEventBus());
+        // Don't register yet - wait for explicit call
     }
 
     @Override
     public <T> Supplier<DataComponentType<T>> register(ResourceLocation id, DataComponentType.Builder<T> builder) {
+        // Lazy registration: attach to event bus on first register call
+        if (!registered) {
+            deferred.register(NeoForgeModContext.getModEventBus());
+            registered = true;
+        }
         return deferred.register(id.getPath(), () -> builder.build());
     }
 }

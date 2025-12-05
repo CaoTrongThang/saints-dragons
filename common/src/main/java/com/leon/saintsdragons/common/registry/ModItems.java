@@ -76,6 +76,7 @@ public final class ModItems {
                             new Item.Properties()
                                     .stacksTo(1)
                                     .durability(0)
+                                    .component(ModDataComponents.BINDER_DATA.get(), com.leon.saintsdragons.common.component.BinderData.EMPTY)
                     ));
 
     public static final Supplier<Item> RAEVYX_BINDER =
@@ -84,6 +85,7 @@ public final class ModItems {
                             new Item.Properties()
                                     .stacksTo(1)
                                     .durability(0)
+                                    .component(ModDataComponents.BINDER_DATA.get(), com.leon.saintsdragons.common.component.BinderData.EMPTY)
                     ));
 
     public static final Supplier<Item> CINDERVANE_BINDER =
@@ -92,6 +94,7 @@ public final class ModItems {
                             new Item.Properties()
                                     .stacksTo(1)
                                     .durability(0)
+                                    .component(ModDataComponents.BINDER_DATA.get(), com.leon.saintsdragons.common.component.BinderData.EMPTY)
                     ));
 
     public static final Supplier<Item> NULLJAW_BINDER =
@@ -100,6 +103,7 @@ public final class ModItems {
                             new Item.Properties()
                                     .stacksTo(1)
                                     .durability(0)
+                                    .component(ModDataComponents.BINDER_DATA.get(), com.leon.saintsdragons.common.component.BinderData.EMPTY)
                     ));
     public static final Supplier<Item> IGNIVORUS_BINDER =
             REGISTER.register("ignivorus_binder",
@@ -107,6 +111,7 @@ public final class ModItems {
                             new Item.Properties()
                                     .stacksTo(1)
                                     .durability(0)
+                                    .component(ModDataComponents.BINDER_DATA.get(), com.leon.saintsdragons.common.component.BinderData.EMPTY)
                     ));
 
     public static final Supplier<Item> HEARTY_DRAGON_MEAL =
