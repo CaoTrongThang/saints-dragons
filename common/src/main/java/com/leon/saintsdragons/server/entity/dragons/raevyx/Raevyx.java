@@ -2404,9 +2404,17 @@ public class Raevyx extends RideableDragonBase implements FlyingAnimal, RangedAt
     
     private void tickRiderLandingBlendTimer() {
         if (!isVehicle() || !isFlying() || onGround()) {
+            // If we were actively landing and now touched ground, trigger landed animation
+            boolean wasLanding = riderLandingBlendTicks > 0 && isRiderLandingBlendActive();
             riderLandingBlendTicks = 0;
             if (!level().isClientSide) {
                 this.entityData.set(DATA_RIDER_LANDING_BLEND, false);
+
+                // Trigger landed animation when rider landing completes
+                if (wasLanding && onGround() && isVehicle()) {
+                    triggerAnim("action", "landed");
+                    lockRiderControls(30);  // Lock controls for 1.50 seconds while animation plays
+                }
             }
             return;
         }
@@ -2600,7 +2608,7 @@ public class Raevyx extends RideableDragonBase implements FlyingAnimal, RangedAt
      */
     private void handleAmbientSounds() {
         // Suppress ambient sounds during transitions to prevent animation snapping
-        if (isBaby() || isDying() || isSleeping() || isSleepTransitioning() || isInSitTransition() || sleepAmbientCooldownTicks > 0) return;
+        if (isBaby() || isDying() || isSleeping() || isSleepTransitioning() || isInSitTransition() || sleepAmbientCooldownTicks > 0 || areRiderControlsLocked()) return;
         ambientSoundTimer++;
 
         // Time to make some noise?

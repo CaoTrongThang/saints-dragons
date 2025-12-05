@@ -96,6 +96,9 @@ public class Ignivorus extends RideableDragonBase implements DragonFlightCapable
     public static final EntityDataAccessor<Boolean> DATA_LANDING =
             SynchedEntityData.defineId(Ignivorus.class, EntityDataSerializers.BOOLEAN);
 
+    public static final EntityDataAccessor<Boolean> DATA_RIDER_LANDING_BLEND =
+            SynchedEntityData.defineId(Ignivorus.class, EntityDataSerializers.BOOLEAN);
+
     public static final EntityDataAccessor<Boolean> DATA_RUNNING =
             SynchedEntityData.defineId(Ignivorus.class, EntityDataSerializers.BOOLEAN);
 
@@ -171,10 +174,8 @@ public class Ignivorus extends RideableDragonBase implements DragonFlightCapable
     public static final int RIDER_WATER_SCAN_DEPTH = 8;
     private static final double WATER_EFFECT_MAX_HEIGHT = 8.0D;
     private static final double WATER_EFFECT_INTENSITY = 1.15D;
-    private static final double LANDING_TRIGGER_ALTITUDE = 6.0D;
-    private static final double LANDING_RELEASE_ALTITUDE = 8.5D;
-    private static final double LANDING_DESCENT_SPEED = -0.02D;
-    private static final int LANDING_HYSTERESIS_TICKS = 6;
+    private static final double RIDER_LANDING_BLEND_ALTITUDE = 8.0D;
+    private static final int RIDER_LANDING_BLEND_DURATION = 5;
 
     // Vocal entries (placeholder - sounds to be added later)
     private static final Map<String, VocalEntry> VOCAL_ENTRIES =
@@ -215,7 +216,7 @@ public class Ignivorus extends RideableDragonBase implements DragonFlightCapable
     private int airTicks;
     public int groundTicks;
     private int riderControlLockTicks;
-    private int landingApproachTicks;
+    private int riderLandingBlendTicks = 0;
 
     // ===== HARDCODED GROUND SPEEDS =====
     public static final double RIDER_WALK_SPEED = 0.225D;
@@ -329,6 +330,7 @@ public class Ignivorus extends RideableDragonBase implements DragonFlightCapable
         builder.define(DATA_TAKEOFF, false);
         builder.define(DATA_HOVERING, false);
         builder.define(DATA_LANDING, false);
+        builder.define(DATA_RIDER_LANDING_BLEND, false);
         builder.define(DATA_RUNNING, false);
         builder.define(DATA_FLIGHT_MODE, -1);
         builder.define(DATA_RIDER_FORWARD, 0F);
@@ -431,7 +433,6 @@ public class Ignivorus extends RideableDragonBase implements DragonFlightCapable
         // Update banking and pitching for animations
         tickBankingLogic();
         tickPitchingLogic();
-        tickLandingLogic();
 
         if (!level().isClientSide) {
             if (tamingAbortCalmTicks > 0) {
@@ -500,7 +501,7 @@ public class Ignivorus extends RideableDragonBase implements DragonFlightCapable
     }
 
     private void handleAmbientSounds() {
-        if (isBaby() || isDying() || isSleeping() || isSleepTransitioning()) {
+        if (isBaby() || isDying() || isSleeping() || isSleepTransitioning() || areRiderControlsLocked()) {
             return;
         }
         if (getTarget() != null || getActiveAbility() != null || isBreathingFire()) {
@@ -1846,6 +1847,8 @@ public class Ignivorus extends RideableDragonBase implements DragonFlightCapable
     }
 
     private void tickPitchingLogic() {
+        tickRiderLandingBlendTimer();
+
         // Reset pitching when not flying
         if (!isFlying()) {
             if (pitchDir != 0) {
@@ -1864,6 +1867,13 @@ public class Ignivorus extends RideableDragonBase implements DragonFlightCapable
                 desiredDir = -1;  // Pitching up
             } else if (isGoingDown()) {
                 desiredDir = 1;   // Pitching down
+
+                // Trigger landing blend when descending near ground
+                double altitude = getAltitudeAboveTerrain();
+                if (altitude != Double.POSITIVE_INFINITY && altitude >= -0.25D && altitude <= RIDER_LANDING_BLEND_ALTITUDE) {
+                    desiredDir = 0; // Stop pitching down
+                    triggerRiderLandingBlend();
+                }
             } else {
                 desiredDir = 0;   // Level flight (pitching_off)
             }
@@ -1896,42 +1906,6 @@ public class Ignivorus extends RideableDragonBase implements DragonFlightCapable
         }
     }
 
-    private void tickLandingLogic() {
-        if (!isFlying()) {
-            if (isLanding()) {
-                setLanding(false);
-            }
-            landingApproachTicks = 0;
-            return;
-        }
-
-        double altitude = getAltitudeAboveTerrain();
-        Vec3 motion = getDeltaMovement();
-        boolean descending = motion.y <= LANDING_DESCENT_SPEED;
-        boolean nearGround = altitude != Double.POSITIVE_INFINITY && altitude <= LANDING_TRIGGER_ALTITUDE;
-
-        if (nearGround && descending && !isVehicle()) {
-            if (landingApproachTicks < LANDING_HYSTERESIS_TICKS) {
-                landingApproachTicks++;
-            }
-            if (landingApproachTicks >= LANDING_HYSTERESIS_TICKS && !isLanding()) {
-                setLanding(true);
-            }
-        } else {
-            landingApproachTicks = 0;
-            if (isLanding()) {
-                boolean tooHigh = altitude == Double.POSITIVE_INFINITY || altitude > LANDING_RELEASE_ALTITUDE;
-                boolean ascending = motion.y > 0.05D;
-                if (tooHigh || ascending || onGround()) {
-                    setLanding(false);
-                }
-            }
-        }
-
-        if (isLanding() && onGround()) {
-            setLanding(false);
-        }
-    }
 
     private double getAltitudeAboveTerrain() {
         BlockPos pos = this.blockPosition();
@@ -1951,6 +1925,41 @@ public class Ignivorus extends RideableDragonBase implements DragonFlightCapable
         }
 
         return this.getY() - groundY;
+    }
+
+    private void tickRiderLandingBlendTimer() {
+        if (!isVehicle() || !isFlying() || onGround()) {
+            // If we were actively landing and now touched ground, trigger landed animation
+            boolean wasLanding = riderLandingBlendTicks > 0 && isRiderLandingBlendActive();
+            riderLandingBlendTicks = 0;
+            if (!level().isClientSide) {
+                this.entityData.set(DATA_RIDER_LANDING_BLEND, false);
+
+                // Trigger landed animation when rider landing completes
+                if (wasLanding && onGround() && isVehicle()) {
+                    triggerAnim("action", "landed");
+                    lockRiderControls(33);  // Lock controls for 1.67 seconds while animation plays
+                }
+            }
+            return;
+        }
+        if (riderLandingBlendTicks > 0) {
+            riderLandingBlendTicks--;
+            if (riderLandingBlendTicks == 0 && !level().isClientSide) {
+                this.entityData.set(DATA_RIDER_LANDING_BLEND, false);
+            }
+        }
+    }
+
+    private void triggerRiderLandingBlend() {
+        riderLandingBlendTicks = RIDER_LANDING_BLEND_DURATION;
+        if (!level().isClientSide) {
+            this.entityData.set(DATA_RIDER_LANDING_BLEND, true);
+        }
+    }
+
+    public boolean isRiderLandingBlendActive() {
+        return this.entityData.get(DATA_RIDER_LANDING_BLEND);
     }
 
     private void tickWaterDisturbance() {
