@@ -49,6 +49,10 @@ public class IgnivorusModel extends DefaultedEntityGeoModel<Ignivorus> {
         float partialTick = animationState.getPartialTick();
 
         if (entity.isAlive()) {
+            if (entity.isTamingStunned()) {
+                return;
+            }
+
             applyBodyRotationDeviation(entity, partialTick);
             applyBankingRoll(entity, animationState);
             applyNeckFollow(entity, modelData, partialTick);

@@ -68,6 +68,10 @@ public class RaevyxModel extends DefaultedEntityGeoModel<Raevyx> {
         float partialTick = animationState.getPartialTick();
 
         if (entity.isAlive()) {
+            if (entity.isTamingStunned()) {
+                return;
+            }
+
             applyBodyRotationDeviation(entity, partialTick);  // Same as Nulljaw/Stegonaut
             applyBankingRoll(entity, animationState);
             applyNeckFollow(entity, modelData, partialTick);   // Base head tracking first (uses animation snapshot)

@@ -50,6 +50,13 @@ public record IgnivorusAnimationHandler(Ignivorus dragon) {
             return PlayState.STOP;
         }
 
+        // Taming stunned - highest priority on ground (plays exhausted/downed animation)
+        if (dragon.isTamingStunned()) {
+            state.getController().transitionLength(4);
+            state.setAndContinue(STUNNED);
+            return PlayState.CONTINUE;
+        }
+
         // Handle sleep: continuous animation for sleep loop, stop for transitions
         if (dragon.isSleeping() && !dragon.isSleepingEntering() && !dragon.isSleepingExiting()) {
             state.getController().transitionLength(6);
@@ -58,13 +65,6 @@ public record IgnivorusAnimationHandler(Ignivorus dragon) {
         } else if (dragon.isSleepingEntering() || dragon.isSleepingExiting()) {
             // Transition animations are triggered, don't interfere
             return PlayState.STOP;
-        }
-
-        // Taming stunned - highest priority on ground (plays exhausted/downed animation)
-        if (dragon.isTamingStunned()) {
-            state.getController().transitionLength(4);
-            state.setAndContinue(STUNNED);
-            return PlayState.CONTINUE;
         }
 
         // Check for sitting - highest priority after flying
@@ -169,7 +169,7 @@ public record IgnivorusAnimationHandler(Ignivorus dragon) {
         }
 
         // Stop banking during sleep transitions or when dying
-        if (dragon.isDying() || dragon.isSleeping() || dragon.isSleepingEntering() || dragon.isSleepingExiting()) {
+        if (dragon.isDying() || dragon.isSleeping() || dragon.isSleepingEntering() || dragon.isSleepingExiting() || dragon.isTamingStunned()) {
             return PlayState.STOP;
         }
 
@@ -194,7 +194,7 @@ public record IgnivorusAnimationHandler(Ignivorus dragon) {
         }
 
         // Stop pitching during sleep transitions or when dying
-        if (dragon.isDying() || dragon.isSleeping() || dragon.isSleepingEntering() || dragon.isSleepingExiting()) {
+        if (dragon.isDying() || dragon.isSleeping() || dragon.isSleepingEntering() || dragon.isSleepingExiting() || dragon.isTamingStunned()) {
             return PlayState.STOP;
         }
 

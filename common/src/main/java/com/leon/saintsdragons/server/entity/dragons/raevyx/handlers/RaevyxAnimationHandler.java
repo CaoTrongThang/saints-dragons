@@ -129,6 +129,13 @@ public record RaevyxAnimationHandler(Raevyx wyvern) {
             return PlayState.STOP;
         }
 
+        // Taming stunned
+        if (wyvern.isTamingStunned()) {
+            state.getController().transitionLength(4);
+            state.setAndContinue(STUNNED);
+            return PlayState.CONTINUE;
+        }
+
         // Handle sleep: continuous animation for sleep loop, stop for transitions
         if (wyvern.isSleeping() && !wyvern.isSleepingEntering() && !wyvern.isSleepingExiting()) {
             state.getController().transitionLength(6);
@@ -146,12 +153,6 @@ public record RaevyxAnimationHandler(Raevyx wyvern) {
             return PlayState.CONTINUE;
         } else if (sitProgress > 0f) {
             return PlayState.STOP;
-        }
-
-        if (wyvern.isTamingStunned()) {
-            state.getController().transitionLength(4);
-            state.setAndContinue(STUNNED);
-            return PlayState.CONTINUE;
         }
 
         if (wyvern.isBaby()) {
@@ -447,7 +448,7 @@ public record RaevyxAnimationHandler(Raevyx wyvern) {
         }
 
         // Stop banking during sleep transitions or when controls are locked
-        if (wyvern.isSleeping() || wyvern.isSleepingEntering() || wyvern.isSleepingExiting() || wyvern.areRiderControlsLocked()) {
+        if (wyvern.isSleeping() || wyvern.isSleepingEntering() || wyvern.isSleepingExiting() || wyvern.areRiderControlsLocked() || wyvern.isTamingStunned()) {
             return PlayState.STOP;
         }
 
@@ -473,7 +474,7 @@ public record RaevyxAnimationHandler(Raevyx wyvern) {
         }
 
         // Stop pitching during sleep transitions or when controls are locked
-        if (wyvern.isSleeping() || wyvern.isSleepingEntering() || wyvern.isSleepingExiting() || wyvern.areRiderControlsLocked()) {
+        if (wyvern.isSleeping() || wyvern.isSleepingEntering() || wyvern.isSleepingExiting() || wyvern.areRiderControlsLocked() || wyvern.isTamingStunned()) {
             return PlayState.STOP;
         }
 

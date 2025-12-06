@@ -33,7 +33,7 @@ public class IgnivorusUltimateAbility extends DragonAbility<Ignivorus> {
     private static final int ULTIMATE_LOOP_TICKS = 108;      // 5.42s animation.ignivorus.ultimate
     private static final int ULTIMATE_END_TICKS = 28;        // 1.38s animation.ignivorus.ultimate_end
     private static final int TOTAL_SEQUENCE_TICKS = ULTIMATE_START_TICKS + ULTIMATE_LOOP_TICKS + ULTIMATE_END_TICKS;
-    private static final int COOLDOWN_TICKS = 0;
+    private static final int COOLDOWN_TICKS = 6000;
 
     // Tick thresholds for animation transitions
     @SuppressWarnings("unused")
@@ -166,19 +166,14 @@ public class IgnivorusUltimateAbility extends DragonAbility<Ignivorus> {
             return;
         }
 
-        // Apply health penalty to ALL dragons (both AI and player-controlled)
-        // This is the cost for using the ultimate ability
-        float current = dragon.getHealth();
-        float penaltyHealth = resolvePenaltyHealth();
-        if (current > penaltyHealth) {
-            dragon.setHealth(penaltyHealth);
-            // Only send message to rider if there is one
-            if (dragon.isVehicle()) {
-                sendPenaltyMessage();
-            }
-        }
-
-        penaltyApplied = true;
+       if (dragon.isTame() && dragon.isVehicle()) {
+           float current = dragon.getHealth();
+           float penaltyHealth = resolvePenaltyHealth();
+           if (current > penaltyHealth) {
+               dragon.setHealth(penaltyHealth);
+               sendPenaltyMessage();
+           }
+       }
     }
 
     private void sendRequirementMessage() {
