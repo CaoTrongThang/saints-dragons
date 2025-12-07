@@ -123,8 +123,6 @@ public class Ignivorus extends RideableDragonBase implements DragonFlightCapable
 
     public static final EntityDataAccessor<Boolean> DATA_ACCELERATING =
             SynchedEntityData.defineId(Ignivorus.class, EntityDataSerializers.BOOLEAN);
-    public static final EntityDataAccessor<Boolean> DATA_RIDER_LOCKED =
-            SynchedEntityData.defineId(Ignivorus.class, EntityDataSerializers.BOOLEAN);
     public static final EntityDataAccessor<Integer> DATA_FEEDING_COOLDOWN =
             SynchedEntityData.defineId(Ignivorus.class, EntityDataSerializers.INT);
     /** Tracks whether the dragon is stunned during a taming attempt */
@@ -216,7 +214,6 @@ public class Ignivorus extends RideableDragonBase implements DragonFlightCapable
     public int timeFlying = 0;
     private int airTicks;
     public int groundTicks;
-    private int riderControlLockTicks;
     private int riderLandingBlendTicks = 0;
 
     // ===== HARDCODED GROUND SPEEDS =====
@@ -305,7 +302,6 @@ public class Ignivorus extends RideableDragonBase implements DragonFlightCapable
     @Override
     protected void defineSynchedData(SynchedEntityData.Builder builder) {
         super.defineSynchedData(builder);
-        builder.define(DATA_RIDER_LOCKED, false);
         builder.define(DATA_FIRE_BREATHING, false);
         builder.define(DATA_FIRE_BREATH_PROGRESS, 0);
         builder.define(DATA_FIRE_START_SET, false);
@@ -391,7 +387,7 @@ public class Ignivorus extends RideableDragonBase implements DragonFlightCapable
     public void tick() {
         super.tick();
         soundHandler.tick();
-        tickRiderControlLock();
+        super.tickRiderControlLock();
         physicsController.tick();
         tickScreenShake();
         tickCinematicZoom();
@@ -492,15 +488,6 @@ public class Ignivorus extends RideableDragonBase implements DragonFlightCapable
         return super.getRiddenInput(player, input);
     }
 
-    private void tickRiderControlLock() {
-        if (riderControlLockTicks > 0) {
-            riderControlLockTicks--;
-            if (riderControlLockTicks <= 0) {
-                this.entityData.set(DATA_RIDER_LOCKED, false);
-            }
-        }
-    }
-
     private void handleAmbientSounds() {
         if (isBaby() || isDying() || isSleeping() || isSleepTransitioning() || areRiderControlsLocked()) {
             return;
@@ -533,10 +520,6 @@ public class Ignivorus extends RideableDragonBase implements DragonFlightCapable
         ambientSoundTimer = 0;
         int range = Math.max(1, MAX_AMBIENT_DELAY - MIN_AMBIENT_DELAY);
         nextAmbientSoundDelay = MIN_AMBIENT_DELAY + random.nextInt(range);
-    }
-
-    public boolean areRiderControlsLocked() {
-        return level().isClientSide ? this.entityData.get(DATA_RIDER_LOCKED) : riderControlLockTicks > 0;
     }
 
     public boolean canFeed() {
@@ -600,9 +583,10 @@ public class Ignivorus extends RideableDragonBase implements DragonFlightCapable
         return this.getMaxHealth() * TAMING_HEALTH_RATIO;
     }
 
+    @Override
     public void lockRiderControls(int ticks) {
-        riderControlLockTicks = Math.max(riderControlLockTicks, Math.max(0, ticks));
-        this.entityData.set(DATA_RIDER_LOCKED, true);
+        super.lockRiderControls(ticks); // Base handles tick counting and entity data
+        // Ignivorus-specific: reset movement states during lock
         this.setAccelerating(false);
         this.setLastRiderForward(0.0F);
         this.setLastRiderStrafe(0.0F);
@@ -614,11 +598,6 @@ public class Ignivorus extends RideableDragonBase implements DragonFlightCapable
             this.getNavigation().stop();
             this.setTarget(null);
         }
-    }
-
-    public void clearRiderControlLock() {
-        riderControlLockTicks = 0;
-        this.entityData.set(DATA_RIDER_LOCKED, false);
     }
 
     private void tickCinematicZoom() {

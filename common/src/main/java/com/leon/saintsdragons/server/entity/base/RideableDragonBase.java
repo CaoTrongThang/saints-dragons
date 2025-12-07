@@ -28,6 +28,13 @@ public abstract class RideableDragonBase extends DragonEntity implements Rideabl
     private static final EntityDataAccessor<Integer> DATA_MELEE_MODE =
             net.minecraft.network.syncher.SynchedEntityData.defineId(RideableDragonBase.class, net.minecraft.network.syncher.EntityDataSerializers.INT);
 
+    /** Entity data accessor for rider control lock state (synced to client for animation gating) */
+    private static final EntityDataAccessor<Boolean> DATA_RIDER_LOCKED =
+            net.minecraft.network.syncher.SynchedEntityData.defineId(RideableDragonBase.class, net.minecraft.network.syncher.EntityDataSerializers.BOOLEAN);
+
+    /** Server-side tick counter for rider control lock duration */
+    private int riderControlLockTicks = 0;
+
     protected RideableDragonBase(EntityType<? extends TamableAnimal> entityType, Level level) {
         super(entityType, level);
     }
@@ -36,6 +43,7 @@ public abstract class RideableDragonBase extends DragonEntity implements Rideabl
     protected void defineSynchedData(net.minecraft.network.syncher.SynchedEntityData.Builder builder) {
         super.defineSynchedData(builder);
         builder.define(DATA_MELEE_MODE, 0); // Default to primary melee (mode 0)
+        builder.define(DATA_RIDER_LOCKED, false);
         defineRideableDragonData(builder);
     }
 
@@ -61,7 +69,7 @@ public abstract class RideableDragonBase extends DragonEntity implements Rideabl
     }
 
     protected boolean isRiderInputLocked(Player player) {
-        return false;
+        return areRiderControlsLocked();
     }
 
     protected void applyRiderVerticalInput(Player player, boolean goingUp, boolean goingDown, boolean locked) {
@@ -402,6 +410,10 @@ public abstract class RideableDragonBase extends DragonEntity implements Rideabl
 
     @Override
     public void removePassenger(@NotNull Entity passenger) {
+        // Clear rider control lock when the controlling passenger dismounts
+        if (passenger == getControllingPassenger()) {
+            clearRiderControlLock();
+        }
         super.removePassenger(passenger);
         // Reset rider-driven movement states immediately on dismount
         if (!this.level().isClientSide) {
@@ -614,5 +626,60 @@ public abstract class RideableDragonBase extends DragonEntity implements Rideabl
      */
     protected void applyLoadedFlightState(boolean flying, boolean takeoff, boolean hovering, boolean landing) {
         // Default no-op; dragons with dedicated flight data should override.
+    }
+
+    // ===== RIDER CONTROL LOCK SYSTEM =====
+
+    /**
+     * Locks rider controls for the specified number of ticks.
+     * Subclasses can override to add dragon-specific behavior (e.g., resetting movement states),
+     * but must call super.lockRiderControls(ticks) to ensure the base lock mechanism works.
+     *
+     * @param ticks Number of ticks to lock controls (extends existing lock if already active)
+     */
+    public void lockRiderControls(int ticks) {
+        // Extend the lock if a longer duration is requested
+        riderControlLockTicks = Math.max(riderControlLockTicks, Math.max(0, ticks));
+        // Sync locked state to client for animation gating
+        this.entityData.set(DATA_RIDER_LOCKED, true);
+    }
+
+    /**
+     * Checks if rider controls are currently locked.
+     * On client: reads from synced entity data
+     * On server: checks actual tick counter
+     *
+     * @return true if controls are locked, false otherwise
+     */
+    public boolean areRiderControlsLocked() {
+        return level().isClientSide
+                ? this.entityData.get(DATA_RIDER_LOCKED)
+                : riderControlLockTicks > 0;
+    }
+
+    /**
+     * Immediately clears the rider control lock.
+     * Called automatically when the controlling passenger dismounts.
+     */
+    public void clearRiderControlLock() {
+        if (riderControlLockTicks > 0 || this.entityData.get(DATA_RIDER_LOCKED)) {
+            riderControlLockTicks = 0;
+            this.entityData.set(DATA_RIDER_LOCKED, false);
+        }
+    }
+
+    /**
+     * Decrements the rider control lock timer.
+     * Call this in your dragon's tick() or aiStep() method.
+     * Automatically clears the lock and syncs to client when timer reaches zero.
+     */
+    protected void tickRiderControlLock() {
+        if (!level().isClientSide && riderControlLockTicks > 0) {
+            riderControlLockTicks--;
+            if (riderControlLockTicks == 0) {
+                // Lock expired - sync cleared state to client
+                this.entityData.set(DATA_RIDER_LOCKED, false);
+            }
+        }
     }
 }
