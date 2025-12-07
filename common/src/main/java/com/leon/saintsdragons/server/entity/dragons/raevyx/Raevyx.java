@@ -1497,6 +1497,14 @@ public class Raevyx extends RideableDragonBase implements FlyingAnimal, RangedAt
                 if (isTakeoff() && timeFlying > 35) {
                     setTakeoff(false);
                 }
+
+                // Auto-land when touching ground (but not during takeoff)
+                if (onGroundNow && !isTakeoff()) {
+                    setFlying(false);
+                    setLanding(false);
+                } else if (isLanding() && !onGroundNow) {
+                    setLanding(false);
+                }
             }
 
             // Update animation states

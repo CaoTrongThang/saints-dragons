@@ -506,6 +506,14 @@ public class Cindervane extends RideableDragonBase implements DragonFlightCapabl
                 if (isTakeoff() && !onGroundNow && airTicks > 5) {
                     setTakeoff(false);
                 }
+
+                // Auto-land when touching ground (but not during takeoff)
+                if (onGroundNow && !isTakeoff()) {
+                    setFlying(false);
+                    setLanding(false);
+                } else if (isLanding() && !onGroundNow) {
+                    setLanding(false);
+                }
             } else {
                 groundTicks++;
                 airTicks = 0;
@@ -1375,10 +1383,26 @@ public class Cindervane extends RideableDragonBase implements DragonFlightCapabl
     @Override
     protected void tickRidden(@Nonnull Player player, @Nonnull Vec3 travelVector) {
         super.tickRidden(player, travelVector);
-        riderController.tickRidden(player, travelVector);
-        // Only call copyRiderLook when not using any ability (active or overlay) to preserve pitch animation
-        if (areRiderControlsLocked() && combatManager.getActiveAbility() == null && !combatManager.hasActiveOverlay()) {
-            copyRiderLook(player);
+
+        if (!areRiderControlsLocked()) {
+            // Normal riding: use rider controller for rotation
+            riderController.tickRidden(player, travelVector);
+        } else {
+            // Controls locked (e.g., during landed animation): use copyRiderLook for smooth rotation
+            // Only when not using any ability to preserve ability-specific pitch animation
+            if (combatManager.getActiveAbility() == null && !combatManager.hasActiveOverlay()) {
+                player.fallDistance = 0.0F;
+                this.fallDistance = 0.0F;
+                this.setTarget(null);
+                copyRiderLook(player);
+
+                // Stop acceleration during lock
+                this.setAccelerating(false);
+                if (!this.isFlying()) {
+                    this.setGoingUp(false);
+                    this.setGoingDown(false);
+                }
+            }
         }
     }
     
