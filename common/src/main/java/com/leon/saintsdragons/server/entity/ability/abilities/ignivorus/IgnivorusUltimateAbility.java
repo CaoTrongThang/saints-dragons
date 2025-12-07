@@ -21,7 +21,6 @@ import static com.leon.saintsdragons.server.entity.ability.DragonAbilitySection.
 /**
  * Cinematic "ultimate" ability: plays a 3-stage animation sequence (start, loop, end) while
  * locking rider controls. Sound effects are triggered via animation keyframes.
- *
  * Animation timing:
  * - ultimate_start: 1.38s (28 ticks)
  * - ultimate: 5.42s (108 ticks)

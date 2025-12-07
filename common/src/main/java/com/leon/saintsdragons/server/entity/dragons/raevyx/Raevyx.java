@@ -1493,34 +1493,10 @@ public class Raevyx extends RideableDragonBase implements FlyingAnimal, RangedAt
             if (isFlying()) {
                 this.fallDistance = 0.0F;
 
-                // Clear takeoff flag after full animation completes (40 ticks = 2 seconds)
-                if (isTakeoff() && !onGroundNow && timeFlying > 35) {
+                // Clear takeoff flag after animation completes (35 ticks)
+                if (isTakeoff() && timeFlying > 35) {
                     setTakeoff(false);
                 }
-
-                // Auto-land when touching ground (like Cindervane)
-                if (onGroundNow && !isTakeoff()) {
-                    if (!isLanding()) {
-                        setLanding(true);
-                    }
-                    setFlying(false);
-                } else if (isLanding() && !onGroundNow) {
-                    setLanding(false);
-                }
-            }
-
-            // Handle landing settle (like Cindervane - 20 ticks = 1 second)
-            if (isLanding()) {
-                if (onGroundNow) {
-                    landingTimer++;
-                    if (landingTimer >= 5) {
-                        markLandedNow();
-                    }
-                } else {
-                    landingTimer = 0;
-                }
-            } else {
-                landingTimer = 0;
             }
 
             // Update animation states

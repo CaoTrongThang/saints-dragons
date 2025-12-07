@@ -19,6 +19,7 @@ public class CindervaneAnimationHandler {
     private static final RawAnimation SPRINT_FLAP = RawAnimation.begin().thenLoop("animation.cindervane.sprint_flap");
     private static final RawAnimation TAKEOFF = RawAnimation.begin().thenPlay("animation.cindervane.takeoff");
     private static final RawAnimation LANDING = RawAnimation.begin().thenPlay("animation.cindervane.landing");
+    private static final RawAnimation LANDED = RawAnimation.begin().thenPlay("animation.cindervane.landed");
     private static final RawAnimation WALK = RawAnimation.begin().thenLoop("animation.cindervane.walk");
     private static final RawAnimation RUN = RawAnimation.begin().thenLoop("animation.cindervane.run");
     private static final RawAnimation SIT = RawAnimation.begin().thenLoop("animation.cindervane.sit");
@@ -308,6 +309,9 @@ public class CindervaneAnimationHandler {
         controller.triggerableAnim("fall_asleep", FALL_ASLEEP);
         controller.triggerableAnim("sleep", SLEEP);
         controller.triggerableAnim("wake_up", WAKE_UP);
+
+        // Landed animation (plays after landing with rider)
+        controller.triggerableAnim("landed", LANDED);
 
         // Vocal entries (automatically registers roar, hurt, die animations with sounds)
         dragon.getVocalEntries().forEach((key, entry) ->

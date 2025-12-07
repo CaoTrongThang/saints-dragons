@@ -502,35 +502,13 @@ public class Cindervane extends RideableDragonBase implements DragonFlightCapabl
                 groundTicks = 0;
                 this.fallDistance = 0.0F;
 
+                // Clear takeoff flag after animation completes (5 ticks in air)
                 if (isTakeoff() && !onGroundNow && airTicks > 5) {
                     setTakeoff(false);
-                }
-
-                if (onGroundNow && !isTakeoff()) {
-                    if (!isLanding()) {
-                        setLanding(true);
-                    }
-                    setFlying(false);
-                } else if (isLanding() && !onGroundNow) {
-                    setLanding(false);
                 }
             } else {
                 groundTicks++;
                 airTicks = 0;
-            }
-
-            if (isLanding()) {
-                // Hold landing state briefly so the landing animation can finish before ground loops resume
-                if (onGroundNow) {
-                    landingTicks++;
-                    if (landingTicks >= LANDING_SETTLE_TICKS) {
-                        markLandedNow();
-                    }
-                } else {
-                    landingTicks = 0;
-                }
-            } else {
-                landingTicks = 0;
             }
 
             // Update animation states
@@ -1382,6 +1360,16 @@ public class Cindervane extends RideableDragonBase implements DragonFlightCapabl
     @Override
     protected boolean isRiderInputLocked(Player player) {
         return areRiderControlsLocked();
+    }
+
+    @Override
+    protected float getRiderLockPitchMin() {
+        return -45.0F;
+    }
+
+    @Override
+    protected float getRiderLockPitchMax() {
+        return 45.0F;
     }
 
     @Override
