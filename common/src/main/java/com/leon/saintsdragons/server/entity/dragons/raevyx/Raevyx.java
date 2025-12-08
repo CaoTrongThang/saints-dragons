@@ -83,6 +83,7 @@ import net.minecraft.core.particles.ParticleTypes;
 
 
 //GeckoLib
+import software.bernie.geckolib.animatable.instance.AnimatableInstanceCache;
 import software.bernie.geckolib.animation.*;
 import software.bernie.geckolib.animation.PlayState;
 import software.bernie.geckolib.animation.keyframe.event.SoundKeyframeEvent;
@@ -90,6 +91,8 @@ import software.bernie.geckolib.animation.keyframe.event.SoundKeyframeEvent;
 //WHO ARE THESE SUCKAS
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.annotations.NotNull;
+import software.bernie.geckolib.util.GeckoLibUtil;
+
 import javax.annotation.Nonnull;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -234,6 +237,7 @@ public class Raevyx extends RideableDragonBase implements FlyingAnimal, RangedAt
 
     public static final float MAX_BEAM_YAW_DEG = 40.0f;
     public static final float MAX_BEAM_PITCH_DEG = 50.0f;
+    public AnimatableInstanceCache dragonCache = GeckoLibUtil.createInstanceCache(this);
 
 
     // Simple per-field caches - more maintainable than generic system
@@ -278,6 +282,11 @@ public class Raevyx extends RideableDragonBase implements FlyingAnimal, RangedAt
     private int riderLandingBlendTicks = 0;
     private static final int DISMOUNT_RECALL_WINDOW = 60;
     private int dismountRecallTicks = 0;
+
+    @Override
+    public AnimatableInstanceCache getAnimatableInstanceCache(){
+        return dragonCache;
+    }
 
     @Override
     public void setCommand(int command) {

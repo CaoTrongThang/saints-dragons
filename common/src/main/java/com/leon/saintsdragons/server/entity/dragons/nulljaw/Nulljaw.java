@@ -49,7 +49,6 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.util.Mth;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
-import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.FluidState;
 import net.minecraft.world.level.pathfinder.PathType;
 import net.minecraft.world.damagesource.DamageSource;
@@ -121,7 +120,7 @@ public class Nulljaw extends RideableDragonBase implements AquaticDragon, Shakes
     private static final EntityDataAccessor<Integer> DATA_FEEDING_COOLDOWN =
             SynchedEntityData.defineId(Nulljaw.class, EntityDataSerializers.INT);
 
-    private final AnimatableInstanceCache animCache = GeckoLibUtil.createInstanceCache(this);
+    public AnimatableInstanceCache dragonCache = GeckoLibUtil.createInstanceCache(this);
     private final DragonSoundHandler soundHandler = new DragonSoundHandler(this);
     private final NulljawAnimationHandler animationHandler = new NulljawAnimationHandler(this);
     private final NulljawInteractionHandler interactionHandler = new NulljawInteractionHandler(this);
@@ -467,7 +466,7 @@ public class Nulljaw extends RideableDragonBase implements AquaticDragon, Shakes
 
     @Override
     public AnimatableInstanceCache getAnimatableInstanceCache() {
-        return animCache;
+        return dragonCache;
     }
 
     public DragonSoundHandler getSoundHandler() {

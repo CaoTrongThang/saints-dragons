@@ -1,7 +1,6 @@
 package com.leon.saintsdragons.common.registry;
 
 import com.leon.saintsdragons.common.SaintsDragonsCommon;
-import com.leon.saintsdragons.common.particle.raevyx.RaevyxLightningArcData;
 import com.leon.saintsdragons.common.particle.raevyx.RaevyxLightningChainData;
 import com.leon.saintsdragons.common.particle.raevyx.RaevyxLightningStormData;
 import com.leon.saintsdragons.platform.RegistryHelper;
@@ -43,20 +42,6 @@ public final class ModParticles {
                         @Override
                         public net.minecraft.network.codec.StreamCodec<net.minecraft.network.RegistryFriendlyByteBuf, RaevyxLightningStormData> streamCodec() {
                             return RaevyxLightningStormData.STREAM_CODEC;
-                        }
-                    });
-
-    public static final Supplier<ParticleType<RaevyxLightningArcData>> LIGHTNING_ARC =
-            REGISTER.register("lightning_arc",
-                    () -> new ParticleType<>(false) {
-                        @Override
-                        public com.mojang.serialization.MapCodec<RaevyxLightningArcData> codec() {
-                            return RaevyxLightningArcData.MAP_CODEC;
-                        }
-
-                        @Override
-                        public net.minecraft.network.codec.StreamCodec<net.minecraft.network.RegistryFriendlyByteBuf, RaevyxLightningArcData> streamCodec() {
-                            return RaevyxLightningArcData.STREAM_CODEC;
                         }
                     });
 

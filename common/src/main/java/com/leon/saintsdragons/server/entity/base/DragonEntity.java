@@ -39,7 +39,6 @@ import net.minecraft.world.level.ServerLevelAccessor;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.NotNull;
 import software.bernie.geckolib.animatable.GeoEntity;
-import software.bernie.geckolib.animatable.instance.AnimatableInstanceCache;
 import software.bernie.geckolib.animation.AnimatableManager;
 import software.bernie.geckolib.util.GeckoLibUtil;
 
@@ -68,7 +67,6 @@ public abstract class DragonEntity extends TamableAnimal implements GeoEntity {
     private static final EntityDataAccessor<Float> DATA_YAW_VELOCITY =
             SynchedEntityData.defineId(DragonEntity.class, EntityDataSerializers.FLOAT);
 
-    private final AnimatableInstanceCache cache = GeckoLibUtil.createInstanceCache(this);
 
     // Dragon ability system (lightweight base – no global cooldown here)
     private DragonAbility<?> activeAbility = null;
@@ -204,11 +202,6 @@ public abstract class DragonEntity extends TamableAnimal implements GeoEntity {
         if (!this.genderInitialized) {
             setGender(this.random.nextBoolean() ? DragonGender.FEMALE : DragonGender.MALE);
         }
-    }
-
-    @Override
-    public AnimatableInstanceCache getAnimatableInstanceCache() {
-        return cache;
     }
 
     @Override
