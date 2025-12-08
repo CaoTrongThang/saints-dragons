@@ -202,7 +202,7 @@ public final class DragonAttributeConfigLoader extends SimpleJsonResourceReloadL
         double flyingSpeed = 0.40D;
         double biteDamage = 50.0D;
         double bodySlamDamage = 40.0D;
-        double fireBreathDamage = 4.0D;
+        double fireBreathDamage = 80.0D;
         double ultimateDamage = 200.0D;
         double ultimatePenaltyHealth = 50.0D;
         double tamingChanceBase = 7.0D;
@@ -344,6 +344,7 @@ public final class DragonAttributeConfigLoader extends SimpleJsonResourceReloadL
             ensureLegacyTamingFlag(entry.getKey(), source);
 
             if (Files.exists(path)) {
+                backfillIgnivorusFireBreathDamage(path, entry.getKey(), entry.getValue());
                 backfillLegacyTaming(path, entry.getKey());
                 continue;
             }
@@ -469,6 +470,40 @@ public final class DragonAttributeConfigLoader extends SimpleJsonResourceReloadL
             if (hints != null && !hints.entrySet().isEmpty()) {
                 json.add("hints", hints);
             }
+        }
+    }
+
+    /**
+     * Migration helper: bump Ignivorus fire_breath damage if the config is missing the field
+     * or still using the legacy 4.0 default. This keeps Fabric/NeoForge user configs in sync
+     * with the updated datapack defaults (80.0 DPS) without breaking user custom values.
+     */
+    private void backfillIgnivorusFireBreathDamage(Path path, ResourceLocation id, DragonAttributeConfig mergedConfig) {
+        if (!id.equals(IGNIVORUS_ID)) {
+            return;
+        }
+        try (Reader reader = Files.newBufferedReader(path)) {
+            JsonElement element = JsonParser.parseReader(reader);
+            JsonObject json = GsonHelper.convertToJsonObject(element, id.toString());
+            JsonObject abilities = json.has("abilities") ? GsonHelper.getAsJsonObject(json, "abilities") : new JsonObject();
+            JsonObject fireBreath = abilities.has("fire_breath")
+                    ? GsonHelper.getAsJsonObject(abilities, "fire_breath")
+                    : new JsonObject();
+
+            boolean hasDamage = fireBreath.has("damage");
+            double current = hasDamage ? GsonHelper.getAsDouble(fireBreath, "damage") : Double.NaN;
+            double newDefault = mergedConfig.abilityDamage("fire_breath", 80.0D);
+
+            // Only update if missing OR stuck on the legacy default (4.0)
+            if (!hasDamage || current <= 4.0001D) {
+                fireBreath.addProperty("damage", newDefault);
+                abilities.add("fire_breath", fireBreath);
+                json.add("abilities", abilities);
+                writeConfigFile(path, json);
+                SaintsDragonsCommon.LOGGER.info("Updated Ignivorus fire_breath damage in {} to {}", path, newDefault);
+            }
+        } catch (Exception e) {
+            SaintsDragonsCommon.LOGGER.warn("Failed to backfill ignivorus fire_breath damage at {}", path, e);
         }
     }
 
