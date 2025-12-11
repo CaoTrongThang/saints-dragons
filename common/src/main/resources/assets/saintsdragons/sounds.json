@@ -753,6 +753,16 @@
       }
     ]
   },
+  "ignivorus_eat": {
+    "subtitle": "Ignivorus eats",
+    "sounds": [
+      {
+        "name": "saintsdragons:entity/ignivorus/ignivorus_eat",
+        "volume": 2.5,
+        "pitch": 1.0
+      }
+    ]
+  },
   "raevyx_summon_storm_air_start": {
     "subtitle": "Storm gathers aloft",
     "sounds": [

@@ -81,6 +81,9 @@ public final class IgnivorusSoundProfile implements DragonSoundProfile {
             playMouthSound(handler, dragon, locator, ModSounds.IGNIVORUS_ULTIMATE_END.get(), 2.0f, 1.0f, 0.0f);
             return true;
         }
+        if ("ignivorus_eat".equals(key)){
+            playMouthSound(handler, dragon, locator, ModSounds.IGNIVORUS_EAT.get(), 1.0F, 1.0F, 0.0F);
+        }
         if ("ignivorus_fire_breath_start".equals(key)) {
             // Block keyframe sound - fire breath start is handled by IgnivorusFireBreathAbility
             return true;
