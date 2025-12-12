@@ -21,6 +21,7 @@ public record IgnivorusAnimationHandler(Ignivorus dragon) {
     private static final RawAnimation GLIDE_DOWN = RawAnimation.begin().thenLoop("animation.ignivorus.glide_down");
     private static final RawAnimation FLAP = RawAnimation.begin().thenLoop("animation.ignivorus.flap");
     private static final RawAnimation SPRINT_FLAP = RawAnimation.begin().thenLoop("animation.ignivorus.sprint_flap");
+    private static final RawAnimation FLY_IDLE = RawAnimation.begin().thenLoop("animation.ignivorus.fly_idle");
     private static final RawAnimation SIT = RawAnimation.begin().thenLoop("animation.ignivorus.sit");
     private static final RawAnimation SWIM = RawAnimation.begin().thenLoop("animation.ignivorus.swim");
     private static final RawAnimation STUNNED = RawAnimation.begin().thenLoop("animation.ignivorus.stunned");
@@ -80,9 +81,8 @@ public record IgnivorusAnimationHandler(Ignivorus dragon) {
 
         if (dragon.isFlying()) {
             // Get synced flight mode from physics controller
-            // 0 = glide, 1 = flap, 2 = hover, 3 = takeoff, -1 = ground
+            // 0 = glide, 1 = flap, 2 = hover, 3 = takeoff, 4 = sprint_flap, 5 = fly_idle, -1 = ground
             int syncedMode = dragon.getSyncedFlightMode();
-            boolean sprinting = dragon.isAccelerating() || Boolean.TRUE.equals(dragon.getAnimData(DragonAnimTickets.FLIGHT_SPRINTING));
 
             // Check for takeoff animation (highest priority)
             if (syncedMode == 3 || dragon.isTakeoff() || dragon.timeFlying < 30) {
@@ -98,10 +98,6 @@ public record IgnivorusAnimationHandler(Ignivorus dragon) {
                 return PlayState.CONTINUE;
             }
 
-            // Check velocity for movement detection
-            var vel = dragon.getDeltaMovement();
-            boolean isMovingHorizontally = vel.horizontalDistanceSqr() > 0.0005 || sprinting;
-
             // GLIDE_DOWN - only for RIDER diving (not AI flight)
             // This prevents AI dragons from always playing glide_down
             // Also prevent glide_down when landing blend is active (rider is landing)
@@ -111,14 +107,22 @@ public record IgnivorusAnimationHandler(Ignivorus dragon) {
                 return PlayState.CONTINUE;
             }
 
-            // SPRINT_FLAP - accelerating flight
-            if (sprinting && (isMovingHorizontally || sprinting)) {
+            // Mode 5: FLY_IDLE - stationary rider hover (physics controller detects via position tracking)
+            if (syncedMode == 5) {
+                state.getController().transitionLength(6);
+                state.setAndContinue(FLY_IDLE);
+                return PlayState.CONTINUE;
+            }
+
+            // Mode 4: SPRINT_FLAP - accelerating flight (detected by physics controller)
+            if (syncedMode == 4) {
                 state.getController().transitionLength(3);
                 state.setAndContinue(SPRINT_FLAP);
                 return PlayState.CONTINUE;
             }
 
             // ASCENDING - always flap when going up (rider or AI)
+            var vel = dragon.getDeltaMovement();
             if (dragon.isGoingUp() || vel.y > 0.02) {
                 state.getController().transitionLength(4);
                 state.setAndContinue(FLAP);
@@ -128,7 +132,7 @@ public record IgnivorusAnimationHandler(Ignivorus dragon) {
             // HOVER - stationary in air
             if (syncedMode == 2 || dragon.isHovering()) {
                 state.getController().transitionLength(6);
-                state.setAndContinue(sprinting ? SPRINT_FLAP : FLAP);
+                state.setAndContinue(FLAP);
                 return PlayState.CONTINUE;
             }
 
@@ -137,7 +141,7 @@ public record IgnivorusAnimationHandler(Ignivorus dragon) {
             // Mode 0 = GLIDE (high altitude, can glide)
             if (syncedMode == 1) {
                 state.getController().transitionLength(4);
-                state.setAndContinue(sprinting ? SPRINT_FLAP : FLAP);
+                state.setAndContinue(FLAP);
             } else {
                 state.getController().transitionLength(12);
                 state.setAndContinue(GLIDE);
