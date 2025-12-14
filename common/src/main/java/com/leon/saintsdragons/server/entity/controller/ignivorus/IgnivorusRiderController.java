@@ -215,10 +215,14 @@ public record IgnivorusRiderController(Ignivorus dragon) {
 
             double verticalVel = currentVelocity.y;
 
-            // Vertical control - add takeoff shove so climb begins smoothly even without input
+            // Vertical control - require explicit ascend input; takeoff only helps while Space is held
             if (dragon.isTakeoff()) {
-                double boost = ASCEND_THRUST * 0.45;
-                verticalVel = Math.max(verticalVel + boost, 0.18);
+                if (dragon.isGoingUp()) {
+                    double boost = ASCEND_THRUST * 0.65; // modest assist while Space is held
+                    verticalVel = Math.max(verticalVel + boost, 0.20);
+                } else {
+                    verticalVel *= VERTICAL_DRAG;
+                }
             } else if (dragon.isGoingUp()) {
                 verticalVel += ASCEND_THRUST;
             } else if (dragon.isGoingDown()) {
@@ -304,7 +308,7 @@ public record IgnivorusRiderController(Ignivorus dragon) {
 
         dragon.getNavigation().stop();
         dragon.setGoingDown(false);
-        dragon.setGoingUp(true); // latch ascend so lift begins even without immediate input
+        dragon.setGoingUp(true); // latch ascend intent at takeoff so holding Space keeps climb
 
         dragon.timeFlying = 0;
         dragon.setFlying(true);
@@ -313,7 +317,7 @@ public record IgnivorusRiderController(Ignivorus dragon) {
         dragon.setLanding(false);
 
         Vec3 current = dragon.getDeltaMovement();
-        double upward = Math.max(current.y, 0.18D); // softer shove to avoid excessive leap
+        double upward = Math.max(current.y, 0.25D); // controlled initial shove to clear the ground
         dragon.setDeltaMovement(current.x, upward, current.z);
         dragon.hasImpulse = true;
     }
