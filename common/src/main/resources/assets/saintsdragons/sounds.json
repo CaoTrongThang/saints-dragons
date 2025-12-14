@@ -181,6 +181,16 @@
       }
     ]
   },
+  "cindervane_landed": {
+    "subtitle": "Cindervane lands heavily",
+    "sounds": [
+      {
+        "name": "saintsdragons:entity/cindervane/cindervane_landed",
+        "volume": 1.0,
+        "pitch": 1.0
+      }
+    ]
+  },
   "cindervane_grumble1": {
     "subtitle": "Cindervane grumbles",
     "sounds": [
@@ -743,26 +753,6 @@
       }
     ]
   },
-  "ignivorus_ultimate_start": {
-    "subtitle": "Ignivorus prepares ultimate attack",
-    "sounds": [
-      {
-        "name": "saintsdragons:entity/ignivorus/ignivorus_ultimate_start",
-        "volume": 2.0,
-        "pitch": 1.0
-      }
-    ]
-  },
-  "ignivorus_eat": {
-    "subtitle": "Ignivorus eats",
-    "sounds": [
-      {
-        "name": "saintsdragons:entity/ignivorus/ignivorus_eat",
-        "volume": 2.5,
-        "pitch": 1.0
-      }
-    ]
-  },
   "raevyx_summon_storm_air_start": {
     "subtitle": "Storm gathers aloft",
     "sounds": [
@@ -783,11 +773,43 @@
       }
     ]
   },
+  "ignivorus_ultimate_start": {
+    "subtitle": "Ignivorus prepares ultimate attack",
+    "sounds": [
+      {
+        "name": "saintsdragons:entity/ignivorus/ignivorus_ultimate_start",
+        "volume": 2.0,
+        "pitch": 1.0
+      }
+    ]
+  },
+  "ignivorus_ultimate_start_air": {
+    "subtitle": "Ignivorus prepares ultimate attack",
+    "sounds": [
+      {
+        "name": "saintsdragons:entity/ignivorus/ignivorus_ultimate_start_air",
+        "volume": 2.0,
+        "pitch": 1.0
+      }
+    ]
+  },
   "ignivorus_ultimate": {
     "subtitle": "Ignivorus unleashes ultimate power",
     "sounds": [
       {
         "name": "saintsdragons:entity/ignivorus/ignivorus_ultimate",
+        "volume": 2.5,
+        "pitch": 1.0,
+        "stream": true,
+        "attenuation_distance": 96
+      }
+    ]
+  },
+  "ignivorus_ultimate_air": {
+    "subtitle": "Ignivorus unleashes ultimate power",
+    "sounds": [
+      {
+        "name": "saintsdragons:entity/ignivorus/ignivorus_ultimate_air",
         "volume": 2.5,
         "pitch": 1.0,
         "stream": true,
@@ -806,12 +828,33 @@
       }
     ]
   },
+  "ignivorus_ultimate_end_air": {
+    "subtitle": "Ignivorus calms the inferno",
+    "sounds": [
+      {
+        "name": "saintsdragons:entity/ignivorus/ignivorus_ultimate_end_air",
+        "volume": 2.0,
+        "pitch": 0.95,
+        "attenuation_distance": 64
+      }
+    ]
+  },
   "ignivorus_landed": {
     "subtitle": "Ignivorus lands heavily",
     "sounds": [
       {
         "name": "saintsdragons:entity/ignivorus/ignivorus_landed",
-        "volume": 1.5,
+        "volume": 3.5,
+        "pitch": 1.0
+      }
+    ]
+  },
+  "ignivorus_eat": {
+    "subtitle": "Ignivorus eats",
+    "sounds": [
+      {
+        "name": "saintsdragons:entity/ignivorus/ignivorus_eat",
+        "volume": 3.5,
         "pitch": 1.0
       }
     ]

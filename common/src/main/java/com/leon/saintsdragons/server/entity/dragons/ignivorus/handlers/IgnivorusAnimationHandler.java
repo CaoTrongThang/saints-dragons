@@ -297,6 +297,14 @@ public record IgnivorusAnimationHandler(Ignivorus dragon) {
         actionController.triggerableAnim("ultimate_end",
             RawAnimation.begin().thenPlay("animation.ignivorus.ultimate_end"));
 
+        // Ultimate ability animations (air variants)
+        actionController.triggerableAnim("ultimate_start_air",
+            RawAnimation.begin().thenPlay("animation.ignivorus.ultimate_start_air"));
+        actionController.triggerableAnim("ultimate_air",
+            RawAnimation.begin().thenPlay("animation.ignivorus.ultimate_air"));
+        actionController.triggerableAnim("ultimate_end_air",
+            RawAnimation.begin().thenPlay("animation.ignivorus.ultimate_end_air"));
+
         // Landed animation (plays after landing with rider)
         actionController.triggerableAnim("landed", LANDED);
 

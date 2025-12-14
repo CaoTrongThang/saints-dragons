@@ -81,6 +81,18 @@ public final class IgnivorusSoundProfile implements DragonSoundProfile {
             playMouthSound(handler, dragon, locator, ModSounds.IGNIVORUS_ULTIMATE_END.get(), 2.0f, 1.0f, 0.0f);
             return true;
         }
+        if ("ignivorus_ultimate_start_air".equals(key)) {
+            playMouthSound(handler, dragon, locator, ModSounds.IGNIVORUS_ULTIMATE_START_AIR.get(), 2.0f, 1.0f, 0.0f);
+            return true;
+        }
+        if ("ignivorus_ultimate_air".equals(key)) {
+            playMouthSound(handler, dragon, locator, ModSounds.IGNIVORUS_ULTIMATE_AIR.get(), 2.5f, 1.0f, 0.0f);
+            return true;
+        }
+        if ("ignivorus_ultimate_end_air".equals(key)) {
+            playMouthSound(handler, dragon, locator, ModSounds.IGNIVORUS_ULTIMATE_END_AIR.get(), 2.0f, 1.0f, 0.0f);
+            return true;
+        }
         if ("ignivorus_eat".equals(key)){
             playMouthSound(handler, dragon, locator, ModSounds.IGNIVORUS_EAT.get(), 1.0F, 1.0F, 0.0F);
         }
