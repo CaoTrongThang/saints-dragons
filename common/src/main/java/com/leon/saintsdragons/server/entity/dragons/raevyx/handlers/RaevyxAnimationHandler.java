@@ -12,9 +12,6 @@ import software.bernie.geckolib.animation.PlayState;
  * Extracted from Raevyx to improve organization and maintainability
  */
 public record RaevyxAnimationHandler(Raevyx wyvern) {
-    private static final int TAKEOFF_ANIM_MAX_TICKS = 35;
-    private static final int TAKEOFF_ANIM_EARLY_TICKS = 30;
-
     // ===== ANIMATION CONSTANTS =====
 
     /** Ground idle animation */
@@ -62,7 +59,7 @@ public record RaevyxAnimationHandler(Raevyx wyvern) {
     /** Taming stun loop (treated like alternate idle) */
     private static final RawAnimation STUNNED = RawAnimation.begin().thenLoop("animation.raevyx.stunned");
 
-    /** Sleep loop animation (continuous, survives chunk reload) */
+    /** Sleep loop animation (applied continuously when sleeping) */
     private static final RawAnimation SLEEP = RawAnimation.begin().thenLoop("animation.raevyx.sleep");
 
     private static RawAnimation currentFlightAnimation = FLY_GLIDE;
@@ -129,7 +126,7 @@ public record RaevyxAnimationHandler(Raevyx wyvern) {
             return PlayState.STOP;
         }
 
-        // Taming stunned
+        // Taming stunned - highest priority (should override sleep)
         if (wyvern.isTamingStunned()) {
             state.getController().transitionLength(4);
             state.setAndContinue(STUNNED);
@@ -249,12 +246,6 @@ public record RaevyxAnimationHandler(Raevyx wyvern) {
             if (syncedMode == 0) {
                 state.getController().transitionLength(12);
                 state.setAndContinue(resolveGlideAnimation(vNow));
-                return PlayState.CONTINUE;
-            }
-
-            if (shouldPlayTakeoff()) {
-                state.getController().transitionLength(4);
-                state.setAndContinue(TAKEOFF);
                 return PlayState.CONTINUE;
             }
 
@@ -379,7 +370,7 @@ public record RaevyxAnimationHandler(Raevyx wyvern) {
         actionController.triggerableAnim("die",
                 RawAnimation.begin().thenPlay("animation.raevyx.die"));
     }
-    
+
     /**
      * Registers vocal animation triggers
      */
@@ -392,14 +383,6 @@ public record RaevyxAnimationHandler(Raevyx wyvern) {
         });
     }
 
-    private boolean shouldPlayTakeoff() {
-        if (wyvern.timeFlying < TAKEOFF_ANIM_EARLY_TICKS) {
-            return true;
-        }
-        boolean airborne = !wyvern.onGround();
-        boolean ascending = wyvern.getDeltaMovement().y > 0.08;
-        return (wyvern.timeFlying < TAKEOFF_ANIM_MAX_TICKS) && (airborne || ascending);
-    }
 
     private RawAnimation resolveGlideAnimation(Vec3 velocity) {
         if (!wyvern.isTame()) {
@@ -436,8 +419,9 @@ public record RaevyxAnimationHandler(Raevyx wyvern) {
             return PlayState.CONTINUE;
         }
 
-        // Stop banking during sleep transitions or when controls are locked
-        if (wyvern.isSleeping() || wyvern.isSleepingEntering() || wyvern.isSleepingExiting() || wyvern.areRiderControlsLocked() || wyvern.isTamingStunned()) {
+        // Stop banking during sleep transitions, taming stun, or when controls are locked
+        if (wyvern.isSleeping() || wyvern.isSleepingEntering() || wyvern.isSleepingExiting()
+                || wyvern.isTamingStunned() || wyvern.areRiderControlsLocked()) {
             return PlayState.STOP;
         }
 
@@ -462,8 +446,9 @@ public record RaevyxAnimationHandler(Raevyx wyvern) {
             return PlayState.CONTINUE;
         }
 
-        // Stop pitching during sleep transitions or when controls are locked
-        if (wyvern.isSleeping() || wyvern.isSleepingEntering() || wyvern.isSleepingExiting() || wyvern.areRiderControlsLocked() || wyvern.isTamingStunned()) {
+        // Stop pitching during sleep transitions, taming stun, or when controls are locked
+        if (wyvern.isSleeping() || wyvern.isSleepingEntering() || wyvern.isSleepingExiting()
+                || wyvern.isTamingStunned() || wyvern.areRiderControlsLocked()) {
             return PlayState.STOP;
         }
 

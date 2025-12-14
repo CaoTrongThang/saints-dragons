@@ -25,10 +25,10 @@ public class CindervaneFlightGoal extends Goal {
     // Landing cooldown to prevent immediate takeoff after landing
     private static final int LANDING_COOLDOWN_TICKS = 40; // 2 seconds minimum on ground (gliders want to fly!)
     private long lastLandingTime = 0;
-    
+
     // Flight decision cooldown (slower than lightning amphithere)
     private int flightDecisionCooldown = 0;
-    
+
     // Weather state tracking for immediate response
     private boolean wasThundering = false;
     private boolean wasRaining = false;
@@ -36,7 +36,7 @@ public class CindervaneFlightGoal extends Goal {
     public CindervaneFlightGoal(Cindervane amphithere) {
         this.amphithere = amphithere;
         this.setFlags(EnumSet.of(Flag.MOVE));
-        
+
         // Start with no offset
         this.flightDecisionCooldown = 0;
     }
@@ -64,11 +64,11 @@ public class CindervaneFlightGoal extends Goal {
         // Weather state snapshot for this decision
         boolean thundering = amphithere.level().isThundering();
         boolean raining = !thundering && amphithere.level().isRaining();
-        
+
         // Check for weather changes that should trigger immediate takeoff
         boolean weatherChangedToStorm = (thundering && !wasThundering) || (raining && !wasRaining);
         boolean weatherChangedToThunder = thundering && !wasThundering;
-        
+
         // Update weather state tracking
         wasThundering = thundering;
         wasRaining = raining;
@@ -81,12 +81,12 @@ public class CindervaneFlightGoal extends Goal {
         int cooldown = LANDING_COOLDOWN_TICKS; // fixed
         if (thundering) cooldown = 0;            // no cooldown in thunder - gliders avoid storms
         else if (raining) cooldown = cooldown / 4; // shorter cooldown in rain - gliders prefer clear weather
-        
+
         // Override cooldown if weather just changed to storm conditions
         if (weatherChangedToStorm) {
             cooldown = 0;
         }
-        
+
         if (!amphithere.isFlying() && (currentTime - lastLandingTime) < cooldown) {
             return false;
         }
@@ -186,7 +186,7 @@ public class CindervaneFlightGoal extends Goal {
                 return false;
             }
         }
-        
+
         return amphithere.isFlying() && targetPosition != null && amphithere.distanceToSqr(targetPosition) > 9.0;
     }
 
@@ -203,7 +203,7 @@ public class CindervaneFlightGoal extends Goal {
     @Override
     public void tick() {
         timeSinceTargetChange++;
-        
+
         // If amphithere wants to land, let it handle that
         if (amphithere.isLanding()) {
             return;
@@ -360,23 +360,49 @@ public class CindervaneFlightGoal extends Goal {
     private double findSafeFlightHeight(double x, double z, boolean tethered) {
         int ix = (int) x;
         int iz = (int) z;
-        int groundY = amphithere.level().getHeight(Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, ix, iz);
+
+        // Check if dragon is currently in a cave/enclosed space
+        BlockPos dragonPos = amphithere.blockPosition();
+        boolean canSeeSky = amphithere.level().canSeeSky(dragonPos);
+
+        int groundY;
+        double capAboveGround;
+
+        if (canSeeSky) {
+            // OUTDOOR: Use heightmap for normal flight
+            groundY = amphithere.level().getHeight(Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, ix, iz);
+
+            // Weather-based cap above ground - gliders avoid storms
+            boolean thundering = amphithere.level().isThundering();
+            boolean raining = !thundering && amphithere.level().isRaining();
+
+            if (tethered) {
+                capAboveGround = thundering ? 12.0 : (raining ? 18.0 : 32.0);
+            } else {
+                capAboveGround = thundering ? 20.0 : (raining ? 30.0 : 80.0);
+            }
+        } else {
+            // CAVE/INDOOR: Find actual floor and ceiling, fly between them
+            int surfaceY = amphithere.level().getHeight(Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, ix, iz);
+            groundY = findGroundInCave(x, surfaceY, z);
+            int ceilingY = findCeilingInCave(x, groundY, z);
+
+            // Fly between 40-70% of the distance from floor to ceiling
+            double caveFactor = tethered ? (0.4 + amphithere.getRandom().nextDouble() * 0.2) : // 40-60% for tethered
+                    (0.5 + amphithere.getRandom().nextDouble() * 0.2);  // 50-70% for free
+            capAboveGround = (ceilingY - groundY) * caveFactor;
+
+            // Ensure minimum clearance
+            capAboveGround = Math.max(capAboveGround, tethered ? 8.0 : 12.0);
+        }
 
         double base;
         if (tethered) {
-            base = 12.0 + amphithere.getRandom().nextDouble() * 12.0;
+            base = canSeeSky ? (12.0 + amphithere.getRandom().nextDouble() * 12.0) :
+                    (5.0 + amphithere.getRandom().nextDouble() * 8.0); // Lower base in caves
         } else {
-            base = 25.0 + amphithere.getRandom().nextDouble() * 35.0;
-        }
-
-        // Weather-based cap above ground - gliders avoid storms
-        boolean thundering = amphithere.level().isThundering();
-        boolean raining = !thundering && amphithere.level().isRaining();
-        double capAboveGround;
-        if (tethered) {
-            capAboveGround = thundering ? 12.0 : (raining ? 18.0 : 32.0);
-        } else {
-            capAboveGround = thundering ? 20.0 : (raining ? 30.0 : 80.0);
+            base = canSeeSky ? (25.0 + amphithere.getRandom().nextDouble() * 35.0) :
+                    (8.0 + amphithere.getRandom().nextDouble() * 15.0); // Lower base in caves
         }
 
         double target = groundY + base;
@@ -384,6 +410,38 @@ public class CindervaneFlightGoal extends Goal {
         double worldCap = amphithere.level().getMaxBuildHeight() - 10.0;
 
         return Math.min(Math.min(target, cap), worldCap);
+    }
+
+    /**
+     * Finds the actual ground level in a cave by searching downward
+     */
+    private int findGroundInCave(double x, double currentY, double z) {
+        BlockPos.MutableBlockPos pos = new BlockPos.MutableBlockPos(x, currentY, z);
+
+        // Search down to find solid ground
+        while (pos.getY() > amphithere.level().getMinBuildHeight() &&
+                !amphithere.level().getBlockState(pos).isSolid() &&
+                amphithere.level().getFluidState(pos).isEmpty()) {
+            pos.move(0, -1, 0);
+        }
+
+        return pos.getY();
+    }
+
+    /**
+     * Finds the ceiling in a cave by searching upward from the floor
+     */
+    private int findCeilingInCave(double x, double floorY, double z) {
+        BlockPos.MutableBlockPos pos = new BlockPos.MutableBlockPos(x, floorY + 2, z);
+
+        // Search up to find ceiling
+        while (pos.getY() < amphithere.level().getMaxBuildHeight() &&
+                !amphithere.level().getBlockState(pos).isSolid()) {
+            pos.move(0, 1, 0);
+        }
+
+        // Return ceiling position (subtract 1 to get the air block just below the solid ceiling)
+        return Math.max((int) floorY + 10, pos.getY() - 1);
     }
 
     private Vec3 getFlightAnchor() {
