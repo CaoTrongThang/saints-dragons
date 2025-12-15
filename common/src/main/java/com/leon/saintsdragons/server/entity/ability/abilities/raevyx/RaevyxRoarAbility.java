@@ -40,36 +40,29 @@ public class RaevyxRoarAbility extends DragonAbility<Raevyx> {
     protected void beginSection(DragonAbilitySection section) {
         if (section == null) return;
         if (section.sectionType == AbilitySectionType.STARTUP) {
-            // Choose variant based on flight state
-            boolean flying = getUser().isFlying();
-            String trigger = flying ? "roar_air" : "roar_ground";
-            // Trigger the action animation immediately
-            getUser().triggerAnim("action", trigger);
+            // Unified roar animation for all states
+            getUser().triggerAnim("action", "roar");
             // Queue the roar sound slightly delayed to sync with mouth opening
             roarQueued = true;
             // Screen shake is now handled by the animation predicate
-            // Lock takeoff only on ground, but allow running and other controls.
-            // While flying, allow normal controls (including ascend/descend) during roar.
-            if (!getUser().isFlying()) {
-                getUser().lockTakeoff(ROAR_TOTAL_TICKS);
-            }
+            // No takeoff restriction - allow full mobility during roar
             // Preselect targets and number of strikes
             selectLightningTargets();
             // If multiple targets, cover more with extra strikes; else 2-3 strikes on single target
             int count = targetIds.size();
             boolean isSupercharged = getUser().isSupercharged();
-            
+
             if (count > 1) {
                 strikesLeft = Math.min(6, Math.max(3, count * 2));
             } else {
                 strikesLeft = 2 + getUser().getRandom().nextInt(2); // 2-3 strikes
             }
-            
+
             // Double the strikes when supercharged
             if (isSupercharged) {
                 strikesLeft *= 2;
             }
-            
+
             strikeCooldown = 0; // strike asap when ACTIVE begins
         }
     }
@@ -197,7 +190,7 @@ public class RaevyxRoarAbility extends DragonAbility<Raevyx> {
         Vec3 pos = from;
         Vec3 dir = step.normalize();
         float size = 0.8f; // Smaller base size
-        
+
         // Spawn single particle at each position (no layering)
         for (int i = 0; i <= steps; i++) {
             server.sendParticles(new RaevyxLightningStormData(size, female),
@@ -217,8 +210,8 @@ public class RaevyxRoarAbility extends DragonAbility<Raevyx> {
         return new Vec3(r * Math.cos(theta), z, r * Math.sin(theta));
     }
 
-private static void applyStun(net.minecraft.world.entity.LivingEntity target) {
-    final int durationTicks = 30; // ~1.5s
+    private static void applyStun(net.minecraft.world.entity.LivingEntity target) {
+        final int durationTicks = 30; // ~1.5s
         // Movement slowdown (amplifier 5 ≈ -73% speed), brief weakness to sell stun
         target.addEffect(new net.minecraft.world.effect.MobEffectInstance(
                 net.minecraft.world.effect.MobEffects.MOVEMENT_SLOWDOWN, durationTicks, 5, false, true));
