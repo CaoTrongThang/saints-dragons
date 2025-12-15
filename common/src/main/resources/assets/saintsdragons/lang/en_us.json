@@ -11,20 +11,21 @@
   "item.saintsdragons.cindervane_spawn_egg": "Cindervane Spawn Egg",
   "item.saintsdragons.nulljaw_spawn_egg": "Nulljaw Spawn Egg",
   "item.saintsdragons.ignivorus_spawn_egg": "Ignivorus Spawn Egg",
-  
+  "itemGroup.saintsdragons": "Saint's Dragons",
+
   "entity.saintsdragons.raevyx": "Raevyx",
   "entity.saintsdragons.raevyx_lightning_chain": "Raevyx's Lightning Chain",
   "entity.saintsdragons.stegonaut": "Stegonaut",
   "entity.saintsdragons.cindervane": "Cindervane",
   "entity.saintsdragons.nulljaw": "Nulljaw",
   "entity.saintsdragons.ignivorus": "Ignivorus",
-  
+
   "saintsdragons.gui.dragon_ally.title": "Dragon Ally Management",
   "saintsdragons.gui.dragon_ally.username_input": "Enter username...",
   "saintsdragons.gui.dragon_ally.add": "Add Ally",
   "saintsdragons.gui.dragon_ally.remove": "Remove Ally",
   "saintsdragons.gui.dragon_ally.count": "Allies: %d/%d",
-  
+
   "saintsdragons.tooltip.dragon_ally_book.line1": "Right-click on your dragon to manage allies",
   "saintsdragons.tooltip.dragon_ally_book.line2": "Allies won't be hurt by dragon attacks",
   "saintsdragons.tooltip.dragon_ally_book.line3": "Supports up to 10 allies per dragon",
@@ -60,22 +61,22 @@
   "saintsdragons.tooltip.nulljaw.right_click_nulljaw_to_bind": "Right-click on ground to release bound Nulljaw",
   "saintsdragons.tooltip.nulljaw.bound": "Contains: %s",
   "saintsdragons.tooltip.nulljaw.right_click_to_release": "Right-click on ground to release bound Nulljaw",
-  
+
   "saintsdragons.message.dragon_not_found": "Dragon not found",
   "saintsdragons.message.not_dragon_owner": "You don't own this dragon",
-  
+
   "saintsdragons.message.stegonaut_captured": "Bound %s in Stegonaut Binder!",
   "saintsdragons.message.stegonaut_released": "Released %s from Stegonaut Binder!",
   "saintsdragons.message.stegonaut_cannot_be_captured": "This drake cannot be bound right now",
   "saintsdragons.message.binder_already_occupied": "This binder already contains a drake",
   "saintsdragons.message.binder_not_bound": "This binder is empty - bind a drake first",
-  
+
   "saintsdragons.message.raevyx_captured": "Bound %s in Raevyx Binder!",
   "saintsdragons.message.raevyx_released": "Released %s from Raevyx Binder!",
   "saintsdragons.message.dragon_cannot_be_captured": "This dragon cannot be bound right now",
   "saintsdragons.message.cannot_release_others_dragon": "You can only release dragons you own",
   "saintsdragons.message.raevyx_already_occupied": "This binder already contains a Raevyx",
-  
+
   "saintsdragons.message.cindervane_captured": "Bound %s in Cindervane Binder!",
   "saintsdragons.message.cindervane_released": "Released %s from Cindervane Binder!",
   "saintsdragons.message.nulljaw_captured": "Bound %s in Nulljaw Binder!",
@@ -83,7 +84,7 @@
   "saintsdragons.message.ignivorus_captured": "Bound %s in Ignivorus Binder!",
   "saintsdragons.message.ignivorus_released": "Released %s from Ignivorus Binder!",
   "saintsdragons.message.nulljaw_cannot_be_captured": "This Nulljaw cannot be bound right now",
-  
+
   "saintsdragons.command.ally.add.result": "Dragon %s: %s - %s",
   "saintsdragons.command.ally.remove.result": "Dragon %s: %s - %s",
   "saintsdragons.command.ally.list.header": "Allies for %s (%d/%d):",
@@ -114,13 +115,13 @@
 
   "advancement.saintsdragons.tame_nulljaw.title": "Depths of Dread",
   "advancement.saintsdragons.tame_nulljaw.description": "Tame a Nulljaw, the abyss that bites back. Good job!",
-  
+
   "advancement.saintsdragons.tame_stegonaut.title": "My Sturdy Friend",
   "advancement.saintsdragons.tame_stegonaut.description": "Win over a Stegonaut with a single fish.",
 
   "advancement.saintsdragons.tame_ignivorus.title": "Destruction Commence",
   "advancement.saintsdragons.tame_ignivorus.description": "Earn the trust of an Ignivorus, the living calamity",
-  
+
   "key.categories.saintsdragons": "Saint's Dragons",
   "key.saintsdragons.ascend": "Ascend",
   "key.saintsdragons.descend": "Descend",
@@ -130,7 +131,7 @@
   "key.saintsdragons.ability_tertiary": "Channel Ability",
   "key.saintsdragons.toggle_melee": "Toggle Melee Mode",
   "key.saintsdragons.toggle_dragon_ui": "Toggle UI",
-  
+
   "saintsdragons.ui.control.title": "Dragon Controls",
   "saintsdragons.ui.control.attack": "Primary Attack",
   "saintsdragons.ui.control.ascend": "Ascend",
@@ -141,7 +142,7 @@
   "saintsdragons.ui.control.ability_tertiary": "Channel Ability",
   "saintsdragons.ui.control.toggle_melee": "Toggle Melee",
   "saintsdragons.ui.control.ability_with_name": "%s (%s)",
-  
+
   "saintsdragons.ability.raevyx_bite": "Lightning Bite",
   "saintsdragons.ability.raevyx_horn_gore": "Horn Gore",
   "saintsdragons.ability.raevyx_lightning_beam": "Lightning Beam",
@@ -162,14 +163,14 @@
 
   "commands.dragonally.description": "Manage allies",
   "commands.dragonally.add.description": "Add a player as an ally to a dragon",
-  "commands.dragonally.remove.description": "Remove a player as an ally from a dragon", 
+  "commands.dragonally.remove.description": "Remove a player as an ally from a dragon",
   "commands.dragonally.list.description": "List all allies of a dragon",
   "commands.dragonally.clear.description": "Clear all allies from a dragon",
-  
+
   "entity.saintsdragons.all.command_0": "%s is now following you",
-  "entity.saintsdragons.all.command_1": "%s is now sitting", 
+  "entity.saintsdragons.all.command_1": "%s is now sitting",
   "entity.saintsdragons.all.command_2": "%s is now wandering",
-  
+
   "entity.saintsdragons.raevyx.fed": "%s is fully healed!",
   "entity.saintsdragons.raevyx.fed_partial": "%s is being healed...",
   "entity.saintsdragons.ignivorus.fed": "%s is fully healed!",
@@ -180,6 +181,10 @@
   "entity.saintsdragons.ignivorus.taming_failed": "%s's pride won't let it submit... yet.",
   "entity.saintsdragons.ignivorus.taming_aborted": "You step back. %s extinguishes its fury.",
   "entity.saintsdragons.ignivorus.taming_timeout": "You hesitated too long. %s reignites and returns to battle!",
+  "entity.saintsdragons.ignivorus.variant_changed_to_two": "%s's scales shift to a new pattern!",
+  "entity.saintsdragons.ignivorus.variant_changed_to_default": "%s's scales return to their original pattern!",
+  "entity.saintsdragons.ignivorus.already_variant_two": "%s already has this scale pattern!",
+  "entity.saintsdragons.ignivorus.already_variant_default": "%s already has this scale pattern!",
   "entity.saintsdragons.raevyx.baby_fed": "%s is growing stronger!",
   "entity.saintsdragons.raevyx.baby_grown": "%s has grown into an adult!",
   "entity.saintsdragons.raevyx.still_eating": "%s is still eating...",
@@ -212,7 +217,7 @@
   "entity.saintsdragons.nulljaw.sitting_down": "%s is settling down...",
   "entity.saintsdragons.nulljaw.standing_up": "%s is standing up...",
   "entity.saintsdragons.nulljaw.transitioning": "%s is reshaping its stance...",
-  
+
   "saintsdragons.message.ally.success": "Successfully managed ally %s",
   "saintsdragons.message.ally.invalid_username": "Invalid username! Must be 3-16 characters, letters/numbers/underscores only, and appropriate content",
   "saintsdragons.message.ally.player_not_found": "Who is %s? Are you sure you're playing with that person?",
@@ -238,31 +243,31 @@
   "entity.saintsdragons.cindervane.mount_occupied": "Uh... you shouldn't be here.",
   "ui.saintsdragons.melee_mode.primary": "Primary Melee",
   "ui.saintsdragons.melee_mode.secondary": "Secondary Melee",
-  
+
   "text.autoconfig.saintsdragonsspawning.title": "Saint's Dragons Config",
   "text.autoconfig.saintsdragonsspawning.category.spawning": "Dragon Spawning",
-  
+
   "text.autoconfig.saintsdragonsspawning.option.raevyxSpawnWeight": "Raevyx Spawn Weight",
   "text.autoconfig.saintsdragonsspawning.option.raevyxSpawnWeight.@Tooltip": "How often Raevyx spawns (0 = disabled, higher = more common)",
   "text.autoconfig.saintsdragonsspawning.option.raevyxMinGroupSize": "Raevyx Min Group Size",
   "text.autoconfig.saintsdragonsspawning.option.raevyxMinGroupSize.@Tooltip": "Minimum number of Raevyx that spawn together",
   "text.autoconfig.saintsdragonsspawning.option.raevyxMaxGroupSize": "Raevyx Max Group Size",
   "text.autoconfig.saintsdragonsspawning.option.raevyxMaxGroupSize.@Tooltip": "Maximum number of Raevyx that spawn together",
-  
+
   "text.autoconfig.saintsdragonsspawning.option.stegonautSpawnWeight": "Stegonaut Spawn Weight",
   "text.autoconfig.saintsdragonsspawning.option.stegonautSpawnWeight.@Tooltip": "How often Stegonaut spawns (0 = disabled, higher = more common)",
   "text.autoconfig.saintsdragonsspawning.option.stegonautMinGroupSize": "Stegonaut Min Group Size",
   "text.autoconfig.saintsdragonsspawning.option.stegonautMinGroupSize.@Tooltip": "Minimum number of Stegonaut that spawn together",
   "text.autoconfig.saintsdragonsspawning.option.stegonautMaxGroupSize": "Stegonaut Max Group Size",
   "text.autoconfig.saintsdragonsspawning.option.stegonautMaxGroupSize.@Tooltip": "Maximum number of Stegonaut that spawn together",
-  
+
   "text.autoconfig.saintsdragonsspawning.option.cindervaneSpawnWeight": "Cindervane Spawn Weight",
   "text.autoconfig.saintsdragonsspawning.option.cindervaneSpawnWeight.@Tooltip": "How often Cindervane spawns (0 = disabled, higher = more common)",
   "text.autoconfig.saintsdragonsspawning.option.cindervaneMinGroupSize": "Cindervane Min Group Size",
   "text.autoconfig.saintsdragonsspawning.option.cindervaneMinGroupSize.@Tooltip": "Minimum number of Cindervane that spawn together",
   "text.autoconfig.saintsdragonsspawning.option.cindervaneMaxGroupSize": "Cindervane Max Group Size",
   "text.autoconfig.saintsdragonsspawning.option.cindervaneMaxGroupSize.@Tooltip": "Maximum number of Cindervane that spawn together",
-  
+
   "text.autoconfig.saintsdragonsspawning.option.nulljawSpawnWeight": "Nulljaw Spawn Weight",
   "text.autoconfig.saintsdragonsspawning.option.nulljawSpawnWeight.@Tooltip": "How often Nulljaw spawns (0 = disabled, higher = more common)",
   "text.autoconfig.saintsdragonsspawning.option.nulljawMinGroupSize": "Nulljaw Min Group Size",
