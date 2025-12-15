@@ -63,7 +63,7 @@ public final class RaevyxSoundProfile implements DragonSoundProfile {
             // Roar sound is handled by RaevyxRoarAbility with precise timing, skip keyframe
             // Hurt/die sounds are handled by entity hurt/death methods, skip keyframe
             if ("roar".equals(vocalKey) || "raevyx_hurt".equals(vocalKey) || "raevyx_die".equals(vocalKey) ||
-                "baby_raevyx_hurt".equals(vocalKey) || "baby_raevyx_die".equals(vocalKey)) {
+                    "baby_raevyx_hurt".equals(vocalKey) || "baby_raevyx_die".equals(vocalKey)) {
                 return true; // Block the keyframe, entity plays the sound
             }
             playVocalEntry(handler, dragon, vocalKey, locator);
@@ -126,6 +126,10 @@ public final class RaevyxSoundProfile implements DragonSoundProfile {
                 playSummonStormAirLoop(handler, dragon, locator);
                 yield true;
             }
+            case "raevyx_eat" -> {
+                playEatSound(handler, dragon, locator);
+                yield true;
+            }
             default -> false;
         };
     }
@@ -181,6 +185,12 @@ public final class RaevyxSoundProfile implements DragonSoundProfile {
                 locator != null && !locator.isEmpty() ? locator : "bodyLocator"
         );
         playClientSound(dragon, at, ModSounds.RAEVYX_LANDED.get(), 1.0f, 1.0f);
+    }
+    private void playEatSound(DragonSoundHandler handler, DragonEntity dragon, String locator) {
+        Vec3 at = handler.resolveLocatorWorldPos(
+                locator != null && !locator.isEmpty() ? locator : "mouth_origin"
+        );
+        playClientSound(dragon, at, ModSounds.RAEVYX_EAT.get(), 1.0f, 1.0f);
     }
 
     private void playVocalEntry(DragonSoundHandler handler, DragonEntity dragon, String vocalKey, String locator) {

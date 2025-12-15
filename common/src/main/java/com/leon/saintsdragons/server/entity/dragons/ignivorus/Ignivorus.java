@@ -358,10 +358,6 @@ public class Ignivorus extends RideableDragonBase implements DragonFlightCapable
             .add(Attributes.KNOCKBACK_RESISTANCE, 2.0D);
     }
 
-    @Override
-    public float maxUpStep() {
-        return 1.1F;
-    }
 
     @Override
     protected void registerGoals() {
