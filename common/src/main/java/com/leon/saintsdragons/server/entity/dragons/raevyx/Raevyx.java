@@ -364,9 +364,15 @@ public class Raevyx extends RideableDragonBase implements FlyingAnimal, RangedAt
     private int pitchDir = 0; // -1 down, 0 none, 1 up
 
     // Dodge system
+    private static final double DODGE_HORIZONTAL_DRAG = 0.92D;
+    private static final double DODGE_VERTICAL_DRAG = 0.95D;
     boolean dodging = false;
     int dodgeTicksLeft = 0;
     Vec3 dodgeVec = Vec3.ZERO;
+    int dodgeCooldownTicks = 0; // Cooldown between dodges
+    int dodgeIFramesTicks = 0; // Invulnerability frames during dodge
+    private float preDodgeStepHeight = 1.25F;
+    private float dynamicMaxUpStep = 1.25F;
 
     // Client-side animation initialization grace period (fixes T-pose on world rejoin with shaders)
     private int clientAnimInitTicks = 0;
@@ -618,7 +624,7 @@ public class Raevyx extends RideableDragonBase implements FlyingAnimal, RangedAt
 
     @Override
     public float maxUpStep() {
-        return 1.25F;
+        return dynamicMaxUpStep;
     }
 
     // Cooldown to prevent hurt sound spam when ridden or under rapid hits
@@ -830,6 +836,16 @@ public class Raevyx extends RideableDragonBase implements FlyingAnimal, RangedAt
             case TOGGLE_MELEE -> {
                 if (!locked) {
                     toggleMeleeMode();
+                }
+            }
+            case DODGE_LEFT -> {
+                if (!locked) {
+                    onRiderDodge(player, true);
+                }
+            }
+            case DODGE_RIGHT -> {
+                if (!locked) {
+                    onRiderDodge(player, false);
                 }
             }
             default -> { }
@@ -1342,8 +1358,58 @@ public class Raevyx extends RideableDragonBase implements FlyingAnimal, RangedAt
         this.dodging = true;
         this.dodgeVec = vec;
         this.dodgeTicksLeft = Math.max(1, ticks);
+        this.setDeltaMovement(vec);
         this.getNavigation().stop();
         this.hasImpulse = true;
+    }
+
+    @Override
+    protected void onRiderDodge(net.minecraft.world.entity.player.Player player, boolean isLeft) {
+        // Only allow dodge on ground
+        if (isFlying()) {
+            return;
+        }
+        if (dodgeCooldownTicks > 0) {
+            return;
+        }
+
+        // Dodge constants
+        final int DODGE_DURATION = 12;
+        final int DODGE_COOLDOWN = 30;
+        final int DODGE_IFRAMES = 8;
+        final int DODGE_CONTROL_LOCK = 12;
+        final double DODGE_DISTANCE = 20; // blocks
+
+        // Get right vector (perpendicular to facing direction)
+        float yawRad = (float) Math.toRadians(this.getYRot());
+        double rightX = Math.cos(yawRad);
+        double rightZ = Math.sin(yawRad);
+
+        // Account for drag so the integrated distance over the duration is ~DODGE_DISTANCE
+        double dragScale = 1.0D - Math.pow(DODGE_HORIZONTAL_DRAG, DODGE_DURATION);
+        double perTickSpeed = DODGE_DISTANCE * (1.0D - DODGE_HORIZONTAL_DRAG) / dragScale;
+
+        // Calculate dodge direction (left or right)
+        double dodgeDirX = rightX * (isLeft ? 1 : -1);
+        double dodgeDirZ = rightZ * (isLeft ? 1 : -1);
+
+        // Create dodge vector (horizontal only, no vertical component)
+        Vec3 dodgeVector = new Vec3(dodgeDirX * perTickSpeed, 0, dodgeDirZ * perTickSpeed);
+
+        // Begin dodge
+        beginDodge(dodgeVector, DODGE_DURATION);
+        lockRiderControls(DODGE_CONTROL_LOCK);
+
+        // Set cooldown and i-frames
+        dodgeCooldownTicks = DODGE_COOLDOWN;
+        dodgeIFramesTicks = DODGE_IFRAMES;
+
+        // Trigger dodge animation
+        if (isLeft) {
+            animationHandler.triggerDodgeLeftAnimation();
+        } else {
+            animationHandler.triggerDodgeRightAnimation();
+        }
     }
 
     // Animation initialization system (fixes T-pose on world rejoin with shaders)
@@ -1414,6 +1480,13 @@ public class Raevyx extends RideableDragonBase implements FlyingAnimal, RangedAt
         tickFeedingCooldown();
         if (tamingAbortCalmTicks > 0) {
             tamingAbortCalmTicks--;
+        }
+        // Dodge system cooldowns
+        if (dodgeCooldownTicks > 0) {
+            dodgeCooldownTicks--;
+        }
+        if (dodgeIFramesTicks > 0) {
+            dodgeIFramesTicks--;
         }
         tamingController.tickServer();
         tickSleepTransition();
@@ -2607,10 +2680,12 @@ public class Raevyx extends RideableDragonBase implements FlyingAnimal, RangedAt
     }
 
     private void handleDodgeMovement() {
-        Vec3 current = this.getDeltaMovement();
-        Vec3 boosted = current.add(dodgeVec.scale(0.25));
-        this.setDeltaMovement(boosted.multiply(0.92, 0.95, 0.92));
+        // Apply the dodge velocity directly
+        this.setDeltaMovement(dodgeVec);
         this.hasImpulse = true;
+
+        // Decay for next tick
+        dodgeVec = dodgeVec.multiply(DODGE_HORIZONTAL_DRAG, DODGE_VERTICAL_DRAG, DODGE_HORIZONTAL_DRAG);
 
         if (--dodgeTicksLeft <= 0) {
             dodging = false;
@@ -2621,18 +2696,19 @@ public class Raevyx extends RideableDragonBase implements FlyingAnimal, RangedAt
     // ===== TRAVEL METHOD =====
     @Override
     public void travel(@NotNull Vec3 motion) {
-        // Handle sitting/dodging/dying states first
+        // During a dodge, preserve the stored dodge velocity and let vanilla travel apply it without rider overrides.
+        if (this.isDodging()) {
+            super.travel(Vec3.ZERO);
+            return;
+        }
+
+        // Handle sitting/dying states
         boolean sittingLocked = (this.isOrderedToSit() || this.isInSittingPose()) && postStandUnlockTicks <= 0;
-        if (sittingLocked || this.isDodging() || this.isDying() || this.isSleeping() || this.isSleepTransitioning()) {
+        if (sittingLocked || this.isDying() || this.isSleeping() || this.isSleepTransitioning()) {
             if (this.getNavigation().getPath() != null) {
                 this.getNavigation().stop();
             }
             motion = Vec3.ZERO;
-            super.travel(motion);
-            return;
-        }
-
-        if (dodging) {
             super.travel(motion);
             return;
         }
@@ -2975,6 +3051,10 @@ public class Raevyx extends RideableDragonBase implements FlyingAnimal, RangedAt
     public boolean hurt(@Nonnull DamageSource damageSource, float amount) {
         // During dying sequence, ignore all damage (entity is already dead, playing death animation)
         if (isDying()) {
+            return false;
+        }
+        // Invulnerability during dodge (i-frames)
+        if (dodgeIFramesTicks > 0) {
             return false;
         }
         // Immune to lightning damage
