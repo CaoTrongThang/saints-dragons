@@ -1,6 +1,5 @@
 package com.leon.saintsdragons.server.entity.dragons.ignivorus.handlers;
 
-import com.leon.saintsdragons.common.network.DragonAnimTickets;
 import com.leon.saintsdragons.server.entity.dragons.ignivorus.Ignivorus;
 import software.bernie.geckolib.animation.*;
 import software.bernie.geckolib.animation.PlayState;
