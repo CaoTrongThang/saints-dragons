@@ -1,0 +1,32 @@
+{
+  "parent": "saintsdragons:root",
+  "criteria": {
+    "tame_cindervane": {
+      "trigger": "minecraft:impossible"
+    }
+  },
+  "display": {
+    "description": {
+      "translate": "advancement.saintsdragons.tame_cindervane.description"
+    },
+    "icon": {
+      "count": 1,
+      "id": "minecraft:magma_block"
+    },
+    "title": {
+      "translate": "advancement.saintsdragons.tame_cindervane.title"
+    },
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": true
+  },
+  "requirements": [
+    [
+      "tame_cindervane"
+    ]
+  ],
+  "rewards": {
+    "experience": 50
+  },
+  "sends_telemetry_event": false
+}

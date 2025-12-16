@@ -1,0 +1,32 @@
+{
+  "parent": "saintsdragons:root",
+  "criteria": {
+    "tame_raevyx": {
+      "trigger": "minecraft:impossible"
+    }
+  },
+  "display": {
+    "description": {
+      "translate": "advancement.saintsdragons.tame_raevyx.description"
+    },
+    "icon": {
+      "count": 1,
+      "id": "minecraft:salmon"
+    },
+    "title": {
+      "translate": "advancement.saintsdragons.tame_raevyx.title"
+    },
+    "frame": "challenge",
+    "show_toast": true,
+    "announce_to_chat": true
+  },
+  "requirements": [
+    [
+      "tame_raevyx"
+    ]
+  ],
+  "rewards": {
+    "experience": 300
+  },
+  "sends_telemetry_event": false
+}

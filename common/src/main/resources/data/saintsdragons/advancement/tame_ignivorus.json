@@ -1,0 +1,32 @@
+{
+  "parent": "saintsdragons:root",
+  "criteria": {
+    "tame_ignivorus": {
+      "trigger": "minecraft:impossible"
+    }
+  },
+  "display": {
+    "description": {
+      "translate": "advancement.saintsdragons.tame_ignivorus.description"
+    },
+    "icon": {
+      "count": 1,
+      "id": "minecraft:netherite_ingot"
+    },
+    "title": {
+      "translate": "advancement.saintsdragons.tame_ignivorus.title"
+    },
+    "frame": "challenge",
+    "show_toast": true,
+    "announce_to_chat": true
+  },
+  "requirements": [
+    [
+      "tame_ignivorus"
+    ]
+  ],
+  "rewards": {
+    "experience": 500
+  },
+  "sends_telemetry_event": false
+}

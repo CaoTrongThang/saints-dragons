@@ -1,0 +1,32 @@
+{
+  "parent": "saintsdragons:root",
+  "criteria": {
+    "tame_stegonaut": {
+      "trigger": "minecraft:impossible"
+    }
+  },
+  "display": {
+    "description": {
+      "translate": "advancement.saintsdragons.tame_stegonaut.description"
+    },
+    "icon": {
+      "count": 1,
+      "id": "minecraft:stone"
+    },
+    "title": {
+      "translate": "advancement.saintsdragons.tame_stegonaut.title"
+    },
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": true
+  },
+  "requirements": [
+    [
+      "tame_stegonaut"
+    ]
+  ],
+  "rewards": {
+    "experience": 5
+  },
+  "sends_telemetry_event": false
+}

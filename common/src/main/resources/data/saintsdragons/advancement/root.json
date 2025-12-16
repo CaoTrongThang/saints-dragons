@@ -1,0 +1,24 @@
+{
+  "criteria": {
+    "always_true": {
+      "trigger": "minecraft:tick"
+    }
+  },
+  "display": {
+    "announce_to_chat": false,
+    "background": "minecraft:textures/gui/advancements/backgrounds/adventure.png",
+    "description": "Tame legendary dragons",
+    "icon": {
+      "count": 1,
+      "id": "minecraft:dragon_egg"
+    },
+    "show_toast": false,
+    "title": "Saints Dragons"
+  },
+  "requirements": [
+    [
+      "always_true"
+    ]
+  ],
+  "sends_telemetry_event": false
+}

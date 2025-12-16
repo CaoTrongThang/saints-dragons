@@ -1,0 +1,32 @@
+{
+  "parent": "saintsdragons:root",
+  "criteria": {
+    "tame_nulljaw": {
+      "trigger": "minecraft:impossible"
+    }
+  },
+  "display": {
+    "description": {
+      "translate": "advancement.saintsdragons.tame_nulljaw.description"
+    },
+    "icon": {
+      "count": 1,
+      "id": "minecraft:salmon"
+    },
+    "title": {
+      "translate": "advancement.saintsdragons.tame_nulljaw.title"
+    },
+    "frame": "challenge",
+    "show_toast": true,
+    "announce_to_chat": true
+  },
+  "requirements": [
+    [
+      "tame_nulljaw"
+    ]
+  ],
+  "rewards": {
+    "experience": 180
+  },
+  "sends_telemetry_event": false
+}
