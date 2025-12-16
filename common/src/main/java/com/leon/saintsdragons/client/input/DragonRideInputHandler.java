@@ -107,6 +107,10 @@ public final class DragonRideInputHandler {
     private static boolean wasRightKeyDown = false;
     private static final long DOUBLE_TAP_WINDOW_MS = 300;
 
+    // Double-tap bulldoze detection (Ignivorus)
+    private static long lastForwardTapTime = 0;
+    private static boolean wasForwardKeyDown = false;
+
     private DragonRideInputHandler() {
     }
 
@@ -231,6 +235,22 @@ public final class DragonRideInputHandler {
 
             wasLeftKeyDown = leftDown;
             wasRightKeyDown = rightDown;
+        }
+
+        // Double-tap bulldoze detection (only for Ignivorus)
+        if (dragon instanceof com.leon.saintsdragons.server.entity.dragons.ignivorus.Ignivorus) {
+            boolean forwardDown = mc.options.keyUp.isDown();
+            long currentTime = System.currentTimeMillis();
+
+            // Detect forward bulldoze (double-tap W)
+            if (forwardDown && !wasForwardKeyDown) {
+                if (currentTime - lastForwardTapTime < DOUBLE_TAP_WINDOW_MS) {
+                    sendInput(ascendDown, descendDown, DragonRiderAction.DOUBLE_TAP_W, null, forward, strafe, yaw);
+                }
+                lastForwardTapTime = currentTime;
+            }
+
+            wasForwardKeyDown = forwardDown;
         }
 
         handleAbilityBinding(dragon.getTertiaryRiderAbility(), tertiaryDown, wasTertiaryAbilityDown, forward, strafe, yaw);

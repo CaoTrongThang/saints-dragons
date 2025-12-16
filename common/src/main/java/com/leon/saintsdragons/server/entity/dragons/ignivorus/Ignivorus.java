@@ -122,6 +122,10 @@ public class Ignivorus extends RideableDragonBase implements DragonFlightCapable
 
     public static final EntityDataAccessor<Boolean> DATA_ACCELERATING =
             SynchedEntityData.defineId(Ignivorus.class, EntityDataSerializers.BOOLEAN);
+
+    public static final EntityDataAccessor<Boolean> DATA_BULLDOZING =
+            SynchedEntityData.defineId(Ignivorus.class, EntityDataSerializers.BOOLEAN);
+
     public static final EntityDataAccessor<Integer> DATA_FEEDING_COOLDOWN =
             SynchedEntityData.defineId(Ignivorus.class, EntityDataSerializers.INT);
     /** Tracks whether the dragon is stunned during a taming attempt */
@@ -251,6 +255,10 @@ public class Ignivorus extends RideableDragonBase implements DragonFlightCapable
     private float bankAngle = 0f;
     private float prevBankAngle = 0f;
 
+    // Bulldoze toggle state
+    private boolean bulldozing = false;
+    private int bulldozeCooldownTicks = 0;
+
     // Screen shake system
     private static final float SHAKE_DECAY_PER_TICK = 0.025F;
     private float prevScreenShakeAmount = 0.0F;
@@ -348,6 +356,7 @@ public class Ignivorus extends RideableDragonBase implements DragonFlightCapable
         builder.define(DATA_GOING_UP, false);
         builder.define(DATA_GOING_DOWN, false);
         builder.define(DATA_ACCELERATING, false);
+        builder.define(DATA_BULLDOZING, false);
     }
 
     public static AttributeSupplier.Builder createAttributes() {
@@ -446,6 +455,7 @@ public class Ignivorus extends RideableDragonBase implements DragonFlightCapable
         // Update banking and pitching for animations
         tickBankingLogic();
         tickPitchingLogic();
+        tickBulldozeState();
 
         if (!level().isClientSide) {
             if (tamingAbortCalmTicks > 0) {
@@ -512,6 +522,9 @@ public class Ignivorus extends RideableDragonBase implements DragonFlightCapable
             return;
         }
         if (isOrderedToSit() || this.isStayOrSitMuted()) {
+            return;
+        }
+        if (bulldozing) {
             return;
         }
 
@@ -633,6 +646,60 @@ public class Ignivorus extends RideableDragonBase implements DragonFlightCapable
         cinematicZoomProgress = Mth.lerp(0.12F, cinematicZoomProgress, target);
         if (Math.abs(cinematicZoomProgress - target) < 0.01F) {
             cinematicZoomProgress = target;
+        }
+    }
+
+    private void tickBulldozeState() {
+        // Only server handles bulldoze logic
+        if (!level().isClientSide) {
+            // Tick down cooldown
+            if (bulldozeCooldownTicks > 0) {
+                bulldozeCooldownTicks--;
+            }
+
+            // Force sprint while bulldozing (even during transition lock)
+            if (bulldozing && this.isVehicle() && !this.isAccelerating()) {
+                setAccelerating(true);
+            }
+
+            // Disable bulldozing if player dismounts
+            if (bulldozing && !this.isVehicle()) {
+                bulldozing = false;
+                this.entityData.set(DATA_BULLDOZING, false);
+                setAccelerating(false);
+                bulldozeCooldownTicks = 40; // 2 second cooldown
+                clearRiderControlLock(); // Clear any transition lock
+            }
+
+            // Handle collision damage while bulldozing
+            if (bulldozing && this.isVehicle()) {
+                // Get all entities in a small radius around the dragon
+                AABB searchBox = this.getBoundingBox().inflate(1.0D);
+                java.util.List<LivingEntity> entities = this.level().getEntitiesOfClass(
+                    LivingEntity.class,
+                    searchBox,
+                    entity -> entity != this && entity != this.getControllingPassenger() && !this.isAlliedTo(entity)
+                );
+
+                // Damage and knockback each entity
+                for (LivingEntity target : entities) {
+                    // Apply damage (5 HP)
+                    target.hurt(this.damageSources().mobAttack(this), 5.0F);
+
+                    // Apply knockback (level 2)
+                    double knockbackStrength = 2.0D;
+                    double dx = target.getX() - this.getX();
+                    double dz = target.getZ() - this.getZ();
+                    double dist = Math.sqrt(dx * dx + dz * dz);
+                    if (dist > 0) {
+                        target.knockback(
+                            knockbackStrength,
+                            -dx / dist,  // Opposite direction
+                            -dz / dist
+                        );
+                    }
+                }
+            }
         }
     }
 
@@ -787,6 +854,21 @@ public class Ignivorus extends RideableDragonBase implements DragonFlightCapable
         if (action == null) {
             return;
         }
+
+        // Allow DOUBLE_TAP_W to toggle bulldoze on/off even while bulldozing
+        // (locked check happens inside onRiderBulldoze)
+        if (action == DragonRiderAction.DOUBLE_TAP_W) {
+            if (!locked) {
+                onRiderBulldoze(player);
+            }
+            return;
+        }
+
+        // Block all other actions while bulldozing (but allow toggle)
+        if (bulldozing) {
+            return;
+        }
+
         switch (action) {
             case TAKEOFF_REQUEST -> {
                 if (!locked) {
@@ -1166,6 +1248,37 @@ public class Ignivorus extends RideableDragonBase implements DragonFlightCapable
         super.onRiderToggleMelee(player);
         if (!level().isClientSide) {
             syncMeleeMode(player);
+        }
+    }
+
+    @Override
+    protected void onRiderBulldoze(Player player) {
+        // Check cooldown
+        if (bulldozeCooldownTicks > 0) {
+            return;
+        }
+
+        // Check if controls are locked (transition in progress)
+        if (areRiderControlsLocked()) {
+            return;
+        }
+
+        // Toggle bulldozing on/off
+        if (bulldozing) {
+            // Turn OFF
+            bulldozing = false;
+            this.entityData.set(DATA_BULLDOZING, false);
+            setAccelerating(false); // Stop forced sprint
+            bulldozeCooldownTicks = 40; // 2 second cooldown
+            lockRiderControls(20); // Lock controls for 1 second during exit animation
+            animationHandler.triggerBulldozeExitAnimation();
+        } else {
+            // Turn ON
+            bulldozing = true;
+            this.entityData.set(DATA_BULLDOZING, true);
+            setAccelerating(true); // Force sprint
+            lockRiderControls(20); // Lock controls for 1 second during enter animation
+            animationHandler.triggerBulldozeEnterAnimation();
         }
     }
 

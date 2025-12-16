@@ -106,6 +106,7 @@ public abstract class RideableDragonBase extends DragonEntity implements Rideabl
             case TOGGLE_MELEE -> { if (!locked) onRiderToggleMelee(player); }
             case DOUBLE_TAP_A -> { if (!locked) onRiderDodge(player, true); }
             case DOUBLE_TAP_D -> { if (!locked) onRiderDodge(player, false); }
+            case DOUBLE_TAP_W -> { if (!locked) onRiderBulldoze(player); }
             default -> { }
         }
     }
@@ -117,6 +118,14 @@ public abstract class RideableDragonBase extends DragonEntity implements Rideabl
      */
     protected void onRiderDodge(Player player, boolean isLeft) {
         // Default: no dodge (override in dragon classes that support it)
+    }
+
+    /**
+     * Called when rider requests a bulldoze toggle. Override in subclasses to implement bulldoze mechanics.
+     * @param player The player riding
+     */
+    protected void onRiderBulldoze(Player player) {
+        // Default: no bulldoze (override in dragon classes that support it)
     }
 
     protected void onRiderToggleMelee(Player player) {
