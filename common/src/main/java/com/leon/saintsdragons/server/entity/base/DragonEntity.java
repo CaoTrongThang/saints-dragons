@@ -920,7 +920,9 @@ public abstract class DragonEntity extends TamableAnimal implements GeoEntity {
      */
     @Override
     public void travel(@NotNull Vec3 travelVector) {
-        if (this.isOrderedToSit() && !this.isVehicle() && !this.isPassenger()) {
+        // Freeze movement when sitting or sleeping
+        if ((this.isOrderedToSit() || this.isSleeping() || this.isSleepTransitioning())
+            && !this.isVehicle() && !this.isPassenger()) {
             this.setDeltaMovement(Vec3.ZERO);
             super.travel(Vec3.ZERO);
             return;
