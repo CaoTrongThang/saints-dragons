@@ -1420,6 +1420,11 @@ public class Nulljaw extends RideableDragonBase implements AquaticDragon, Shakes
                 return;
             }
 
+            // Don't update look rotation when sleeping
+            if (this.dragon.isSleeping() || this.dragon.isSleepTransitioning()) {
+                return;
+            }
+
             LivingEntity rider = this.dragon.getControllingPassenger();
             if (this.dragon.isVehicle() && rider != null) {
                 if (this.dragon.isControlledByLocalInstance()) {
