@@ -19,7 +19,7 @@ public class DragonSleepBehavior {
         // Use shorter delay if sleep conditions are met (chunk reload), longer if not (fresh spawn)
         if (shouldSleepBasedOnConditions()) {
             // Sleep time - short delay for chunk reload (allows quick re-entry but not instant)
-            delaySleep(20, 40); // 1-2 seconds
+            delaySleep(60, 80);
         } else {
             // Not sleep time - longer random delay before first sleep check
             delaySleep(100, 300); // 5-15 seconds
