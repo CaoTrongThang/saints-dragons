@@ -3563,18 +3563,8 @@ public class Raevyx extends RideableDragonBase implements FlyingAnimal, RangedAt
             this.setOrderedToSit(false);
         }
 
-        // Clear all sleep state on world load (sleep is ephemeral, not persisted)
-        // Sleep goal will re-evaluate conditions and put dragon back to sleep if appropriate
-        if (this.sleepLocked || this.isSleepingEntering() || this.isSleepingExiting() || this.entityData.get(DATA_SLEEPING)) {
-            this.releaseSleepLock();
-            this.wakeUpImmediately();
-            this.suppressSleep(200);
-        }
-        this.setSleepingEntering(false);
-        this.setSleepingExiting(false);
-        this.sleepTransitionTicks = 0;
-        this.entityData.set(DATA_SLEEPING, false);
-        this.sleepCommandSnapshot = -1;
+        // Don't force wake on chunk reload - let sleep behavior re-evaluate naturally (like Naturalist mod)
+        // Sleep transition states are ephemeral and will be re-evaluated by DragonSleepBehavior
         this.followFailsafeCooldown = 0;
 
         // Wild wyverns should never persist sit/sleep suppression after reload; reset fully to allow sleep re-evaluation
