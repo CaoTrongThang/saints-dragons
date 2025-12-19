@@ -837,18 +837,10 @@ public class Nulljaw extends RideableDragonBase implements AquaticDragon, Shakes
 
 
     public void handleJumpRequest() {
-        if (areRiderControlsLocked()) {
-            return;
-        }
-        if (this.isInWater()) {
-            // Enhanced water jump - more powerful for aquatic creature
-            Vec3 jump = new Vec3(0.0D, 0.6D, 0.0D);
-            this.setDeltaMovement(this.getDeltaMovement().add(jump));
-            this.hasImpulse = true;
-        } else if (this.onGround()) {
+       if (this.onGround()) {
             // Ground jump - standard jump height
             Vec3 movement = this.getDeltaMovement();
-            this.setDeltaMovement(movement.x, 0.42D, movement.z);
+            this.setDeltaMovement(movement.x, 1.0, movement.z);
             this.hasImpulse = true;
         }
     }
@@ -869,14 +861,6 @@ public class Nulljaw extends RideableDragonBase implements AquaticDragon, Shakes
             setLastRiderStrafe(Math.abs(str) > 0.02f ? str : 0f);
         }
         return input;
-    }
-
-    @Override
-    protected float getRiddenSpeed(@Nonnull @NotNull Player rider) {
-        if (areRiderControlsLocked()) {
-            return 0.0F;
-        }
-        return riderController.getRiddenSpeed(rider);
     }
 
     @Override
