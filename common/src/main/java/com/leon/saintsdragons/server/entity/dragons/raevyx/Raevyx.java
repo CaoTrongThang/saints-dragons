@@ -1224,14 +1224,6 @@ public class Raevyx extends RideableDragonBase implements FlyingAnimal, RangedAt
         return 1; // Forward flight
     }
 
-    /**
-     * Computes flight mode for network sync (delegates to getFlightMode)
-     * 0 = glide, 1 = flap, 2 = hover, 3 = takeoff, 4 = sprint_flap, 5 = fly_idle, -1 = ground
-     */
-    private int computeFlightModeForSync() {
-        return getFlightMode();
-    }
-
     @Override
     protected boolean isDragonFlying() {
         return getBooleanData(DATA_FLYING);

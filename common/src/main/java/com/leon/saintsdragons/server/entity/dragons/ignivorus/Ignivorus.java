@@ -435,12 +435,6 @@ public class Ignivorus extends RideableDragonBase implements DragonFlightCapable
             timeFlying = 0;
         }
 
-        // Update flight mode for animation system (server side only)
-        if (!level().isClientSide && isFlying()) {
-            int newFlightMode = computeFlightModeForSync();
-            setFlightMode(newFlightMode);
-        }
-
         // Auto-complete landing once we're actually on ground to avoid hover-stuck states
         if (!level().isClientSide && isLanding() && onGround()) {
             markLandedNow();
@@ -1492,11 +1486,9 @@ public class Ignivorus extends RideableDragonBase implements DragonFlightCapable
 
     @Override
     public int getFlightMode() {
-        return this.entityData.get(DATA_FLIGHT_MODE);
-    }
-
-    public void setFlightMode(int mode) {
-        this.entityData.set(DATA_FLIGHT_MODE, mode);
+        // Flight mode computation (consistent with Cindervane/Raevyx architecture)
+        // Calls the actual computation logic below
+        return computeFlightModeForSync();
     }
 
     public boolean isBreathingFire() {

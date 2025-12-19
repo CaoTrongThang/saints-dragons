@@ -800,12 +800,15 @@ public class Cindervane extends RideableDragonBase implements DragonFlightCapabl
     private void tickRiderTakeoff() {
         if (!level().isClientSide && riderTakeoffTicks > 0) {
             riderTakeoffTicks--;
-            Vec3 velocity = this.getDeltaMovement();
-            double boost = this.isFlying() ? 0.08D : 0.12D;
-            if (velocity.y < boost) {
-                this.setDeltaMovement(velocity.x, boost, velocity.z);
+            // Only apply boost if NOT being ridden (rider controller handles takeoff boost instead)
+            if (getControllingPassenger() == null) {
+                Vec3 velocity = this.getDeltaMovement();
+                double boost = this.isFlying() ? 0.08D : 0.12D;
+                if (velocity.y < boost) {
+                    this.setDeltaMovement(velocity.x, boost, velocity.z);
+                }
+                this.hasImpulse = true;
             }
-            this.hasImpulse = true;
         }
     }
 
@@ -2310,6 +2313,10 @@ public class Cindervane extends RideableDragonBase implements DragonFlightCapabl
         setLanding(false);
         setTakeoff(false);
         this.riderTakeoffTicks = 0;
+    }
+
+    public int getRiderTakeoffTicks() {
+        return riderTakeoffTicks;
     }
 
     public void setRiderTakeoffTicks(int ticks) {
