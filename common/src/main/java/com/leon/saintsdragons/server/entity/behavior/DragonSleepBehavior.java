@@ -15,11 +15,14 @@ public class DragonSleepBehavior {
 
     public DragonSleepBehavior(DragonEntity dragon) {
         this.dragon = dragon;
-        // Only apply delay if sleep conditions are NOT currently met
-        // This allows immediate re-entry on chunk reload if it's still sleep time
-        if (!shouldSleepBasedOnConditions()) {
-            // Not sleep time - apply random delay before first sleep check
-            delaySleep(100, 300); // 5-15 seconds of wandering before first sleep check
+        // Always apply an initial delay to prevent immediate sleep on spawn/time change
+        // Use shorter delay if sleep conditions are met (chunk reload), longer if not (fresh spawn)
+        if (shouldSleepBasedOnConditions()) {
+            // Sleep time - short delay for chunk reload (allows quick re-entry but not instant)
+            delaySleep(20, 40); // 1-2 seconds
+        } else {
+            // Not sleep time - longer random delay before first sleep check
+            delaySleep(100, 300); // 5-15 seconds
         }
     }
 

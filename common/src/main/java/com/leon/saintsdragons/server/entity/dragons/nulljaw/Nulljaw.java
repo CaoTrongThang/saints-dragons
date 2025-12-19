@@ -600,6 +600,12 @@ public class Nulljaw extends RideableDragonBase implements AquaticDragon, Shakes
                 this.lookControl = landLookControl;
             }
 
+            // Lock head and body rotation when sleeping to prevent look goals from rotating the dragon
+            if (isSleeping() || isSleepingEntering() || isSleepingExiting()) {
+                this.setYHeadRot(this.yBodyRot);
+                this.yHeadRotO = this.yBodyRot;
+            }
+
             if ((isSleeping() || isSleepingEntering() || isSleepingExiting())
                     && (this.getTarget() != null || this.isAggressive() || this.isInWaterOrBubble())) {
                 wakeUpImmediately();
