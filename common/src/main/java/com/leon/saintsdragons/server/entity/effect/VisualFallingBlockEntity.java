@@ -3,8 +3,6 @@ package com.leon.saintsdragons.server.entity.effect;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtUtils;
-import net.minecraft.network.protocol.Packet;
-import net.minecraft.network.protocol.game.ClientGamePacketListener;
 import net.minecraft.network.protocol.game.ClientboundAddEntityPacket;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
@@ -45,8 +43,8 @@ public class VisualFallingBlockEntity extends Entity {
     }
 
     @Override
-    protected void defineSynchedData() {
-        this.entityData.define(BLOCK_STATE, Blocks.AIR.defaultBlockState());
+    protected void defineSynchedData(SynchedEntityData.Builder builder) {
+        builder.define(BLOCK_STATE, Blocks.AIR.defaultBlockState());
     }
 
     public BlockState getBlockState() {
@@ -102,11 +100,6 @@ public class VisualFallingBlockEntity extends Entity {
     @Override
     public boolean isAttackable() {
         return false;
-    }
-
-    @Override
-    public @NotNull Packet<ClientGamePacketListener> getAddEntityPacket() {
-        return new ClientboundAddEntityPacket(this);
     }
 
     @Override
