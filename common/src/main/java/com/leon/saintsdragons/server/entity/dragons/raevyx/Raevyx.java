@@ -3093,6 +3093,7 @@ public class Raevyx extends RideableDragonBase implements FlyingAnimal, RangedAt
             }
         }
         applyConfiguredAttributes();
+        this.setHealth(this.getMaxHealth());
         return spawnData;
     }
 
@@ -4113,11 +4114,11 @@ public class Raevyx extends RideableDragonBase implements FlyingAnimal, RangedAt
         if (!areRiderControlsLocked()) {
             riderController.tickRidden(player, travelVector);
         } else {
-            // While locked, keep rider safe and aligned but do not apply rider-driven yaw/pitch changes
+            // While locked, keep rider safe and aligned but do not apply rider-driven pitch changes
             player.fallDistance = 0.0F;
             this.fallDistance = 0.0F;
             this.setTarget(null);
-            copyRiderLook(player);
+            copyRiderYaw(player);
             // Stop acceleration & vertical intents during lock
             this.setAccelerating(false);
             if (!this.isFlying()) {
