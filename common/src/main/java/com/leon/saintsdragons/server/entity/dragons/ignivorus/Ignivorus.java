@@ -292,6 +292,7 @@ public class Ignivorus extends RideableDragonBase implements DragonFlightCapable
     private static final double LEAP_KNOCKBACK = 5.5D; // Knockback strength
     private static final double LEAP_LIFT = 0.8D; // Upward launch on hit
     private static final double LEAP_IMPACT_TRIGGER_HEIGHT = 7.0D; // Trigger impact anim just before landing
+    private static final int LEAP_GROUNDED_FAILSAFE_TICKS = 6; // Abort if we never leave the ground
 
     // Leap animation states
     private static final int LEAP_STATE_NONE = 0;
@@ -304,6 +305,7 @@ public class Ignivorus extends RideableDragonBase implements DragonFlightCapable
     private int leapImpactRecoveryTicks = 0; // Blocks ambient sounds during impact animation
     private boolean leapImpactTriggered = false;
     private boolean wasAirborneBeforeLanding = false; // Track if we were in the air before landing
+    private int leapGroundedTicks = 0; // Failsafe for rare cases where we never leave the ground
 
     // Animation timing constants (in ticks, 20 ticks = 1 second)
     private static final int LEAP_IMPACT_RECOVERY_DURATION = 20;
@@ -840,6 +842,7 @@ public class Ignivorus extends RideableDragonBase implements DragonFlightCapable
                 setDeltaMovement(Vec3.ZERO);
                 wasAirborneBeforeLanding = false;
                 leapImpactTriggered = false;
+                leapGroundedTicks = 0;
                 leapCooldownTicks = 60; // 3 second cooldown
                 leapImpactRecoveryTicks = 0; // Clear recovery timer
             }
@@ -852,9 +855,12 @@ public class Ignivorus extends RideableDragonBase implements DragonFlightCapable
     }
 
     private void handleLeapMovement() {
-        // Track if we've left the ground
+        // Track if we've left the ground (and detect stuck-ground edge cases)
         if (!onGround()) {
             wasAirborneBeforeLanding = true;
+            leapGroundedTicks = 0;
+        } else {
+            leapGroundedTicks++;
         }
 
         // Trigger impact animation slightly before touchdown when descending
@@ -904,6 +910,22 @@ public class Ignivorus extends RideableDragonBase implements DragonFlightCapable
             setDeltaMovement(Vec3.ZERO);
 
             // Animation handled by IgnivorusAnimationHandler.handleMovementAnimation()
+            leapGroundedTicks = 0;
+            return;
+        }
+
+        // Failsafe: if we never leave the ground, clear the leap to avoid freezing
+        if (onGround() && !wasAirborneBeforeLanding && leapGroundedTicks >= LEAP_GROUNDED_FAILSAFE_TICKS) {
+            leaping = false;
+            this.entityData.set(DATA_LEAPING, false);
+            leapAnimState = LEAP_STATE_NONE;
+            this.entityData.set(DATA_LEAP_ANIM_STATE, LEAP_STATE_NONE);
+            leapVelocity = Vec3.ZERO;
+            setDeltaMovement(Vec3.ZERO);
+            wasAirborneBeforeLanding = false;
+            leapImpactTriggered = false;
+            leapGroundedTicks = 0;
+            leapCooldownTicks = 20;
         }
     }
 
@@ -1452,10 +1474,11 @@ public class Ignivorus extends RideableDragonBase implements DragonFlightCapable
             case ABILITY_USE -> {
                 if (!locked && abilityName != null && !abilityName.isEmpty()) {
                     // Block non-attack abilities while in Phase 2
-                    // Wing swipe, stomp, and fire breath are allowed in Phase 2
+                    // Wing swipe, stomp, bite (for air), and fire breath are allowed in Phase 2
                     if (isPhase2Active() &&
                         !abilityName.equals(IgnivorusAbilities.IGNIVORUS_WING_SWIPE_ID) &&
                         !abilityName.equals(IgnivorusAbilities.IGNIVORUS_STOMP_ID) &&
+                        !abilityName.equals(IgnivorusAbilities.IGNIVORUS_BITE_ID) &&
                         !abilityName.equals(IgnivorusAbilities.IGNIVORUS_FIRE_BREATH_ID)) {
                         return;
                     }
@@ -1778,6 +1801,9 @@ public class Ignivorus extends RideableDragonBase implements DragonFlightCapable
     public RiderAbilityBinding getAttackRiderAbility() {
         // Phase 2 uses melee mode toggle (wing swipe or stomp)
         if (isPhase2Active()) {
+            if (isFlying()) {
+                return new RiderAbilityBinding(IgnivorusAbilities.IGNIVORUS_BITE_ID, RiderAbilityBinding.Activation.PRESS);
+            }
             String abilityId = getMeleeMode() == 1
                     ? IgnivorusAbilities.IGNIVORUS_STOMP_ID
                     : IgnivorusAbilities.IGNIVORUS_WING_SWIPE_ID;
@@ -1908,6 +1934,7 @@ public class Ignivorus extends RideableDragonBase implements DragonFlightCapable
         this.setDeltaMovement(leapVec);
         this.getNavigation().stop();
         this.hasImpulse = true;
+        leapGroundedTicks = 0;
 
         // Break ground at takeoff position
         if (level() instanceof ServerLevel server) {
@@ -2646,8 +2673,12 @@ public class Ignivorus extends RideableDragonBase implements DragonFlightCapable
 
     @Override
     public DragonAbilityType<?, ?> getPrimaryAttackAbility() {
-        // Phase 2 uses melee mode toggle (wing swipe or stomp)
+        // Phase 2 uses melee mode toggle (wing swipe or stomp) when grounded
+        // But falls back to bite when flying
         if (isPhase2Active()) {
+            if (isFlying()) {
+                return IgnivorusAbilities.IGNIVORUS_BITE;
+            }
             return getMeleeMode() == 1 ? IgnivorusAbilities.IGNIVORUS_STOMP : IgnivorusAbilities.IGNIVORUS_WING_SWIPE;
         }
 
@@ -2873,8 +2904,14 @@ public class Ignivorus extends RideableDragonBase implements DragonFlightCapable
 
                 // Trigger landed animation when rider landing completes
                 if (wasLanding && onGround() && isVehicle()) {
-                    triggerAnim("action", "landed");
-                    lockRiderControls(33);  // Lock controls for 1.67 seconds while animation plays
+                    // Properly clear flight state to prevent T-pose gliding bug
+                    setFlying(false);
+                    setTakeoff(false);
+                    timeFlying = 0;
+                    // Use Phase 2 landed animation if in Phase 2 mode
+                    String landedAnim = isPhase2Active() ? "phase2_landed" : "landed";
+                    triggerAnim("action", landedAnim);  // Trigger as one-shot animation
+                    lockRiderControls(25);  // Lock controls for 1.25 seconds while animation plays
                 }
             }
             return;
