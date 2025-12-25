@@ -203,6 +203,7 @@ public final class DragonAttributeConfigLoader extends SimpleJsonResourceReloadL
         double biteDamage = 50.0D;
         double bodySlamDamage = 40.0D;
         double fireBreathDamage = 80.0D;
+        double fireballDamage = 70.0D;
         double ultimateDamage = 200.0D;
         double ultimatePenaltyHealth = 50.0D;
         double tamingChanceBase = 7.0D;
@@ -218,6 +219,7 @@ public final class DragonAttributeConfigLoader extends SimpleJsonResourceReloadL
             biteDamage = (double) configClass.getField("IGNIVORUS_BITE_DAMAGE").get(null).getClass().getMethod("get").invoke(configClass.getField("IGNIVORUS_BITE_DAMAGE").get(null));
             bodySlamDamage = (double) configClass.getField("IGNIVORUS_BODY_SLAM_DAMAGE").get(null).getClass().getMethod("get").invoke(configClass.getField("IGNIVORUS_BODY_SLAM_DAMAGE").get(null));
             fireBreathDamage = (double) configClass.getField("IGNIVORUS_FIRE_BREATH_DAMAGE").get(null).getClass().getMethod("get").invoke(configClass.getField("IGNIVORUS_FIRE_BREATH_DAMAGE").get(null));
+            fireballDamage = (double) configClass.getField("IGNIVORUS_FIREBALL_DAMAGE").get(null).getClass().getMethod("get").invoke(configClass.getField("IGNIVORUS_FIREBALL_DAMAGE").get(null));
             ultimateDamage = (double) configClass.getField("IGNIVORUS_ULTIMATE_DAMAGE").get(null).getClass().getMethod("get").invoke(configClass.getField("IGNIVORUS_ULTIMATE_DAMAGE").get(null));
             ultimatePenaltyHealth = (double) configClass.getField("IGNIVORUS_ULTIMATE_PENALTY_HEALTH").get(null).getClass().getMethod("get").invoke(configClass.getField("IGNIVORUS_ULTIMATE_PENALTY_HEALTH").get(null));
             tamingChanceBase = (double) configClass.getField("IGNIVORUS_TAMING_CHANCE_BASE").get(null).getClass().getMethod("get").invoke(configClass.getField("IGNIVORUS_TAMING_CHANCE_BASE").get(null));
@@ -236,6 +238,7 @@ public final class DragonAttributeConfigLoader extends SimpleJsonResourceReloadL
                         "bite", DragonAbilityOverride.ofDamage(biteDamage),
                         "body_slam", DragonAbilityOverride.ofDamage(bodySlamDamage),
                         "fire_breath", DragonAbilityOverride.ofDamage(fireBreathDamage),
+                        "fireball", DragonAbilityOverride.ofDamage(fireballDamage),
                         "ultimate", DragonAbilityOverride.ofDamage(ultimateDamage)
                 ),
                 Map.of(
