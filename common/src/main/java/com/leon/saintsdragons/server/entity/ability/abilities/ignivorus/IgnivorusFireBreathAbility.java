@@ -9,7 +9,6 @@ import com.leon.saintsdragons.server.entity.dragons.ignivorus.Ignivorus;
 import com.leon.saintsdragons.server.entity.dragons.util.DragonDestructionManager;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.level.ClipContext;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
@@ -23,7 +22,6 @@ import static com.leon.saintsdragons.server.entity.ability.DragonAbilitySection.
  * Continuous fire-breath ability for Ignivorus.
  * Holds while the rider presses the tertiary key (default: G) and
  * applies block ignition + entity damage along the rider's look direction.
- *
  * Animation flow (similar to Raevyx beam):
  * - STARTUP (4 ticks/75ms): Plays fire_breath_starts animation, NO fire cone yet
  * - ACTIVE (400 ticks): Loops fire_breathing animation, fire cone renders
@@ -40,6 +38,8 @@ public class IgnivorusFireBreathAbility extends DragonAbility<Ignivorus> {
     private static final double IMPACT_RADIUS = 1.25D;
     private static final float DEFAULT_DAMAGE_PER_SECOND = 80.0F;  // Config value = damage per second
     private static final int FIRE_DURATION_SECONDS = 3;
+    private static final int ABILITY_ACTIVE_BEFORE_MELTING = 80;  // Ability must be active for 4 seconds before melting starts
+    private static final int BLOCK_MELT_TICKS = 40;  // Each block takes 2 seconds of continuous exposure to melt
 
     private static final DragonAbilitySection[] RIDER_TRACK = new DragonAbilitySection[]{
         new AbilitySectionDuration(STARTUP, STARTUP_TICKS),
@@ -54,6 +54,7 @@ public class IgnivorusFireBreathAbility extends DragonAbility<Ignivorus> {
     // Animation state tracking (follows Raevyx pattern)
     private boolean breathStartPlayed = false;
     private boolean breathLoopActive = false;
+    private int totalActiveTicks = 0;  // Track total active ticks for block melting
 
     public IgnivorusFireBreathAbility(DragonAbilityType<Ignivorus, IgnivorusFireBreathAbility> type,
                                       Ignivorus user) {
@@ -81,6 +82,7 @@ public class IgnivorusFireBreathAbility extends DragonAbility<Ignivorus> {
             // Play startup animation but don't show fire cone yet
             breathStartPlayed = true;
             breathLoopActive = false;
+            totalActiveTicks = 0;  // Reset active tick counter
             dragon.setBreathingFire(false);  // NO fire cone during startup
             dragon.setFireBreathProgress(0);  // Reset progress
             dragon.clearFireBreathPath();
@@ -173,6 +175,9 @@ public class IgnivorusFireBreathAbility extends DragonAbility<Ignivorus> {
             dragon.setFireBreathProgress(currentProgress + 1);
         }
 
+        // Track total active ticks for block melting
+        totalActiveTicks++;
+
         Vec3 origin = dragon.getFireBreathStartAnchor(1.0f);
         if (origin == null) {
             dragon.clearFireBreathPath();
@@ -200,7 +205,18 @@ public class IgnivorusFireBreathAbility extends DragonAbility<Ignivorus> {
             double progressRatio = Math.min(1.0, currentProgress / 40.0);
             Vec3 currentImpact = origin.add(impact.subtract(origin).scale(progressRatio));
 
-            DragonDestructionManager.applyFireBreathImpact(serverLevel, dragon, currentImpact, radius, damage, FIRE_DURATION_SECONDS);
+            boolean canMeltBlocks = totalActiveTicks >= ABILITY_ACTIVE_BEFORE_MELTING;
+
+            DragonDestructionManager.applyFireBreathImpact(
+                serverLevel,
+                dragon,
+                currentImpact,
+                radius,
+                damage,
+                FIRE_DURATION_SECONDS,
+                BLOCK_MELT_TICKS,  // Each block needs 2 seconds of continuous exposure
+                canMeltBlocks
+            );
         }
     }
 
