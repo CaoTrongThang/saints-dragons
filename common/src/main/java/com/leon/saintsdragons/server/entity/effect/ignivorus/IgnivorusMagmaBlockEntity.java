@@ -62,9 +62,9 @@ public class IgnivorusMagmaBlockEntity extends Entity {
     }
 
     @Override
-    protected void defineSynchedData() {
-        this.entityData.define(DATA_BLOCK_STATE, Blocks.MAGMA_BLOCK.defaultBlockState());
-        this.entityData.define(DATA_SCALE, 1.0F);
+    protected void defineSynchedData(SynchedEntityData.Builder builder) {
+        builder.define(DATA_BLOCK_STATE, Blocks.MAGMA_BLOCK.defaultBlockState());
+        builder.define(DATA_SCALE, 1.0F);
     }
 
     public void setBlockState(BlockState state) {
@@ -153,7 +153,7 @@ public class IgnivorusMagmaBlockEntity extends Entity {
                 0.5D * scale, 0.3D * scale, 0.5D * scale, 0.04D);
         server.sendParticles(ParticleTypes.FLAME, impact.x, impact.y + 0.5D * scale, impact.z, (int)(30 * scale),
                 0.6D * scale, 0.4D * scale, 0.6D * scale, 0.08D);
-        server.playSound(null, blockPosition(), SoundEvents.GENERIC_EXPLODE, getSoundSource(), 0.7F * scale, 1.1F / scale);
+        server.playSound(null, blockPosition(), SoundEvents.GENERIC_EXPLODE.value(), getSoundSource(), 0.7F * scale, 1.1F / scale);
 
         AABB area = new AABB(impact.x - impactRadius, impact.y - impactRadius, impact.z - impactRadius,
                 impact.x + impactRadius, impact.y + impactRadius, impact.z + impactRadius);
@@ -162,7 +162,7 @@ public class IgnivorusMagmaBlockEntity extends Entity {
 
         for (net.minecraft.world.entity.LivingEntity target : hits) {
             target.hurt(server.damageSources().explosion(this, owner != null ? owner : this), impactDamage);
-            target.setSecondsOnFire((int)(4 * scale));
+            target.igniteForSeconds((int)(4 * scale));
         }
 
         igniteArea(server, BlockPos.containing(impact));
@@ -214,11 +214,6 @@ public class IgnivorusMagmaBlockEntity extends Entity {
     }
 
     @Override
-    public Packet<ClientGamePacketListener> getAddEntityPacket() {
-        return new ClientboundAddEntityPacket(this);
-    }
-
-    @Override
     public void recreateFromPacket(ClientboundAddEntityPacket packet) {
         super.recreateFromPacket(packet);
         // Restore velocity from packet
@@ -255,18 +250,8 @@ public class IgnivorusMagmaBlockEntity extends Entity {
     }
 
     @Override
-    public double getPassengersRidingOffset() {
-        return -0.2D * getVisualScale();
-    }
-
-    @Override
     public boolean isInvulnerableTo(net.minecraft.world.damagesource.DamageSource source) {
         return !source.is(net.minecraft.tags.DamageTypeTags.BYPASSES_INVULNERABILITY);
-    }
-
-    @Override
-    public float getEyeHeight(@NotNull Pose pose) {
-        return 0.5F * getVisualScale();
     }
 
     @Override
