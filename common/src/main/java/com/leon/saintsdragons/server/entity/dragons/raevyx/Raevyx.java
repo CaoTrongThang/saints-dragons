@@ -3337,6 +3337,16 @@ public class Raevyx extends RideableDragonBase implements FlyingAnimal, RangedAt
         return result;
     }
 
+    /**
+     * Returns a larger bounding box for frustum culling to prevent the model from
+     * disappearing when the entity's collision box is off-screen but the visual model
+     * (wings, tail, etc.) should still be visible.
+     */
+    @Override
+    public AABB getBoundingBoxForCulling() {
+        return super.getBoundingBoxForCulling().inflate(5.0, 3.0, 5.0);
+    }
+
     // Lightning immunity is now handled by DragonEntity base class via DragonType.LIGHTNING elemental profile
 
     // ===== BREATHING / AIR SUPPLY =====
