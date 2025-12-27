@@ -8,7 +8,8 @@ import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.resources.ResourceLocation;
 
 public class FabricDragonPartRenderer extends EntityRenderer<FabricDragonPart> {
-    private static final ResourceLocation EMPTY_TEXTURE = new ResourceLocation("minecraft", "textures/misc/white.png");
+    private static final ResourceLocation EMPTY_TEXTURE =
+            ResourceLocation.fromNamespaceAndPath("minecraft", "textures/misc/white.png");
 
     public FabricDragonPartRenderer(EntityRendererProvider.Context context) {
         super(context);

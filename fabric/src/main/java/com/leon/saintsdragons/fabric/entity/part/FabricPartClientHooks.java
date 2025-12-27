@@ -19,6 +19,6 @@ public final class FabricPartClientHooks {
         if (clientLevel.getEntity(part.getId()) != null) {
             return;
         }
-        ((ClientLevelAccessor) clientLevel).saintsdragons$addEntity(part.getId(), part);
+        ((ClientLevelAccessor) clientLevel).saintsdragons$addEntity(part);
     }
 }

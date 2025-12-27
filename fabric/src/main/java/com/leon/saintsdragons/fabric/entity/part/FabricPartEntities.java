@@ -20,7 +20,7 @@ public final class FabricPartEntities {
     }
 
     public static void register() {
-        ResourceLocation id = new ResourceLocation(SaintsDragonsCommon.MOD_ID, "dragon_part");
+        ResourceLocation id = ResourceLocation.fromNamespaceAndPath(SaintsDragonsCommon.MOD_ID, "dragon_part");
         Registry.register(BuiltInRegistries.ENTITY_TYPE, id, DRAGON_PART);
     }
 }

@@ -11,5 +11,5 @@ import org.spongepowered.asm.mixin.gen.Invoker;
 @Mixin(ClientLevel.class)
 public interface ClientLevelAccessor {
     @Invoker("addEntity")
-    void saintsdragons$addEntity(int entityId, Entity entity);
+    void saintsdragons$addEntity(Entity entity);
 }

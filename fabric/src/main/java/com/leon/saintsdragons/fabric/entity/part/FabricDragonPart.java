@@ -9,6 +9,8 @@ import net.minecraft.world.entity.EntityDimensions;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.Pose;
 import net.minecraft.world.level.Level;
+import net.minecraft.network.syncher.SynchedEntityData;
+import net.minecraft.server.level.ServerEntity;
 import net.minecraft.world.phys.AABB;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -131,7 +133,7 @@ public class FabricDragonPart extends Entity {
     }
 
     @Override
-    protected void defineSynchedData() {
+    protected void defineSynchedData(SynchedEntityData.Builder builder) {
         // No synced data needed for hitbox parts
     }
 
@@ -156,7 +158,7 @@ public class FabricDragonPart extends Entity {
     }
 
     @Override
-    public @Nullable Packet<ClientGamePacketListener> getAddEntityPacket() {
+    public @Nullable Packet<ClientGamePacketListener> getAddEntityPacket(ServerEntity entity) {
         // Parts are not synced to client as separate entities
         return null;
     }
