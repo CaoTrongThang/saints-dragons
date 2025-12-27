@@ -13,6 +13,9 @@ description = "Adds animated, AI-driven dragons or wyverns to Minecraft."
 [[mixins]]
 config = "saintsdragons-neoforge.mixins.json"
 
+[[mixins]]
+config = "saintsdragons-neoforge-multipart.mixins.json"
+
 [[dependencies.saintsdragons]]
 modId = "neoforge"
 type = "required"
