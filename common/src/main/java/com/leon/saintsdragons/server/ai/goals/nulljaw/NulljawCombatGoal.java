@@ -19,6 +19,7 @@ public class NulljawCombatGoal extends Goal {
     private static final double BITE_RANGE = 5.0D;   // Matched to bite ability (5.5) - slightly conservative for AI
     private static final double HORN_RANGE = 5.0D;   // Matched to horn gore ability (7.0) - slightly conservative for AI
     private static final int MIN_ATTACK_COOLDOWN_TICKS = 20;
+    private static final float PHASE_TWO_HEALTH_THRESHOLD = 0.5F;
 
     private final Nulljaw drake;
     private int attackCooldown;
@@ -112,6 +113,17 @@ public class NulljawCombatGoal extends Goal {
 
         drake.getLookControl().setLookAt(target, 30.0F, 30.0F);
 
+        if (drake.isAbilityActive(NulljawAbilities.NULLJAW_PHASE_SHIFT)) {
+            return;
+        }
+
+        if (shouldEnterPhaseTwo()) {
+            drake.combatManager.tryUseAbility(NulljawAbilities.NULLJAW_PHASE_SHIFT);
+            if (drake.isAbilityActive(NulljawAbilities.NULLJAW_PHASE_SHIFT)) {
+                return;
+            }
+        }
+
         // Handle roar opener - use roar once at the start of combat (phase 2 only)
         if (!hasUsedRoarOpener) {
             if (roarOpenerDelay > 0) {
@@ -193,6 +205,11 @@ public class NulljawCombatGoal extends Goal {
             || drake.isAbilityActive(NulljawAbilities.NULLJAW_CLAW)
             || drake.isAbilityActive(NulljawAbilities.NULLJAW_HORN_GORE)
             || drake.isAbilityActive(NulljawAbilities.NULLJAW_ROAR);
+    }
+
+    private boolean shouldEnterPhaseTwo() {
+        return !drake.isPhaseTwoActive()
+            && drake.getHealth() <= drake.getMaxHealth() * PHASE_TWO_HEALTH_THRESHOLD;
     }
 
     private boolean isWithinAggroRange(LivingEntity target) {
