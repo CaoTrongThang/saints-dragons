@@ -135,7 +135,7 @@ public class FireballChargeIndicator {
 
         // Position: centered horizontally, above hotbar
         int x = (screenWidth - BAR_WIDTH) / 2;
-        int y = screenHeight - 52; // Above the hotbar
+        int y = screenHeight - 82; // Above the hotbar
 
         // Apply fade alpha to all rendering
         RenderSystem.setShaderColor(1.0f, 1.0f, 1.0f, smoothAlpha);
