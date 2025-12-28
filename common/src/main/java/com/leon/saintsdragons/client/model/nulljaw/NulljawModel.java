@@ -53,7 +53,7 @@ public class NulljawModel extends DefaultedEntityGeoModel<Nulljaw> {
     }
 
     private void applyBodyRotationDeviation(Nulljaw entity, float partialTick) {
-        var rootOpt = getBone("body");
+        var rootOpt = getBone("heightController");
         if (rootOpt.isEmpty()) {
             return;
         }

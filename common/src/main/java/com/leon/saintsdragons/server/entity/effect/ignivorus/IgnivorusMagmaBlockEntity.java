@@ -39,6 +39,7 @@ public class IgnivorusMagmaBlockEntity extends Entity {
     private float impactDamage;
     private int lifetimeTicks;
     private int livedTicks;
+    private boolean impactSoundPlayed;
 
     private static final SphereOffsets OFFSETS_RADIUS_4 = SphereOffsets.create(4);
     private static final SphereOffsets OFFSETS_RADIUS_8 = SphereOffsets.create(8);
@@ -154,6 +155,11 @@ public class IgnivorusMagmaBlockEntity extends Entity {
                 this.setDeltaMovement(this.getDeltaMovement().scale(0.99D));
             }
 
+            if (!impactSoundPlayed && (hitBlock || livedTicks > lifetimeTicks)) {
+                playImpactSoundLocal(hitBlock ? hitResult.getLocation() : currentPos, getVisualScale());
+                impactSoundPlayed = true;
+            }
+
             // Spawn trail particles
             spawnTrailParticles();
         }
@@ -220,16 +226,6 @@ public class IgnivorusMagmaBlockEntity extends Entity {
             destroyBlocks(server, impactPos, 8, true);
         }
 
-        // Sound - louder and lower pitch for bigger explosions
-        float volume = 1.0F + (scale * 0.2F);
-        float pitch = Math.max(0.4F, 0.9F / scale);
-        server.playSound(null, blockPosition(), SoundEvents.GENERIC_EXPLODE.value(), getSoundSource(), volume, pitch);
-
-        // Additional dramatic sound for max charge
-        if (scale >= 8.0F) {
-            server.playSound(null, blockPosition(), SoundEvents.LIGHTNING_BOLT_THUNDER, getSoundSource(), 0.6F, 0.6F);
-        }
-
         AABB area = new AABB(impact.x - impactRadius, impact.y - impactRadius, impact.z - impactRadius,
                 impact.x + impactRadius, impact.y + impactRadius, impact.z + impactRadius);
         List<net.minecraft.world.entity.LivingEntity> hits = server.getEntitiesOfClass(net.minecraft.world.entity.LivingEntity.class, area,
@@ -250,6 +246,16 @@ public class IgnivorusMagmaBlockEntity extends Entity {
 
         igniteArea(server, impactPos);
         discard();
+    }
+
+    private void playImpactSoundLocal(Vec3 impact, float scale) {
+        if (!level().isClientSide) {
+            return;
+        }
+
+        float volume = 1.0F + (scale * 0.2F);
+        float pitch = Math.max(0.4F, 0.9F / scale);
+        level().playLocalSound(impact.x, impact.y, impact.z, SoundEvents.GENERIC_EXPLODE.value(), getSoundSource(), volume, pitch, false);
     }
 
     private void destroyBlocks(ServerLevel server, BlockPos center, int radius, boolean maxPower) {
@@ -277,20 +283,20 @@ public class IgnivorusMagmaBlockEntity extends Entity {
             if (hardness > 100.0F) continue; // Never destroy reinforced blocks
 
             if (distance <= innerCore) {
-                server.destroyBlock(pos, true, owner);
+                server.setBlock(pos, Blocks.AIR.defaultBlockState(), 11);
                 continue;
             }
 
             double distanceFactor = 1.0 - ((distance - innerCore) / outerRadius);
             if (maxPower) {
                 if (server.random.nextDouble() < distanceFactor * 0.9) {
-                    server.destroyBlock(pos, true, owner);
+                    server.setBlock(pos, Blocks.AIR.defaultBlockState(), 11);
                 }
             } else {
                 double hardnessFactor = hardness > 3.0F ? 0.8 : 1.0;
                 double breakChance = distanceFactor * hardnessFactor;
                 if (server.random.nextDouble() < breakChance) {
-                    server.destroyBlock(pos, true, owner);
+                    server.setBlock(pos, Blocks.AIR.defaultBlockState(), 11);
                 }
             }
         }
@@ -298,7 +304,9 @@ public class IgnivorusMagmaBlockEntity extends Entity {
 
     private void igniteArea(ServerLevel server, BlockPos base) {
         float scale = getVisualScale();
-        int radius = (int) Math.ceil(scale) + 1; // Slightly larger fire spread
+        int radius = Math.max(2, (int) Math.ceil(scale * 0.6F));
+        int maxFires = scale >= 8.0F ? 24 : scale >= 6.0F ? 16 : 8;
+        int placedFires = 0;
         BlockPos.MutableBlockPos pos = new BlockPos.MutableBlockPos();
         BlockPos.MutableBlockPos below = new BlockPos.MutableBlockPos();
         int minY = base.getY() - radius;
@@ -324,9 +332,13 @@ public class IgnivorusMagmaBlockEntity extends Entity {
                     }
 
                     double distance = Math.sqrt(dx * dx + dz * dz);
-                    double chance = 1.0 - (distance / (radius + 1)) * 0.5;
+                    double chance = 0.35 - (distance / (radius + 1)) * 0.2;
                     if (server.random.nextDouble() < chance) {
                         server.setBlock(pos, Blocks.FIRE.defaultBlockState(), 11);
+                        placedFires++;
+                        if (placedFires >= maxFires) {
+                            return;
+                        }
                     }
                     break; // Only place one fire per column
                 }

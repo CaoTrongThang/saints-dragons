@@ -3,6 +3,8 @@ package com.leon.saintsdragons.neoforge.client;
 import com.leon.saintsdragons.client.DragonStatusUIManager;
 import com.leon.saintsdragons.client.ui.DragonStatusUI;
 import com.leon.saintsdragons.common.SaintsDragonsCommon;
+import com.leon.saintsdragons.client.ui.FireballChargeIndicator;
+import com.leon.saintsdragons.server.entity.dragons.ignivorus.Ignivorus;
 import com.mojang.blaze3d.platform.InputConstants;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
@@ -54,6 +56,7 @@ public final class NeoForgeDragonUI {
         }
 
         manager.getDragonStatusUI().getMeleeModeNotification().tick();
+        manager.getDragonStatusUI().getFireballChargeIndicator().tick();
     }
 
     /**
@@ -77,5 +80,11 @@ public final class NeoForgeDragonUI {
         int width = client.getWindow().getGuiScaledWidth();
         int height = client.getWindow().getGuiScaledHeight();
         ui.getMeleeModeNotification().render(event.getGuiGraphics(), width, height);
+
+        if (ui.getCurrentDragon() instanceof Ignivorus ignivorus) {
+            FireballChargeIndicator chargeIndicator = ui.getFireballChargeIndicator();
+            chargeIndicator.setChargeLevel(ignivorus.getFireballChargeLevel());
+            chargeIndicator.render(event.getGuiGraphics(), width, height);
+        }
     }
 }

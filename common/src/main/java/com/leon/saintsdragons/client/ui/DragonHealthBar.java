@@ -11,11 +11,11 @@ import net.minecraft.resources.ResourceLocation;
  * Displays current health with dragon-specific theming.
  */
 public class DragonHealthBar extends DragonUIElement {
-    private static final ResourceLocation RAEVYX_BASE = new ResourceLocation(SaintsDragonsCommon.MOD_ID, "textures/gui/healthbar/raevyx/raevyx_base.png");
-    private static final ResourceLocation RAEVYX_OVERLAY = new ResourceLocation(SaintsDragonsCommon.MOD_ID, "textures/gui/healthbar/raevyx/raevyx_overlay.png");
+    private static final ResourceLocation RAEVYX_BASE = SaintsDragonsCommon.rl("textures/gui/healthbar/raevyx/raevyx_base.png");
+    private static final ResourceLocation RAEVYX_OVERLAY = SaintsDragonsCommon.rl("textures/gui/healthbar/raevyx/raevyx_overlay.png");
 
-    private static final ResourceLocation MALE_ICON = new ResourceLocation(SaintsDragonsCommon.MOD_ID, "textures/gui/genders/male.png");
-    private static final ResourceLocation FEMALE_ICON = new ResourceLocation(SaintsDragonsCommon.MOD_ID, "textures/gui/genders/female.png");
+    private static final ResourceLocation MALE_ICON = SaintsDragonsCommon.rl("textures/gui/genders/male.png");
+    private static final ResourceLocation FEMALE_ICON = SaintsDragonsCommon.rl("textures/gui/genders/female.png");
 
     // Texture dimensions
     private static final int TEXTURE_WIDTH = 32;
