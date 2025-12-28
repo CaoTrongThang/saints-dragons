@@ -6,8 +6,6 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtUtils;
-import net.minecraft.network.protocol.Packet;
-import net.minecraft.network.protocol.game.ClientGamePacketListener;
 import net.minecraft.network.protocol.game.ClientboundAddEntityPacket;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
@@ -259,7 +257,7 @@ public class IgnivorusMagmaBlockEntity extends Entity {
         // Sound - louder and lower pitch for bigger explosions
         float volume = 1.0F + (scale * 0.2F);
         float pitch = Math.max(0.4F, 0.9F / scale);
-        server.playSound(null, blockPosition(), SoundEvents.GENERIC_EXPLODE, getSoundSource(), volume, pitch);
+        server.playSound(null, blockPosition(), SoundEvents.GENERIC_EXPLODE.value(), getSoundSource(), volume, pitch);
         AABB area = new AABB(impact.x - impactRadius, impact.y - impactRadius, impact.z - impactRadius,
                 impact.x + impactRadius, impact.y + impactRadius, impact.z + impactRadius);
         List<net.minecraft.world.entity.LivingEntity> hits = server.getEntitiesOfClass(net.minecraft.world.entity.LivingEntity.class, area,

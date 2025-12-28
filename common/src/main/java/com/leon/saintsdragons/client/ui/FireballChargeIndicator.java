@@ -10,11 +10,11 @@ import net.minecraft.resources.ResourceLocation;
  * Shows 3 charge levels with custom textures.
  */
 public class FireballChargeIndicator {
-    private static final ResourceLocation CHARGE_BAR = new ResourceLocation(SaintsDragonsCommon.MOD_ID, "textures/gui/ignivorus/fireball_charge_bar.png");
-    private static final ResourceLocation CHARGE_BAR_FLASH = new ResourceLocation(SaintsDragonsCommon.MOD_ID, "textures/gui/ignivorus/fireball_charge_bar_flashes.png");
-    private static final ResourceLocation CHARGE_LEVEL_1 = new ResourceLocation(SaintsDragonsCommon.MOD_ID, "textures/gui/ignivorus/fireball_first_charge.png");
-    private static final ResourceLocation CHARGE_LEVEL_2 = new ResourceLocation(SaintsDragonsCommon.MOD_ID, "textures/gui/ignivorus/fireball_second_charge.png");
-    private static final ResourceLocation CHARGE_LEVEL_3 = new ResourceLocation(SaintsDragonsCommon.MOD_ID, "textures/gui/ignivorus/fireball_third_charge.png");
+    private static final ResourceLocation CHARGE_BAR = SaintsDragonsCommon.rl( "textures/gui/ignivorus/fireball_charge_bar.png");
+    private static final ResourceLocation CHARGE_BAR_FLASH = SaintsDragonsCommon.rl( "textures/gui/ignivorus/fireball_charge_bar_flashes.png");
+    private static final ResourceLocation CHARGE_LEVEL_1 = SaintsDragonsCommon.rl( "textures/gui/ignivorus/fireball_first_charge.png");
+    private static final ResourceLocation CHARGE_LEVEL_2 = SaintsDragonsCommon.rl( "textures/gui/ignivorus/fireball_second_charge.png");
+    private static final ResourceLocation CHARGE_LEVEL_3 = SaintsDragonsCommon.rl( "textures/gui/ignivorus/fireball_third_charge.png");
 
     // Texture dimensions
     private static final int BAR_WIDTH = 128;
