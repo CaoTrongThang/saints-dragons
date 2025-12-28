@@ -84,7 +84,7 @@ public final class NeoForgeDragonUI {
         if (ui.getCurrentDragon() instanceof Ignivorus ignivorus) {
             FireballChargeIndicator chargeIndicator = ui.getFireballChargeIndicator();
             chargeIndicator.setChargeLevel(ignivorus.getFireballChargeLevel());
-            chargeIndicator.render(event.getGuiGraphics(), width, height);
+            chargeIndicator.render(event.getGuiGraphics(), width, height, partialTick);
         }
     }
 }

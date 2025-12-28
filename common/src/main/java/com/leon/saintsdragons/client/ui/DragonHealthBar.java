@@ -11,8 +11,8 @@ import net.minecraft.resources.ResourceLocation;
  * Displays current health with dragon-specific theming.
  */
 public class DragonHealthBar extends DragonUIElement {
-    private static final ResourceLocation RAEVYX_BASE = SaintsDragonsCommon.rl("textures/gui/healthbar/raevyx/raevyx_base.png");
-    private static final ResourceLocation RAEVYX_OVERLAY = SaintsDragonsCommon.rl("textures/gui/healthbar/raevyx/raevyx_overlay.png");
+    private static final ResourceLocation RAEVYX_BASE = SaintsDragonsCommon.rl("textures/gui/raevyx/raevyx_base.png");
+    private static final ResourceLocation RAEVYX_OVERLAY = SaintsDragonsCommon.rl("textures/gui/raevyx/raevyx_overlay.png");
 
     private static final ResourceLocation MALE_ICON = SaintsDragonsCommon.rl("textures/gui/genders/male.png");
     private static final ResourceLocation FEMALE_ICON = SaintsDragonsCommon.rl("textures/gui/genders/female.png");
@@ -21,6 +21,7 @@ public class DragonHealthBar extends DragonUIElement {
     private static final int TEXTURE_WIDTH = 32;
     private static final int TEXTURE_HEIGHT = 128;
     private static final int GENDER_ICON_SIZE = 16;
+
     private DragonEntity dragon;
     private float currentHealthPercent = 1.0f;
     private float targetHealthPercent = 1.0f;
