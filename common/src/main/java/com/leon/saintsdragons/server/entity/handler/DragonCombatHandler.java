@@ -168,22 +168,30 @@ public class DragonCombatHandler {
 
     public void forceEndActiveAbility() {
         if (activeAbility != null) {
-            activeAbility.interrupt();
+            DragonAbility<?> finished = activeAbility;
+            finished.interrupt();
+            applyCooldownsForForcedEnd(finished, true);
             setActiveAbility(null);
         }
         if (overlayAbility != null) {
-            overlayAbility.interrupt();
+            DragonAbility<?> finishedOverlay = overlayAbility;
+            finishedOverlay.interrupt();
+            applyCooldownsForForcedEnd(finishedOverlay, false);
             overlayAbility = null;
         }
     }
 
     public void forceEndAbility(DragonAbilityType<?, ?> abilityType) {
         if (activeAbility != null && activeAbility.getAbilityType() == abilityType) {
-            activeAbility.interrupt();
+            DragonAbility<?> finished = activeAbility;
+            finished.interrupt();
+            applyCooldownsForForcedEnd(finished, true);
             setActiveAbility(null);
         }
         if (overlayAbility != null && overlayAbility.getAbilityType() == abilityType) {
-            overlayAbility.interrupt();
+            DragonAbility<?> finishedOverlay = overlayAbility;
+            finishedOverlay.interrupt();
+            applyCooldownsForForcedEnd(finishedOverlay, false);
             overlayAbility = null;
         }
     }
@@ -221,6 +229,19 @@ public class DragonCombatHandler {
             DragonAbility ability = ((DragonAbilityType) type).makeInstance(dragon);
             return ability.isOverlayAbility();
         });
+    }
+
+    private void applyCooldownsForForcedEnd(DragonAbility<?> ability, boolean applyGlobalCooldown) {
+        if (ability == null) {
+            return;
+        }
+        DragonAbilityType<?, ?> type = ability.getAbilityType();
+        if (type != null) {
+            setAbilityCooldown(type, ability.getCooldownTimer());
+        }
+        if (applyGlobalCooldown) {
+            globalCooldown = Math.max(globalCooldown, 6);
+        }
     }
 
     // Removed unused target validation stub
