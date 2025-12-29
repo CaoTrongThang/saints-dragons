@@ -1907,6 +1907,10 @@ public class Raevyx extends RideableDragonBase implements FlyingAnimal, RangedAt
                     setLanding(false);
                 }
             }
+            // If landing was triggered while flight was disabled, clear it once grounded.
+            if (!isFlying() && isLanding() && onGroundNow) {
+                setLanding(false);
+            }
 
             // Update animation states
             tickAnimationStates();
