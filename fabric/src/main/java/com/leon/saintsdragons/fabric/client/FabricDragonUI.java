@@ -59,8 +59,8 @@ public final class FabricDragonUI {
             DragonStatusUIManager manager = DragonStatusUIManager.getInstance();
             DragonStatusUI ui = manager.getDragonStatusUI();
 
+            float partialTick = tickDelta.getGameTimeDeltaPartialTick(client.isPaused());
             if (ui.isVisible()) {
-                float partialTick = tickDelta.getGameTimeDeltaPartialTick(client.isPaused());
                 ui.render(graphics, -1, -1, partialTick);
             }
 
@@ -72,7 +72,7 @@ public final class FabricDragonUI {
             if (ui.getCurrentDragon() instanceof Ignivorus ignivorus) {
                 FireballChargeIndicator chargeIndicator = ui.getFireballChargeIndicator();
                 chargeIndicator.setChargeLevel(ignivorus.getFireballChargeLevel());
-                chargeIndicator.render(graphics, width, height, tickDelta);
+                chargeIndicator.render(graphics, width, height, partialTick);
             }
         });
     }

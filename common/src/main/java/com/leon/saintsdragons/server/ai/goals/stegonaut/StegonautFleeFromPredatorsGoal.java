@@ -22,7 +22,7 @@ import java.util.List;
  */
 public class StegonautFleeFromPredatorsGoal extends Goal {
     private static final TagKey<EntityType<?>> STEGONAUT_FLEE_TAG =
-            TagKey.create(Registries.ENTITY_TYPE, new ResourceLocation("saintsdragons", "stegonaut_flee"));
+            TagKey.create(Registries.ENTITY_TYPE, ResourceLocation.fromNamespaceAndPath("saintsdragons", "stegonaut_flee"));
     private final Stegonaut stegonaut;
     private final double fleeSpeed;
     private final double detectionRange;
