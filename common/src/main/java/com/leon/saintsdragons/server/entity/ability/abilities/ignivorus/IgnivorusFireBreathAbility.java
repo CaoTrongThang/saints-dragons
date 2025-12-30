@@ -290,7 +290,7 @@ public class IgnivorusFireBreathAbility extends DragonAbility<Ignivorus> {
                 if (entity.position().distanceTo(samplePoint) <= coneRadius) {
                     // Apply damage and fire
                     entity.hurt(level.damageSources().dragonBreath(), damagePerTick);
-                    entity.setSecondsOnFire(FIRE_DURATION_SECONDS);
+                    entity.igniteForSeconds(FIRE_DURATION_SECONDS);
                     hitEntities.add(entity);
                 }
             }
