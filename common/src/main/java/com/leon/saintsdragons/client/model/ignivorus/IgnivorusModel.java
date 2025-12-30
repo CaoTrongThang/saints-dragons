@@ -186,5 +186,7 @@ public class IgnivorusModel extends DefaultedEntityGeoModel<Ignivorus> {
         var boneOpt = getBone(boneName);
         if (boneOpt.isEmpty()) return;
         GeoBone bone = boneOpt.get();
+
         bone.setRotY(bone.getRotY() + rotationY);
+    }
 }
