@@ -3599,4 +3599,9 @@ public class Ignivorus extends RideableDragonBase implements DragonFlightCapable
         screenShakeAmount = Math.max(screenShakeAmount, clamped);
         this.entityData.set(DATA_SCREEN_SHAKE_AMOUNT, screenShakeAmount);
     }
+
+    @Override
+    public int getMaxHeadXRot() {
+        return 180; // Allow full pitch range for head tracking
+    }
 }
