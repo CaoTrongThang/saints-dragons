@@ -27,7 +27,6 @@ public final class NeoForgeClientEvents {
     @SubscribeEvent
     public static void onRegisterParticles(RegisterParticleProvidersEvent event) {
         event.registerSpriteSet(ModParticles.LIGHTNING_STORM.get(), RaevyxLightningParticle.Factory::new);
-        event.registerSpriteSet(ModParticles.LIGHTNING_STORM_FEMALE.get(), RaevyxLightningParticle.Factory::new);
         event.registerSpriteSet(ModParticles.LIGHTNING_CHAIN.get(), RaevyxLightningChainParticle.Factory::new);
         event.registerSpriteSet(ModParticles.FIRE_BREATH_FLAME.get(), FireBreathFlameParticle.Factory::new);
         event.registerSpriteSet(ModParticles.FIRE_BREATH_SMOKE.get(), FireBreathSmokeParticle.Factory::new);
