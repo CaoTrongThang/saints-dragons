@@ -106,7 +106,13 @@ public class NeoForgeClientEventHandler {
             float raevyxTargetPitch = isFlying ? 6.0f : 0.0f;
             float raevyxPitchBlendRate = 0.15f;
             raevyxCameraPitch += (raevyxTargetPitch - raevyxCameraPitch) * raevyxPitchBlendRate;
-            event.setPitch(Mth.clamp(event.getPitch() + raevyxCameraPitch, -90.0f, 90.0f));
+            float raevyxYaw = CameraAccessor.invokeGetYRot(camera);
+            float raevyxPitch = CameraAccessor.invokeGetXRot(camera);
+            CameraAccessor.invokeSetRotation(
+                camera,
+                raevyxYaw,
+                Mth.clamp(raevyxPitch + raevyxCameraPitch, -90.0f, 90.0f)
+            );
         } else {
             // Reset zoom and shift when not riding Raevyx
             raevyxCameraZoom = 10F;
@@ -161,7 +167,13 @@ public class NeoForgeClientEventHandler {
             float cindervaneTargetPitch = isFlying ? 10.0f : 0.0f;
             float cindervanePitchBlendRate = 0.15f;
             cindervaneCameraPitch += (cindervaneTargetPitch - cindervaneCameraPitch) * cindervanePitchBlendRate;
-            event.setPitch(Mth.clamp(event.getPitch() + cindervaneCameraPitch, -90.0f, 90.0f));
+            float cindervaneYaw = CameraAccessor.invokeGetYRot(camera);
+            float cindervanePitch = CameraAccessor.invokeGetXRot(camera);
+            CameraAccessor.invokeSetRotation(
+                camera,
+                cindervaneYaw,
+                Mth.clamp(cindervanePitch + cindervaneCameraPitch, -90.0f, 90.0f)
+            );
         } else if (!(player.getVehicle() instanceof Cindervane)) {
             // Reset zoom and shift when not riding Cindervane
             cindervaneCameraZoom = 15F;
@@ -223,7 +235,13 @@ public class NeoForgeClientEventHandler {
             float ignivorusTargetPitch = isFlying ? 10.0f : 0.0f;
             float ignivorusPitchBlendRate = 0.15f;
             ignivorusCameraPitch += (ignivorusTargetPitch - ignivorusCameraPitch) * ignivorusPitchBlendRate;
-            event.setPitch(Mth.clamp(event.getPitch() + ignivorusCameraPitch, -90.0f, 90.0f));
+            float ignivorusYaw = CameraAccessor.invokeGetYRot(camera);
+            float ignivorusPitch = CameraAccessor.invokeGetXRot(camera);
+            CameraAccessor.invokeSetRotation(
+                camera,
+                ignivorusYaw,
+                Mth.clamp(ignivorusPitch + ignivorusCameraPitch, -90.0f, 90.0f)
+            );
         } else if (!(player.getVehicle() instanceof Ignivorus)) {
             // Reset zoom and shift when not riding Ignivorus
             ignivorusCameraZoom = 15F;
