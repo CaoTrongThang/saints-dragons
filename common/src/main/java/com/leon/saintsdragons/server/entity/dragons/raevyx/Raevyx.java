@@ -1641,7 +1641,7 @@ public class Raevyx extends RideableDragonBase implements FlyingAnimal, RangedAt
             }
         }
 
-        final int DASH_DURATION = 25; // 1.25 seconds
+        final int DASH_DURATION = 20;
         final int DASH_COOLDOWN = 40; // 2 seconds
         final double DASH_DISTANCE = 25; // blocks
 
@@ -1747,9 +1747,9 @@ public class Raevyx extends RideableDragonBase implements FlyingAnimal, RangedAt
         }
 
         // Dash constants
-        final int DASH_DURATION = 25; // 1.25 seconds
+        final int DASH_DURATION = 20;
         final int DASH_COOLDOWN = 40; // 2 seconds
-        final double DASH_DISTANCE = 25; // blocks
+        final double DASH_DISTANCE = 30; // blocks
 
         // Get forward vector (direction dragon is facing)
         float yawRad = (float) Math.toRadians(this.getYRot());
@@ -4110,7 +4110,7 @@ public class Raevyx extends RideableDragonBase implements FlyingAnimal, RangedAt
         // Use entity-specific controller names to prevent animation bleeding between dragons
         // Update frequency: run every tick to maintain accurate keyframe timing
         AnimationController<Raevyx> movementController =
-                new AnimationController<>(this, "movement", 5, animationHandler::handleMovementAnimation);
+                new AnimationController<>(this, "movement", 8, animationHandler::handleMovementAnimation);
 
         // Action controller uses ONLY triggers (no predicate logic)
         // All animations (combat, abilities, sleep, death) are triggered via triggerAnim()
