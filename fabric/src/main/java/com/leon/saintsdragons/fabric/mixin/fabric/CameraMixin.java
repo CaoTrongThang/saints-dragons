@@ -15,6 +15,15 @@ public abstract class CameraMixin implements CameraAccessor {
     @Shadow
     protected abstract void move(float x, float y, float z);
 
+    @Shadow
+    protected abstract void setRotation(float yaw, float pitch);
+
+    @Shadow
+    protected abstract float getXRot();
+
+    @Shadow
+    protected abstract float getYRot();
+
     /**
      * Accessor methods for other parts of the mod to call.
      */
@@ -22,6 +31,21 @@ public abstract class CameraMixin implements CameraAccessor {
     public void saintsdragons$invokeMove(double x, double y, double z) {
         // In 1.21.1, Camera.move uses floats (double signature was removed)
         this.move((float) x, (float) y, (float) z);
+    }
+
+    @Override
+    public void saintsdragons$invokeSetRotation(float yaw, float pitch) {
+        this.setRotation(yaw, pitch);
+    }
+
+    @Override
+    public float saintsdragons$invokeGetXRot() {
+        return this.getXRot();
+    }
+
+    @Override
+    public float saintsdragons$invokeGetYRot() {
+        return this.getYRot();
     }
 
     /**

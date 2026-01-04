@@ -36,6 +36,7 @@ public class CindervaneModel extends DefaultedEntityGeoModel<Cindervane> {
         if (entity.isAlive()) {
             applyBodyRotationDeviation(entity, partialTick);
             applyBankingRoll(entity, animationState);
+            applyFlightPitch(entity, animationState);
             applyNeckFollow(entity, modelData, partialTick);
             applyNeckBankingLean(entity, partialTick);
             applyGroundNeckTurn(entity, partialTick);
@@ -87,6 +88,22 @@ public class CindervaneModel extends DefaultedEntityGeoModel<Cindervane> {
         body.setRotZ(snap.getRotZ() + bankAngleRad);
     }
 
+    private void applyFlightPitch(Cindervane entity, AnimationState<Cindervane> state) {
+        var bodyOpt = getBone("body");
+        if (bodyOpt.isEmpty()) {
+            return;
+        }
+
+        GeoBone body = bodyOpt.get();
+        var snap = body.getInitialSnapshot();
+
+        float partialTick = state.getPartialTick();
+        float pitchRad = entity.getFlightPitchRadians(partialTick);
+        pitchRad = Mth.clamp(pitchRad, -Mth.HALF_PI, Mth.HALF_PI);
+
+        body.setRotX(snap.getRotX() + pitchRad);
+    }
+
     private void applyNeckBankingLean(Cindervane entity, float partialTick) {
         if (!entity.isVehicle() || !entity.isFlying()) {
             return;
@@ -128,6 +145,9 @@ public class CindervaneModel extends DefaultedEntityGeoModel<Cindervane> {
 
         float lookYawRad = modelData.netHeadYaw() * Mth.DEG_TO_RAD;
         float lookPitchRad = modelData.headPitch() * Mth.DEG_TO_RAD;
+        if (entity.isFlying()) {
+            lookPitchRad *= 0.5f;
+        }
 
         double bodyDeviation = entity.bodyRotDeviation.get(partialTick);
         float structuralYawRad = (float)(bodyDeviation * 2.0 * Mth.DEG_TO_RAD);

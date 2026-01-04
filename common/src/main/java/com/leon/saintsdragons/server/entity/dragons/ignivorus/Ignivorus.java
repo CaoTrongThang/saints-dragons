@@ -143,6 +143,9 @@ public class Ignivorus extends RideableDragonBase implements DragonFlightCapable
     /** Tracks whether the dragon is stunned during a taming attempt */
     public static final EntityDataAccessor<Boolean> DATA_TAMING_STUNNED =
             SynchedEntityData.defineId(Ignivorus.class, EntityDataSerializers.BOOLEAN);
+    /** Entity data accessor for flight pitch (radians) */
+    public static final EntityDataAccessor<Float> DATA_FLIGHT_PITCH =
+            SynchedEntityData.defineId(Ignivorus.class, EntityDataSerializers.FLOAT);
 
     /** Tracks the texture variant (0 = default, 1 = second variant) */
     public static final EntityDataAccessor<Integer> DATA_TEXTURE_VARIANT =
@@ -333,6 +336,8 @@ public class Ignivorus extends RideableDragonBase implements DragonFlightCapable
     private float pitchSmoothedPitch = 0f;
     private int pitchHoldTicks = 0;
     private int pitchDir = 0;
+    private float flightPitchRad = 0f;
+    private float prevFlightPitchRad = 0f;
 
     // Client-side animation initialization grace period (fixes T-pose on world rejoin with shaders)
     private int clientAnimInitTicks = 0;
@@ -391,6 +396,7 @@ public class Ignivorus extends RideableDragonBase implements DragonFlightCapable
         builder.define(DATA_CINEMATIC_ZOOM_ACTIVE, false);
         builder.define(DATA_FEEDING_COOLDOWN, 0);
         builder.define(DATA_TAMING_STUNNED, false);
+        builder.define(DATA_FLIGHT_PITCH, 0f);
         builder.define(DATA_TEXTURE_VARIANT, 0);
         builder.define(DATA_FIREBALL_CHARGE, 0);
         builder.define(DATA_SLEEPING, false);
@@ -2942,6 +2948,20 @@ public class Ignivorus extends RideableDragonBase implements DragonFlightCapable
 
     private void tickPitchingLogic() {
         tickRiderLandingBlendTimer();
+        prevFlightPitchRad = flightPitchRad;
+        if (level().isClientSide) {
+            float syncedPitch = this.entityData.get(DATA_FLIGHT_PITCH);
+            if (Math.abs(syncedPitch) <= 1.0E-4f && isFlying()) {
+                Vec3 velocity = getDeltaMovement();
+                double horizontalSpeed = Math.sqrt(velocity.x * velocity.x + velocity.z * velocity.z);
+                if (horizontalSpeed > 0.01 || Math.abs(velocity.y) > 0.01) {
+                    syncedPitch = (float)Math.atan2(velocity.y, horizontalSpeed);
+                    syncedPitch = Mth.clamp(syncedPitch, -Mth.HALF_PI, Mth.HALF_PI);
+                }
+            }
+            flightPitchRad = syncedPitch;
+            return;
+        }
 
         // Reset pitching when not flying
         if (!isFlying()) {
@@ -2950,19 +2970,48 @@ public class Ignivorus extends RideableDragonBase implements DragonFlightCapable
                 pitchSmoothedPitch = 0f;
                 pitchHoldTicks = 0;
             }
+            flightPitchRad = 0f;
+            this.entityData.set(DATA_FLIGHT_PITCH, flightPitchRad);
             return;
         }
 
+        Vec3 velocity = getDeltaMovement();
+        double horizontalSpeed = Math.sqrt(velocity.x * velocity.x + velocity.z * velocity.z);
+        float targetPitchRad = 0f;
+        if (this.isVehicle() && this.getControllingPassenger() instanceof Player player) {
+            float riderForward = player.zza;
+            float riderStrafe = player.xxa;
+            if (Math.abs(riderForward) < 0.01f && Math.abs(riderStrafe) < 0.01f) {
+                targetPitchRad = 0f;
+            } else if (horizontalSpeed > 0.01 || Math.abs(velocity.y) > 0.01) {
+                targetPitchRad = (float)Math.atan2(velocity.y, horizontalSpeed);
+                targetPitchRad = Mth.clamp(targetPitchRad, -Mth.HALF_PI, Mth.HALF_PI);
+                if (horizontalSpeed < 0.35) {
+                    float pitchScale = (float)Mth.clamp(horizontalSpeed / 0.35, 0.0, 1.0);
+                    targetPitchRad *= pitchScale;
+                }
+            }
+        } else if (horizontalSpeed > 0.01 || Math.abs(velocity.y) > 0.01) {
+            targetPitchRad = (float)Math.atan2(velocity.y, horizontalSpeed);
+            targetPitchRad = Mth.clamp(targetPitchRad, -Mth.HALF_PI, Mth.HALF_PI);
+            if (horizontalSpeed < 0.35) {
+                float pitchScale = (float)Mth.clamp(horizontalSpeed / 0.35, 0.0, 1.0);
+                targetPitchRad *= pitchScale;
+            }
+        }
+        flightPitchRad = Mth.lerp(0.6f, flightPitchRad, targetPitchRad);
+        if (Math.abs(flightPitchRad) < 0.001f) {
+            flightPitchRad = 0f;
+        }
+        this.entityData.set(DATA_FLIGHT_PITCH, flightPitchRad);
+
         int desiredDir = pitchDir;
 
-        // When ridden, use Space/L-Alt input directly (NOT entity pitch)
+        // When ridden, Space/L-Alt should not drive pitch animations (mouse handles pitch)
         if (this.isVehicle() && this.getControllingPassenger() instanceof Player) {
-            if (isGoingUp()) {
-                desiredDir = -1;  // Pitching up
-            } else if (isGoingDown()) {
-                desiredDir = 1;   // Pitching down
-
-                // Trigger landing blend when descending near ground
+            desiredDir = 0;
+            // Trigger landing blend when descending near ground
+            if (isGoingDown()) {
                 double altitude = getAltitudeAboveTerrain();
                 if (altitude != Double.POSITIVE_INFINITY && altitude >= -0.25D && altitude <= LANDING_BLEND_ALTITUDE) {
                     desiredDir = 0; // Stop pitching down
@@ -3270,6 +3319,9 @@ public class Ignivorus extends RideableDragonBase implements DragonFlightCapable
     public float getBankAngleDegrees(float partialTick) {
         return Mth.lerp(partialTick, prevBankAngle, bankAngle);
     }
+    public float getFlightPitchRadians(float partialTick) {
+        return Mth.lerp(partialTick, prevFlightPitchRad, flightPitchRad);
+    }
 
     public double getPitchDirection() {
         return pitchDir;
@@ -3284,12 +3336,9 @@ public class Ignivorus extends RideableDragonBase implements DragonFlightCapable
             new AnimationController<>(this, "movement", 5, animationHandler::handleMovementAnimation);
         movementController.setSoundKeyframeHandler(this::onAnimationSound);
 
-        // Banking and pitching controllers for flight dynamics
+        // Banking controller for flight dynamics
         AnimationController<Ignivorus> bankingController =
             new AnimationController<>(this, "banking", 8, animationHandler::bankingPredicate);
-
-        AnimationController<Ignivorus> pitchingController =
-            new AnimationController<>(this, "pitching", 6, animationHandler::pitchingPredicate);
 
         // Action controller for triggerable animations (sit transitions, fire breath, etc.)
         AnimationController<Ignivorus> actionController =
@@ -3310,7 +3359,7 @@ public class Ignivorus extends RideableDragonBase implements DragonFlightCapable
         animationHandler.setupActionController(actionController);
         actionController.setSoundKeyframeHandler(this::onAnimationSound);
 
-        controllers.add(movementController, bankingController, pitchingController, hurtController, actionController);
+        controllers.add(movementController, bankingController, hurtController, actionController);
     }
 
     private void onAnimationSound(SoundKeyframeEvent<Ignivorus> event) {

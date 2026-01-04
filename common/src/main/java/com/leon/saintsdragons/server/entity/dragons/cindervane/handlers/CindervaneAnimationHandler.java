@@ -99,7 +99,7 @@ public class CindervaneAnimationHandler {
                     return PlayState.CONTINUE;
                 }
                 // GLIDE_DOWN - third priority, absolute lock (nothing overrides diving)
-                else if (dragon.isGoingDown() && !dragon.isRiderLandingBlendActive()) {
+                else if (dragon.getXRot() > 15.0f && !dragon.isRiderLandingBlendActive()) {
                     state.getController().transitionLength(6);
                     state.setAndContinue(GLIDE_DOWN);
                     return PlayState.CONTINUE;
