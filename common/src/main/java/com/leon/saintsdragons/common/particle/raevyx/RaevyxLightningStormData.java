@@ -18,15 +18,13 @@ import java.util.Locale;
  * Server-safe ParticleOptions payload for the lightning_storm particle.
  * Holds a single float parameter: size.
  */
-public record RaevyxLightningStormData(float size, boolean female) implements ParticleOptions {
+public record RaevyxLightningStormData(float size) implements ParticleOptions {
     public static final MapCodec<RaevyxLightningStormData> MAP_CODEC = RecordCodecBuilder.mapCodec(b -> b.group(
-            Codec.FLOAT.fieldOf("size").forGetter(RaevyxLightningStormData::size),
-            Codec.BOOL.optionalFieldOf("female", false).forGetter(RaevyxLightningStormData::female)
+            Codec.FLOAT.fieldOf("size").forGetter(RaevyxLightningStormData::size)
     ).apply(b, RaevyxLightningStormData::new));
 
     public static final StreamCodec<RegistryFriendlyByteBuf, RaevyxLightningStormData> STREAM_CODEC = StreamCodec.composite(
             ByteBufCodecs.FLOAT, RaevyxLightningStormData::size,
-            ByteBufCodecs.BOOL, RaevyxLightningStormData::female,
             RaevyxLightningStormData::new
     );
 
@@ -35,18 +33,16 @@ public record RaevyxLightningStormData(float size, boolean female) implements Pa
     }
 
     public @NotNull String writeToString() {
-        ParticleType<RaevyxLightningStormData> type = female ? ModParticles.LIGHTNING_STORM_FEMALE.get() : ModParticles.LIGHTNING_STORM.get();
         return String.format(
                 Locale.ROOT,
-                "%s %.2f %s",
-                BuiltInRegistries.PARTICLE_TYPE.getKey(type),
-                this.size,
-                Boolean.toString(this.female)
+                "%s %.2f",
+                BuiltInRegistries.PARTICLE_TYPE.getKey(ModParticles.LIGHTNING_STORM.get()),
+                this.size
         );
     }
 
     @Override
     public @NotNull ParticleType<RaevyxLightningStormData> getType() {
-        return female ? ModParticles.LIGHTNING_STORM_FEMALE.get() : ModParticles.LIGHTNING_STORM.get();
+        return ModParticles.LIGHTNING_STORM.get();
     }
 }

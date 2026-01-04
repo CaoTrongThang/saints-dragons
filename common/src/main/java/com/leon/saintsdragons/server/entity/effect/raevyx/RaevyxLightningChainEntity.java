@@ -211,7 +211,7 @@ public class RaevyxLightningChainEntity extends Entity {
                     Vec3 dir = step.normalize();
                     
                     this.level().addAlwaysVisibleParticle(
-                        new RaevyxLightningStormData(getSize(), female),
+                        new RaevyxLightningStormData(getSize()),
                         pos.x, pos.y, pos.z,
                         dir.x, dir.y, dir.z
                     );
@@ -221,13 +221,13 @@ public class RaevyxLightningChainEntity extends Entity {
             // Single point lightning
             if (getIsChain()) {
                 this.level().addAlwaysVisibleParticle(
-                    new RaevyxLightningStormData(getSize(), female),
+                    new RaevyxLightningStormData(getSize()),
                     this.getX(), this.getY(), this.getZ(),
                     0, 0, 0
                 );
             } else {
                 this.level().addAlwaysVisibleParticle(
-                    new RaevyxLightningStormData(getSize(), female),
+                    new RaevyxLightningStormData(getSize()),
                     this.getX(), this.getY(), this.getZ(),
                     0, 0, 0
                 );
@@ -262,7 +262,7 @@ public class RaevyxLightningChainEntity extends Entity {
         // Simple impact particle (removed excessive layering)
         float size = getSize() * 0.8f;
 
-        server.sendParticles(new RaevyxLightningStormData(size, female),
+        server.sendParticles(new RaevyxLightningStormData(size),
                 impactPos.x, impactPos.y, impactPos.z,
                 1, 0, 0, 0, 0.0);
     }
@@ -274,7 +274,7 @@ public class RaevyxLightningChainEntity extends Entity {
         // Simple chain impact particle (removed excessive layering)
         float size = getSize() * 0.6f;
 
-        server.sendParticles(new RaevyxLightningStormData(size, female),
+        server.sendParticles(new RaevyxLightningStormData(size),
                 chainPos.x, chainPos.y, chainPos.z,
                 1, 0, 0, 0, 0.0);
     }

@@ -31,20 +31,6 @@ public final class ModParticles {
                         }
                     });
 
-    public static final Supplier<ParticleType<RaevyxLightningStormData>> LIGHTNING_STORM_FEMALE =
-            REGISTER.register("lightning_storm_female",
-                    () -> new ParticleType<>(false) {
-                        @Override
-                        public com.mojang.serialization.MapCodec<RaevyxLightningStormData> codec() {
-                            return RaevyxLightningStormData.MAP_CODEC;
-                        }
-
-                        @Override
-                        public net.minecraft.network.codec.StreamCodec<net.minecraft.network.RegistryFriendlyByteBuf, RaevyxLightningStormData> streamCodec() {
-                            return RaevyxLightningStormData.STREAM_CODEC;
-                        }
-                    });
-
     public static final Supplier<ParticleType<RaevyxLightningChainData>> LIGHTNING_CHAIN =
             REGISTER.register("lightning_chain",
                     () -> new ParticleType<>(false) {
