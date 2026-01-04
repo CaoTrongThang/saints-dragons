@@ -190,31 +190,14 @@ public class CindervaneAnimationHandler {
             // Check if descending when being ridden (for GLIDE_DOWN animation)
             // Note: pitch is negated, so looking down = negative pitch
             float pitchDegrees = (float)Math.toDegrees(dragon.getFlightPitchRadians(state.getPartialTick()));
-            boolean riderDescending = dragon.isVehicle() && dragon.getControllingPassenger() != null && pitchDegrees < -30.0f;
-            if (riderDescending) {
-                state.getController().transitionLength(6);
-                state.setAndContinue(GLIDE_DOWN);
-            } else {
-                boolean sprinting = dragon.isAccelerating();
-                boolean isMovingHorizontally = dragon.getDeltaMovement().horizontalDistanceSqr() > 0.01 || sprinting;
-
-                // Wild dragons alternate between FLAP and GLIDE for natural flight
-                // Use vertical velocity to determine which animation to play
-                double verticalVelocity = dragon.getDeltaMovement().y;
-
-                // Ascending or low-speed flight: flap wings
-                // Gliding: high-speed level flight or descending slowly
-                if (sprinting && isMovingHorizontally) {
-                    state.getController().transitionLength(3);
-                    state.setAndContinue(SPRINT_FLAP);
-                } else if (verticalVelocity > 0.02 || dragon.getDeltaMovement().horizontalDistanceSqr() < 0.1) {
+            boolean riderDescending = dragon.isVehicle() && dragon.getControllingPassenger() != null && pitchDegrees < -10.0f;
+                if (riderDescending) {
                     state.getController().transitionLength(6);
                     state.setAndContinue(FLAP);
                 } else {
                     state.getController().transitionLength(8);
                     state.setAndContinue(GLIDE);
                 }
-            }
             return PlayState.CONTINUE;
         }
 
