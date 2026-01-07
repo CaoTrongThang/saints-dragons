@@ -200,23 +200,31 @@ public class Cindervane extends RideableDragonBase implements DragonFlightCapabl
 
     @Override
     public float maxSitTicks() {
-        return 45.0F; // down animation is ~45 ticks
+        return 33.0F; // Matches sit_down animation (1.6667s = ~33 ticks)
+    }
+
+    private int getSitDownAnimationTicks() {
+        return 33; // 1.6667s = ~33 ticks
+    }
+
+    private int getSitUpAnimationTicks() {
+        return 17; // 0.8333s = ~17 ticks
     }
 
     public int getSleepSitDownDuration() {
-        return Math.round(maxSitTicks()); // matches sit_down length (45 ticks)
+        return getSitDownAnimationTicks();
     }
 
     public int getSleepFallAsleepDuration() {
-        return 60; // fall_asleep animation duration
+        return 33; // 1.6667s = ~33 ticks
     }
 
     public int getSleepWakeUpDuration() {
-        return 42; // wake_up animation duration
+        return 33; // 1.6667s = ~33 ticks
     }
 
     public int getSleepSitUpDuration() {
-        return Math.round(maxSitTicks()); // re-use sit_up length (~46 ticks)
+        return getSitUpAnimationTicks();
     }
 
     // Feeding cooldown synced via DATA_FEEDING_COOLDOWN entity data accessor
@@ -684,7 +692,7 @@ public class Cindervane extends RideableDragonBase implements DragonFlightCapabl
                 animationHandler.triggerSitDownAnimation();
                 isSittingDown = true;
                 isStandingUp = false; // Cancel the stand-up
-                sitTransitionTicks = 45; // down animation is 2.25s = 45 ticks
+                sitTransitionTicks = getSitDownAnimationTicks();
             }
 
             if (sitProgress < maxSitTicks()) {
@@ -707,11 +715,12 @@ public class Cindervane extends RideableDragonBase implements DragonFlightCapabl
                     animationHandler.triggerSitUpAnimation();
                     isStandingUp = true;
                     isSittingDown = false; // Cancel the sit-down
-                    sitTransitionTicks = 46; // up animation is 2.2917s = ~46 ticks
+                    sitTransitionTicks = getSitUpAnimationTicks();
                 }
 
-                // Always decrement sitProgress when standing up (let the animation play as it decrements)
-                sitProgress--;
+                // Decrement sitProgress to match stand-up animation duration
+                float decrementRate = maxSitTicks() / (float) getSitUpAnimationTicks();
+                sitProgress -= decrementRate;
                 if (sitProgress < 0f) sitProgress = 0f;
                 this.entityData.set(DATA_SIT_PROGRESS, sitProgress);
             }
@@ -868,7 +877,7 @@ public class Cindervane extends RideableDragonBase implements DragonFlightCapabl
                 // Trigger landed animation when rider landing completes
                 if (wasLanding && onGround() && isVehicle()) {
                     triggerAnim("actions", "landed");
-                    lockRiderControls(29);  // Lock controls for 1.46 seconds while animation plays
+                    lockRiderControls(34);  // Lock controls for 1.67 seconds while animation plays
                 }
             }
             return;
@@ -1291,13 +1300,13 @@ public class Cindervane extends RideableDragonBase implements DragonFlightCapabl
         int timeFlying = getTimeFlying();
 
         // Play takeoff at the very start of flight
-        if (timeFlying < 28) return true; // TAKEOFF_ANIM_EARLY_TICKS
+        if (timeFlying < 25) return true; // TAKEOFF_ANIM_EARLY_TICKS (1.25s)
 
         // Continue playing if still within max ticks AND conditions are met
         boolean airborne = !onGround();
         boolean ascending = getDeltaMovement().y > 0.05;
 
-        return (timeFlying < 30) && (airborne || ascending); // TAKEOFF_ANIM_MAX_TICKS
+        return (timeFlying < 25) && (airborne || ascending); // TAKEOFF_ANIM_MAX_TICKS (1.25s)
     }
 
     private boolean isRiddenByOwner() {
@@ -1954,7 +1963,7 @@ public class Cindervane extends RideableDragonBase implements DragonFlightCapabl
 
     @Override
     public int getDeathAnimationDurationTicks() {
-        return 87; // 4.3333s - matches Cindervane death animation length
+        return 50;
     }
 
     // Death handling now uses base class helpers
@@ -1963,6 +1972,19 @@ public class Cindervane extends RideableDragonBase implements DragonFlightCapabl
     public boolean hurt(@Nonnull DamageSource source, float amount) {
         // During dying sequence, ignore all damage (entity is already dead, playing death animation)
         if (isDying()) {
+            return false;
+        }
+
+        // Immune to fire damage (explicit check since IS_FIRE tag doesn't work reliably)
+        if (source.is(net.minecraft.world.damagesource.DamageTypes.IN_FIRE) ||
+            source.is(net.minecraft.world.damagesource.DamageTypes.ON_FIRE) ||
+            source.is(net.minecraft.world.damagesource.DamageTypes.LAVA) ||
+            source.is(net.minecraft.world.damagesource.DamageTypes.HOT_FLOOR)) {
+            return false;
+        }
+
+        // Immune to fall damage (flying dragon)
+        if (source.is(net.minecraft.world.damagesource.DamageTypes.FALL)) {
             return false;
         }
 
@@ -2484,16 +2506,14 @@ public class Cindervane extends RideableDragonBase implements DragonFlightCapabl
         // Handle sleep enter transition: sit_down -> fall_asleep -> sleep loop
         if (isSleepingEntering() && !level().isClientSide) {
             // Wait until sit_down completes, then trigger fall_asleep once
-            if (!sleepFallAsleepTriggered) {
-                if (getSitProgress() < maxSitTicks()) {
+            if (!sleepFallAsleepTriggered && sleepTransitionTicks > 0) {
+                sleepTransitionTicks--;
+                if (sleepTransitionTicks == 0) {
+                    // Sit down complete: trigger fall_asleep and start countdown
+                    sleepFallAsleepTriggered = true;
                     sleepTransitionTicks = getSleepFallAsleepDuration();
-                    return; // hold until seated
+                    animationHandler.triggerFallAsleepAnimation();
                 }
-
-                // Sit down complete: trigger fall_asleep and start countdown next tick
-                sleepFallAsleepTriggered = true;
-                sleepTransitionTicks = getSleepFallAsleepDuration();
-                animationHandler.triggerFallAsleepAnimation();
                 return;
             }
         }
@@ -2629,17 +2649,19 @@ public class Cindervane extends RideableDragonBase implements DragonFlightCapabl
         setSleepingEntering(true);
         sleepFallAsleepTriggered = false;
         sleepSitUpTriggered = false;
-        // New system: sit_down (uses sitProgress) -> fall_asleep (3s = 60 ticks) -> sleep loop
-        sleepTransitionTicks = getSleepFallAsleepDuration() + 1; // sentinel; held until sit completes
 
         // enterSleepLock forces sit command, which triggers sit_down via updateSittingProgress
         if (!level().isClientSide) {
             enterSleepLock();
             if (getSitProgress() < maxSitTicks()) {
+                // Not seated: start sit_down countdown
+                sleepTransitionTicks = getSleepSitDownDuration();
                 animationHandler.triggerSitDownAnimation();
             } else {
-                animationHandler.triggerFallAsleepAnimation();
+                // Already seated: skip sit_down, jump straight to fall_asleep
+                sleepFallAsleepTriggered = true;
                 sleepTransitionTicks = getSleepFallAsleepDuration();
+                animationHandler.triggerFallAsleepAnimation();
             }
         }
     }

@@ -29,7 +29,7 @@ public class NeoForgeClientEventHandler {
     private static double raevyxCameraShift = 0.0;
 
     // Cindervane takeoff camera zoom transition
-    private static float cindervaneCameraZoom = 15F; // Base zoom
+    private static float cindervaneCameraZoom = 5F; // Base zoom
     private static float cindervaneCameraZoomTarget = 15F;
 
     // Cindervane camera shift smoothing (banking response)
@@ -176,8 +176,8 @@ public class NeoForgeClientEventHandler {
             );
         } else if (!(player.getVehicle() instanceof Cindervane)) {
             // Reset zoom and shift when not riding Cindervane
-            cindervaneCameraZoom = 15F;
-            cindervaneCameraZoomTarget = 15F;
+            cindervaneCameraZoom = 5F;
+            cindervaneCameraZoomTarget = 5F;
             cindervaneCameraShift = 0.0;
             verticalCameraShift = 0.0;
             cindervaneCameraPitch = 0.0f;
