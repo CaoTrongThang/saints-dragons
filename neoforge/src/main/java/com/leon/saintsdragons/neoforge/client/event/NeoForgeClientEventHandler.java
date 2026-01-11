@@ -110,9 +110,9 @@ public class NeoForgeClientEventHandler {
             float raevyxYaw = CameraAccessor.invokeGetYRot(camera);
             float raevyxPitch = CameraAccessor.invokeGetXRot(camera);
             CameraAccessor.invokeSetRotation(
-                camera,
-                raevyxYaw,
-                Mth.clamp(raevyxPitch + raevyxCameraPitch, -90.0f, 90.0f)
+                    camera,
+                    raevyxYaw,
+                    Mth.clamp(raevyxPitch + raevyxCameraPitch, -90.0f, 90.0f)
             );
         } else {
             // Reset zoom and shift when not riding Raevyx
@@ -171,9 +171,9 @@ public class NeoForgeClientEventHandler {
             float cindervaneYaw = CameraAccessor.invokeGetYRot(camera);
             float cindervanePitch = CameraAccessor.invokeGetXRot(camera);
             CameraAccessor.invokeSetRotation(
-                camera,
-                cindervaneYaw,
-                Mth.clamp(cindervanePitch + cindervaneCameraPitch, -90.0f, 90.0f)
+                    camera,
+                    cindervaneYaw,
+                    Mth.clamp(cindervanePitch + cindervaneCameraPitch, -90.0f, 90.0f)
             );
         } else if (!(player.getVehicle() instanceof Cindervane)) {
             // Reset zoom and shift when not riding Cindervane
@@ -239,9 +239,9 @@ public class NeoForgeClientEventHandler {
             float ignivorusYaw = CameraAccessor.invokeGetYRot(camera);
             float ignivorusPitch = CameraAccessor.invokeGetXRot(camera);
             CameraAccessor.invokeSetRotation(
-                camera,
-                ignivorusYaw,
-                Mth.clamp(ignivorusPitch + ignivorusCameraPitch, -90.0f, 90.0f)
+                    camera,
+                    ignivorusYaw,
+                    Mth.clamp(ignivorusPitch + ignivorusCameraPitch, -90.0f, 90.0f)
             );
         } else if (!(player.getVehicle() instanceof Ignivorus)) {
             // Reset zoom and shift when not riding Ignivorus
@@ -282,9 +282,9 @@ public class NeoForgeClientEventHandler {
                 float nulljawYaw = CameraAccessor.invokeGetYRot(camera);
                 float nulljawPitch = CameraAccessor.invokeGetXRot(camera);
                 CameraAccessor.invokeSetRotation(
-                    camera,
-                    nulljawYaw,
-                    Mth.clamp(nulljawPitch + nulljawCameraPitch, -90.0f, 90.0f)
+                        camera,
+                        nulljawYaw,
+                        Mth.clamp(nulljawPitch + nulljawCameraPitch, -90.0f, 90.0f)
                 );
             } else {
                 CameraAccessor.invokeMove(camera, -15F, 0, 0);
@@ -293,44 +293,43 @@ public class NeoForgeClientEventHandler {
                 nulljawCameraPitch = 0.0f;
             }
         }
-        }
 
         // Screen shake detection and application
         applyScreenShake(camera, player, partialTicks);
     }
 
     private static void applyScreenShake(Camera camera, Entity player, float partialTicks) {
-        double shakeDistanceScale = 64.0;
-        double distance = Double.MAX_VALUE;
-        float tremorAmount = 0.0F; // Reset tremor amount each frame
+    double shakeDistanceScale = 64.0;
+    double distance = Double.MAX_VALUE;
+    float tremorAmount = 0.0F; // Reset tremor amount each frame
 
-        AABB aabb = player.getBoundingBox().inflate(shakeDistanceScale);
-        var level = Minecraft.getInstance().level;
-        if (level == null) return;
+    AABB aabb = player.getBoundingBox().inflate(shakeDistanceScale);
+    var level = Minecraft.getInstance().level;
+    if (level == null) return;
 
-        for (Mob screenShaker : level.getEntitiesOfClass(Mob.class, aabb, (mob -> mob instanceof ShakesScreen))) {
-            ShakesScreen shakesScreen = (ShakesScreen) screenShaker;
-            if (shakesScreen.canFeelShake(player) && screenShaker.distanceTo(player) < distance) {
-                distance = screenShaker.distanceTo(player);
-                float shakeAmount = shakesScreen.getScreenShakeAmount(partialTicks);
-                tremorAmount = Math.min((1F - (float) Math.min(1, distance / shakesScreen.getShakeDistance())) * Math.max(shakeAmount, 0F), 2.0F);
-            }
+    for (Mob screenShaker : level.getEntitiesOfClass(Mob.class, aabb, (mob -> mob instanceof ShakesScreen))) {
+        ShakesScreen shakesScreen = (ShakesScreen) screenShaker;
+        if (shakesScreen.canFeelShake(player) && screenShaker.distanceTo(player) < distance) {
+            distance = screenShaker.distanceTo(player);
+            float shakeAmount = shakesScreen.getScreenShakeAmount(partialTicks);
+            tremorAmount = Math.min((1F - (float) Math.min(1, distance / shakesScreen.getShakeDistance())) * Math.max(shakeAmount, 0F), 2.0F);
         }
+    }
 
-        if (tremorAmount > 0) {
-            // Generate random offsets for camera movement
-            double intensity = tremorAmount * Minecraft.getInstance().options.screenEffectScale().get();
+    if (tremorAmount > 0) {
+        // Generate random offsets for camera movement
+        double intensity = tremorAmount * Minecraft.getInstance().options.screenEffectScale().get();
 
-            CameraAccessor.invokeMove(camera,
+        CameraAccessor.invokeMove(camera,
                 randomTremorOffsets[0] * 0.2F * intensity,
                 randomTremorOffsets[1] * 0.2F * intensity,
                 randomTremorOffsets[2] * 0.5F * intensity
-            );
+        );
 
-            // Update random offsets for next frame
-            randomTremorOffsets[0] = (Math.random() - 0.5) * 2.0;
-            randomTremorOffsets[1] = (Math.random() - 0.5) * 2.0;
-            randomTremorOffsets[2] = (Math.random() - 0.5) * 2.0;
-        }
+        // Update random offsets for next frame
+        randomTremorOffsets[0] = (Math.random() - 0.5) * 2.0;
+        randomTremorOffsets[1] = (Math.random() - 0.5) * 2.0;
+        randomTremorOffsets[2] = (Math.random() - 0.5) * 2.0;
+    }
     }
 }
