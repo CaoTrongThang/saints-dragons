@@ -5,9 +5,9 @@ import com.leon.saintsdragons.common.config.dragon.DragonAttributeConfig;
 import com.leon.saintsdragons.common.config.dragon.DragonAttributeConfigLoader;
 import com.leon.saintsdragons.common.registry.nulljaw.NulljawAbilities;
 import com.leon.saintsdragons.server.ai.goals.nulljaw.*;
+import com.leon.saintsdragons.server.ai.goals.base.DirectSwimToTargetGoal;
+import com.leon.saintsdragons.server.ai.goals.base.DirectSwimWanderGoal;
 import com.leon.saintsdragons.server.ai.navigation.DragonPathNavigateGround;
-import com.leon.saintsdragons.server.ai.navigation.DragonAmphibiousNavigation;
-import com.leon.saintsdragons.server.ai.navigation.DragonSwimMoveControl;
 import com.leon.saintsdragons.server.ai.goals.base.DragonOwnerHurtByTargetGoal;
 import com.leon.saintsdragons.server.ai.goals.base.DragonOwnerHurtTargetGoal;
 import com.leon.saintsdragons.server.entity.ability.DragonAbilityType;
@@ -68,7 +68,7 @@ import net.minecraft.world.effect.MobEffects;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-public class Nulljaw extends RideableDragonBase implements AquaticDragon, ShakesScreen, SoundHandledDragon {
+public class Nulljaw extends RideableDragonBase implements SemiAquaticDragon, ShakesScreen, SoundHandledDragon {
 
     // Force-load abilities registry when this class is loaded
     static {
@@ -131,13 +131,9 @@ public class Nulljaw extends RideableDragonBase implements AquaticDragon, Shakes
     // ===== HARDCODED GROUND SPEEDS =====
     public static final double RIDER_WALK_SPEED = 0.22D;
     public static final double RIDER_RUN_SPEED = 0.42D;
-    private double configuredSwimSpeed = 1.45D; // Still configurable
     private final PathNavigation groundNavigation;
-    private final DragonAmphibiousNavigation waterNavigation;
     private final MoveControl landMoveControl;
-    private final DragonSwimMoveControl swimMoveControl;
     private final RiftDrakeLookController landLookControl;
-    private NulljawSwimGoal waterSwimGoal;
     private NulljawGroundWanderGoal groundWanderGoal;
     private boolean swimming;
     private int swimTicks;
@@ -218,9 +214,7 @@ public class Nulljaw extends RideableDragonBase implements AquaticDragon, Shakes
         this.setPathfindingMalus(PathType.WATER, 0.0F);
         this.setPathfindingMalus(PathType.WATER_BORDER, 0.0F);
         this.groundNavigation = new DragonPathNavigateGround(this, level);
-        this.waterNavigation = new DragonAmphibiousNavigation(this, level);
         this.landMoveControl = new RiftDrakeMoveControl(this);
-        this.swimMoveControl = new DragonSwimMoveControl(this, 6.0F, 0.08D, 0.12D);
         this.landLookControl = new RiftDrakeLookController(this);
         this.navigation = this.groundNavigation;
         this.moveControl = this.landMoveControl;
@@ -432,14 +426,14 @@ public class Nulljaw extends RideableDragonBase implements AquaticDragon, Shakes
     protected void registerGoals() {
         super.registerGoals();
         this.goalSelector.addGoal(1, new BreathAirGoal(this));
-        this.goalSelector.addGoal(3, new NulljawCombatGoal(this));
-        this.goalSelector.addGoal(6, new NulljawLeaveWaterGoal(this));
-        this.goalSelector.addGoal(7, new NulljawFindWaterGoal(this));
-        this.goalSelector.addGoal(8, new NulljawFollowOwnerGoal(this));
-        this.waterSwimGoal = new NulljawSwimGoal(this, 1.2D, 30);
-        this.goalSelector.addGoal(9, waterSwimGoal);
+        this.goalSelector.addGoal(2, new NulljawCombatGoal(this));
+        this.goalSelector.addGoal(3, new DirectSwimToTargetGoal(this, 8.0F, 0.30D, true));
+        this.goalSelector.addGoal(5, new NulljawLeaveWaterGoal(this));
+        this.goalSelector.addGoal(6, new NulljawFindWaterGoal(this));
+        this.goalSelector.addGoal(7, new NulljawFollowOwnerGoal(this));
+        this.goalSelector.addGoal(10, new DirectSwimWanderGoal(this, 6.0F, 0.20D, 30));
         this.groundWanderGoal = new NulljawGroundWanderGoal(this, 1.0D, 100);
-        this.goalSelector.addGoal(10, groundWanderGoal);
+        this.goalSelector.addGoal(11, groundWanderGoal);
         this.goalSelector.addGoal(11, new RandomLookAroundGoal(this));
         this.goalSelector.addGoal(11, new LookAtPlayerGoal(this, Player.class, 8.0F));
         this.targetSelector.addGoal(1, new DragonOwnerHurtByTargetGoal(this));
@@ -671,35 +665,14 @@ public class Nulljaw extends RideableDragonBase implements AquaticDragon, Shakes
 
     @Override
     public @NotNull PathNavigation getNavigation() {
-        return swimming ? waterNavigation : groundNavigation;
-    }
-
-    @Override
-    public PathNavigation getAquaticNavigation() {
-        return waterNavigation;
+        return groundNavigation;
     }
 
     @Override
     public double getSwimSpeed() {
-        double baseSpeed = configuredSwimSpeed;
-        if (this.isVehicle()) {
-            // Reduced bonus for mounted swimming (camera-controlled is more direct)
-            baseSpeed *= 0.65D;
-        }
-        return baseSpeed;
+        return 1;
     }
 
-    @Override
-    public void onEnterWater() {
-        this.setDeltaMovement(this.getDeltaMovement());
-        this.tickAnimationStates();
-    }
-
-    @Override
-    public void onExitWater() {
-        this.setDeltaMovement(this.getDeltaMovement().multiply(1.0D, 0.6D, 1.0D));
-        this.tickAnimationStates();
-    }
 
     @Override
     public @NotNull InteractionResult mobInteract(@NotNull Player player, @NotNull InteractionHand hand) {
@@ -747,9 +720,6 @@ public class Nulljaw extends RideableDragonBase implements AquaticDragon, Shakes
         setAttributeBase(Attributes.ARMOR, config.armor());
         // MOVEMENT_SPEED is hardcoded in createAttributes() - no config needed
 
-        // Only swim speed is configurable
-        configuredSwimSpeed = config.extraDouble("swim_speed", 1.45D);
-
         if (this.getHealth() > config.maxHealth()) {
             this.setHealth((float) config.maxHealth());
         }
@@ -764,10 +734,6 @@ public class Nulljaw extends RideableDragonBase implements AquaticDragon, Shakes
 
     // Ground speeds are now hardcoded constants (RIDER_WALK_SPEED, RIDER_RUN_SPEED)
 
-    public double getConfiguredSwimSpeed() {
-        return configuredSwimSpeed;
-    }
-    
     @Override
     public boolean isFood(@Nonnull net.minecraft.world.item.ItemStack stack) {
         // Rift Drakes prefer fish like other dragons
@@ -1096,21 +1062,11 @@ public class Nulljaw extends RideableDragonBase implements AquaticDragon, Shakes
 
     private void enterSwimState() {
         swimming = true;
-        this.navigation = waterNavigation;
-        this.moveControl = swimMoveControl;
-        
         this.entityData.set(DATA_SWIMMING, true);
-        if (waterSwimGoal != null) {
-            waterSwimGoal.forceTrigger();
-        }
     }
 
     private void exitSwimState() {
         swimming = false;
-        this.navigation = groundNavigation;
-        this.moveControl = landMoveControl;
-        this.lookControl = landLookControl; // Always use land look control when exiting water
-        this.waterNavigation.stop();
         Vec3 delta = this.getDeltaMovement();
         this.setDeltaMovement(new Vec3(delta.x, 0.0D, delta.z));
         if (groundWanderGoal != null) {
@@ -1839,6 +1795,20 @@ public class Nulljaw extends RideableDragonBase implements AquaticDragon, Shakes
 
     private void updateSittingProgress() {
         if (level().isClientSide) {
+            return;
+        }
+
+        if (this.isInWaterOrBubble()) {
+            if (isSittingDown || isStandingUp || sitTransitionTicks > 0) {
+                isSittingDown = false;
+                isStandingUp = false;
+                sitTransitionTicks = 0;
+            }
+            if (sitProgress != 0f || prevSitProgress != 0f) {
+                sitProgress = 0f;
+                prevSitProgress = 0f;
+                this.entityData.set(DATA_SIT_PROGRESS, 0f);
+            }
             return;
         }
 

@@ -1,5 +1,8 @@
 package com.leon.saintsdragons.server.entity.interfaces;
 
+import com.leon.saintsdragons.server.entity.base.RideableDragonBase;
+import net.minecraft.world.entity.animal.FlyingAnimal;
+
 /**
  * Interface for dragons that can fly.
  * Defines the minimum requirements for flight behaviors.
@@ -7,9 +10,18 @@ package com.leon.saintsdragons.server.entity.interfaces;
 public interface DragonFlightCapable {
     
     /**
-     * Check if the wyvern is currently flying
+     * Check if the wyvern is currently flying.
+     * Defaulted to guard against old binaries that may not have compiled against this method.
      */
-    boolean isFlying();
+    default boolean isFlying() {
+        if (this instanceof RideableDragonBase rideable) {
+            return rideable.isFlying();
+        }
+        if (this instanceof FlyingAnimal flyingAnimal) {
+            return flyingAnimal.isFlying();
+        }
+        return false;
+    }
     
     /**
      * Set the wyvern's flying state

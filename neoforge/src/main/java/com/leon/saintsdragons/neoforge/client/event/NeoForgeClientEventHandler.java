@@ -48,6 +48,7 @@ public class NeoForgeClientEventHandler {
     private static float raevyxCameraPitch = 0.0f;
     private static float cindervaneCameraPitch = 0.0f;
     private static float ignivorusCameraPitch = 0.0f;
+    private static float nulljawCameraPitch = 0.0f;
 
     public static void onClientTick(Minecraft minecraft) {
         RaevyxLightningBeamSoundController.tick(minecraft);
@@ -252,8 +253,46 @@ public class NeoForgeClientEventHandler {
         }
 
         // Nulljaw camera zoom
-        if (player.isPassenger() && player.getVehicle() instanceof Nulljaw && camera.isDetached()) {
-            CameraAccessor.invokeMove(camera, -15F, 0, 0);
+        if (player.isPassenger() && player.getVehicle() instanceof Nulljaw nulljaw && camera.isDetached()) {
+            boolean isSwimming = nulljaw.isInWaterOrBubble();
+            if (isSwimming) {
+                float blendRate = 0.05F;
+                raevyxCameraZoomTarget = 18F;
+                raevyxCameraZoom += (raevyxCameraZoomTarget - raevyxCameraZoom) * blendRate;
+
+                double targetCameraShift = 0.0;
+                float bankAngle = nulljaw.getSwimRollAngleDegrees(partialTicks);
+                double velocity = nulljaw.getDeltaMovement().horizontalDistance();
+                double velocityFactor = Math.min(velocity * 2.0, 1.5);
+                targetCameraShift = -(bankAngle / 45.0) * 5.5 * velocityFactor;
+
+                double shiftBlendRate = 0.15;
+                raevyxCameraShift += (targetCameraShift - raevyxCameraShift) * shiftBlendRate;
+
+                double targetVerticalShift = 30.0;
+                double verticalBlendRate = 0.12;
+                verticalCameraShift += (targetVerticalShift - verticalCameraShift) * verticalBlendRate;
+
+                CameraAccessor.invokeMove(camera, -raevyxCameraZoom, 0, 0);
+                CameraAccessor.invokeMove(camera, 0, verticalCameraShift, raevyxCameraShift);
+
+                float nulljawTargetPitch = 15.0f;
+                float pitchBlendRate = 0.15f;
+                nulljawCameraPitch += (nulljawTargetPitch - nulljawCameraPitch) * pitchBlendRate;
+                float nulljawYaw = CameraAccessor.invokeGetYRot(camera);
+                float nulljawPitch = CameraAccessor.invokeGetXRot(camera);
+                CameraAccessor.invokeSetRotation(
+                    camera,
+                    nulljawYaw,
+                    Mth.clamp(nulljawPitch + nulljawCameraPitch, -90.0f, 90.0f)
+                );
+            } else {
+                CameraAccessor.invokeMove(camera, -15F, 0, 0);
+                raevyxCameraShift = 0.0;
+                verticalCameraShift = 0.0;
+                nulljawCameraPitch = 0.0f;
+            }
+        }
         }
 
         // Screen shake detection and application
