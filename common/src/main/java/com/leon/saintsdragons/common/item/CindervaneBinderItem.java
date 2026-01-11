@@ -31,7 +31,6 @@ import java.util.UUID;
  * While carrying a bound amphithere binder, the player can release the amphithere.
  */
 public class CindervaneBinderItem extends Item {
-
     public CindervaneBinderItem(Properties properties) {
         super(properties);
     }
@@ -50,12 +49,11 @@ public class CindervaneBinderItem extends Item {
             }
 
             if (BinderComponentUtil.isBound(stack)) {
-                player.displayClientMessage(Component.translatable("saintsdragons.message.cindervane_already_occupied"), true);
+                player.displayClientMessage(Component.translatable("saintsdragons.message.binder_already_occupied"), true);
                 return InteractionResult.FAIL;
             }
 
             ItemStack newStack = captureDragon(stack, dragon, player);
-
             if (hand == InteractionHand.MAIN_HAND) {
                 player.getInventory().setItem(player.getInventory().selected, newStack);
             } else {
@@ -110,15 +108,6 @@ public class CindervaneBinderItem extends Item {
         );
         BinderComponentUtil.setData(newStack, data);
 
-        if (player instanceof net.minecraft.server.level.ServerPlayer serverPlayer) {
-            for (int i = 0; i < serverPlayer.getInventory().getContainerSize(); i++) {
-                if (serverPlayer.getInventory().getItem(i) == stack) {
-                    serverPlayer.getInventory().setItem(i, newStack);
-                    break;
-                }
-            }
-        }
-
         dragon.remove(net.minecraft.world.entity.Entity.RemovalReason.DISCARDED);
 
         player.displayClientMessage(Component.translatable("saintsdragons.message.cindervane_captured", dragon.getName().getString()), true);
@@ -139,7 +128,7 @@ public class CindervaneBinderItem extends Item {
         }
 
         if (!(player.level() instanceof ServerLevel serverLevel)) {
-            return true;
+            return false;
         }
 
         String dragonName = data.dragonName().orElse("");
@@ -148,14 +137,13 @@ public class CindervaneBinderItem extends Item {
 
         data.dragonData().ifPresent(newDragon::readAdditionalSaveData);
 
-        newDragon.setUUID(java.util.UUID.randomUUID());
+        data.dragonUuid().ifPresent(newDragon::setUUID);
         newDragon.setPos(pos.getX() + 0.5, pos.getY() + 1, pos.getZ() + 0.5);
 
+        // Restore owner even if they're offline
         if (ownerUUID != null) {
-            Player owner = serverLevel.getPlayerByUUID(ownerUUID);
-            if (owner != null) {
-                newDragon.tame(owner);
-            }
+            newDragon.setTame(true, true);
+            newDragon.setOwnerUUID(ownerUUID);
         } else {
             newDragon.tame(player);
         }

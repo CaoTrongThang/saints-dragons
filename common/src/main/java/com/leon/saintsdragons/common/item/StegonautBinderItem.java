@@ -27,7 +27,6 @@ import java.util.UUID;
  * While carrying a bound drake binder, the player gets resistance buff.
  */
 public class StegonautBinderItem extends Item {
-
     public StegonautBinderItem(Properties properties) {
         super(properties);
     }
@@ -107,16 +106,6 @@ public class StegonautBinderItem extends Item {
                 drakeData
         );
         BinderComponentUtil.setData(newStack, data);
-
-        if (player instanceof net.minecraft.server.level.ServerPlayer serverPlayer) {
-            for (int i = 0; i < serverPlayer.getInventory().getContainerSize(); i++) {
-                if (serverPlayer.getInventory().getItem(i) == stack) {
-                    serverPlayer.getInventory().setItem(i, newStack);
-                    break;
-                }
-            }
-        }
-
         drake.remove(net.minecraft.world.entity.Entity.RemovalReason.DISCARDED);
 
         player.displayClientMessage(Component.translatable("saintsdragons.message.stegonaut_captured", drake.getName().getString()), true);
@@ -131,29 +120,22 @@ public class StegonautBinderItem extends Item {
         }
 
         String drakeName = data.dragonName().orElse("");
-        net.minecraft.nbt.CompoundTag drakeData = data.dragonData().orElse(null);
         UUID ownerUUID = data.ownerUuid().orElse(null);
-
         if (ownerUUID != null && !player.getUUID().equals(ownerUUID)) {
             player.displayClientMessage(Component.translatable("saintsdragons.message.not_dragon_owner"), true);
             return false;
         }
 
         if (!(player.level() instanceof ServerLevel serverLevel)) {
-            return true;
+            return false;
         }
 
         Stegonaut newDrake = new Stegonaut(com.leon.saintsdragons.common.registry.ModEntities.STEGONAUT.get(), serverLevel);
+        data.dragonData().ifPresent(newDrake::readAdditionalSaveData);
+        data.dragonUuid().ifPresent(newDrake::setUUID);
         newDrake.setPos(pos.getX() + 0.5, pos.getY() + 1, pos.getZ() + 0.5);
-
-        if (drakeData != null) {
-            newDrake.readAdditionalSaveData(drakeData);
-        }
-
-        newDrake.setUUID(java.util.UUID.randomUUID());
-
         if (ownerUUID != null) {
-        newDrake.setTame(true, true);
+            newDrake.setTame(true, true);
             newDrake.setOwnerUUID(ownerUUID);
         } else {
             newDrake.tame(player);
