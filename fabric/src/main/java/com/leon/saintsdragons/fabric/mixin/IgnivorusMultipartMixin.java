@@ -27,17 +27,17 @@ public abstract class IgnivorusMultipartMixin implements IgnivorusPartProvider {
         this.saintsdragons$fabricPartManager = new FabricIgnivorusPartManager((Ignivorus) (Object) this);
     }
 
-    @Inject(method = "tick", at = @At("RETURN"))
+    @Inject(method = "tick", at = @At("HEAD"))
     private void onTick(CallbackInfo ci) {
+        // Clean up parts if entity is removed
+        if (((Ignivorus) (Object) this).isRemoved() && this.saintsdragons$fabricPartManager != null) {
+            this.saintsdragons$fabricPartManager.removeAllParts();
+            this.saintsdragons$fabricPartManager = null;
+            return;
+        }
+
         if (this.saintsdragons$fabricPartManager != null) {
             this.saintsdragons$fabricPartManager.updatePartPositions();
-        }
-    }
-
-    @Inject(method = "remove", at = @At("HEAD"))
-    private void onRemove(net.minecraft.world.entity.Entity.RemovalReason reason, CallbackInfo ci) {
-        if (this.saintsdragons$fabricPartManager != null) {
-            this.saintsdragons$fabricPartManager.removeAllParts();
         }
     }
 

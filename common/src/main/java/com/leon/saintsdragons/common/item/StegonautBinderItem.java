@@ -130,6 +130,11 @@ public class StegonautBinderItem extends Item {
             return false;
         }
 
+        if (data.dragonData().isEmpty()) {
+            player.displayClientMessage(Component.translatable("saintsdragons.message.binder_data_corrupted"), true);
+            return false;
+        }
+
         Stegonaut newDrake = new Stegonaut(com.leon.saintsdragons.common.registry.ModEntities.STEGONAUT.get(), serverLevel);
         data.dragonData().ifPresent(newDrake::readAdditionalSaveData);
         data.dragonUuid().ifPresent(newDrake::setUUID);

@@ -131,6 +131,11 @@ public class CindervaneBinderItem extends Item {
             return false;
         }
 
+        if (data.dragonData().isEmpty()) {
+            player.displayClientMessage(Component.translatable("saintsdragons.message.binder_data_corrupted"), true);
+            return false;
+        }
+
         String dragonName = data.dragonName().orElse("");
 
         Cindervane newDragon = new Cindervane(ModEntities.CINDERVANE.get(), serverLevel);

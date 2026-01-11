@@ -19,16 +19,17 @@ public final class FabricPartClientHooks {
         if (clientLevel.getEntity(part.getId()) != null) {
             return;
         }
-        ((ClientLevelAccessor) clientLevel).saintsdragons$addEntity(part.getId(), part);
+        ((ClientLevelAccessor) clientLevel).saintsdragons$addEntity(part);
     }
 
     public static void removeClientPart(Level level, Entity part) {
         if (!(level instanceof ClientLevel clientLevel)) {
             return;
         }
-        if (clientLevel.getEntity(part.getId()) == null) {
-            return;
+        // In 1.21.1, just call discard() - the client handles removal automatically
+        // Don't need to manually invoke removeEntity
+        if (clientLevel.getEntity(part.getId()) != null) {
+            part.discard();
         }
-        ((ClientLevelAccessor) clientLevel).saintsdragons$removeEntity(part.getId(), Entity.RemovalReason.DISCARDED);
     }
 }

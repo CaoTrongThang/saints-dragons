@@ -70,6 +70,7 @@
   "saintsdragons.message.stegonaut_cannot_be_captured": "This drake cannot be bound right now",
   "saintsdragons.message.binder_already_occupied": "This binder already contains a drake",
   "saintsdragons.message.binder_not_bound": "This binder is empty - bind a drake first",
+  "saintsdragons.message.binder_data_corrupted": "This binder's data looks corrupted",
 
   "saintsdragons.message.raevyx_captured": "Bound %s in Raevyx Binder!",
   "saintsdragons.message.raevyx_released": "Released %s from Raevyx Binder!",

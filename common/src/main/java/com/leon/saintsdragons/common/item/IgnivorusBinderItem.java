@@ -129,6 +129,11 @@ public class IgnivorusBinderItem extends Item {
             return false;
         }
 
+        if (data.dragonData().isEmpty()) {
+            player.displayClientMessage(Component.translatable("saintsdragons.message.binder_data_corrupted"), true);
+            return false;
+        }
+
         String dragonName = data.dragonName().orElse("");
 
         Ignivorus newDragon = new Ignivorus(ModEntities.IGNIVORUS.get(), serverLevel);
