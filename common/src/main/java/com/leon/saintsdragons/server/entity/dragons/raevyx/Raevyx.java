@@ -241,11 +241,15 @@ public class Raevyx extends RideableDragonBase implements FlyingAnimal, RangedAt
     /** Entity data accessor for flight pitch (radians) */
     public static final EntityDataAccessor<Float> DATA_FLIGHT_PITCH =
             net.minecraft.network.syncher.SynchedEntityData.defineId(Raevyx.class, net.minecraft.network.syncher.EntityDataSerializers.FLOAT);
+    /** Entity data accessor for rider pitch key mode */
+    public static final EntityDataAccessor<Boolean> DATA_PITCH_KEY_MODE =
+            net.minecraft.network.syncher.SynchedEntityData.defineId(Raevyx.class, net.minecraft.network.syncher.EntityDataSerializers.BOOLEAN);
 
     // ===== OTHER CONSTANTS =====
 
     public static final float MAX_BEAM_YAW_DEG = 40.0f;
     public static final float MAX_BEAM_PITCH_DEG = 50.0f;
+    public static final float RIDER_KEY_PITCH_DEG = 25.0f;
     public AnimatableInstanceCache dragonCache = GeckoLibUtil.createInstanceCache(this);
 
 
@@ -673,6 +677,7 @@ public class Raevyx extends RideableDragonBase implements FlyingAnimal, RangedAt
         builder.define(DATA_FEEDING_COOLDOWN, 0);
         builder.define(DATA_TAMING_STUNNED, false);
         builder.define(DATA_FLIGHT_PITCH, 0f);
+        builder.define(DATA_PITCH_KEY_MODE, false);
     }
 
     @Override
@@ -864,6 +869,11 @@ public class Raevyx extends RideableDragonBase implements FlyingAnimal, RangedAt
                     toggleMeleeMode();
                 }
             }
+            case TOGGLE_PITCH_MODE -> {
+                if (!locked) {
+                    setRiderPitchKeyMode(!isRiderPitchKeyMode());
+                }
+            }
             case DOUBLE_TAP_A -> {
                 if (!locked) {
                     onRiderDodge(player, true);
@@ -985,6 +995,14 @@ public class Raevyx extends RideableDragonBase implements FlyingAnimal, RangedAt
 
     public void setBeamGlowActive(boolean active) {
         this.entityData.set(DATA_BEAM_GLOW, active);
+    }
+
+    public boolean isRiderPitchKeyMode() {
+        return this.entityData.get(DATA_PITCH_KEY_MODE);
+    }
+
+    public void setRiderPitchKeyMode(boolean enabled) {
+        this.entityData.set(DATA_PITCH_KEY_MODE, enabled);
     }
 
     // (No client/server rider anchor fields; seat uses math-based head-space anchor)
@@ -2925,27 +2943,41 @@ public class Raevyx extends RideableDragonBase implements FlyingAnimal, RangedAt
         float targetPitchRad = 0f;
 
         if (this.isVehicle() && this.getControllingPassenger() instanceof Player player) {
-            // RIDING: Use player camera for visual pitch WHEN MOVING
-            float riderForward = player.zza;
-            float riderStrafe = player.xxa;
-            boolean hasMovementInput = Math.abs(riderForward) > 0.01f || Math.abs(riderStrafe) > 0.01f;
+            boolean useKeyPitch = isRiderPitchKeyMode();
 
-            if (hasMovementInput) {
-                // Player is pressing WASD → use camera pitch for visuals
-                // Negate because Minecraft xRot is positive=down, but we want dragon to pitch up when looking up
-                float rawPlayerPitchRad = -(float)Math.toRadians(player.getXRot());
+            if (useKeyPitch) {
+                float rawKeyPitchRad = 0f;
+                if (isGoingUp()) {
+                    rawKeyPitchRad = (float) Math.toRadians(RIDER_KEY_PITCH_DEG);
+                } else if (isGoingDown()) {
+                    rawKeyPitchRad = (float) -Math.toRadians(RIDER_KEY_PITCH_DEG);
+                }
 
-                // Exponential smoothing on player pitch input to avoid jitter (matches banking system)
-                smoothedPlayerPitchRad = smoothedPlayerPitchRad * 0.65f + rawPlayerPitchRad * 0.35f;
-
+                smoothedPlayerPitchRad = smoothedPlayerPitchRad * 0.65f + rawKeyPitchRad * 0.35f;
                 targetPitchRad = Mth.clamp(smoothedPlayerPitchRad, -Mth.HALF_PI, Mth.HALF_PI);
             } else {
-                // Hovering (no WASD) → pitch = 0, even if ascending/descending with Spacebar/L-Alt
-                smoothedPlayerPitchRad = 0f; // Reset smoothing when not moving
-                targetPitchRad = 0f;
+                // RIDING: Use player camera for visual pitch WHEN MOVING
+                float riderForward = this.entityData.get(DATA_RIDER_FORWARD);
+                float riderStrafe = this.entityData.get(DATA_RIDER_STRAFE);
+                boolean hasMovementInput = Math.abs(riderForward) > 0.01f || Math.abs(riderStrafe) > 0.01f;
+
+                if (hasMovementInput) {
+                    // Player is pressing WASD  use camera pitch for visuals
+                    // Negate because Minecraft xRot is positive=down, but we want dragon to pitch up when looking up
+                    float rawPlayerPitchRad = -(float)Math.toRadians(player.getXRot());
+
+                    // Exponential smoothing on player pitch input to avoid jitter (matches banking system)
+                    smoothedPlayerPitchRad = smoothedPlayerPitchRad * 0.65f + rawPlayerPitchRad * 0.35f;
+
+                    targetPitchRad = Mth.clamp(smoothedPlayerPitchRad, -Mth.HALF_PI, Mth.HALF_PI);
+                } else {
+                    // Hovering (no WASD)  pitch = 0, even if ascending/descending with Spacebar/L-Alt
+                    smoothedPlayerPitchRad = 0f; // Reset smoothing when not moving
+                    targetPitchRad = 0f;
+                }
             }
 
-            boolean wantsLanding = isGoingDown() || player.getXRot() > 30.0f;
+            boolean wantsLanding = isGoingDown() || (!useKeyPitch && player.getXRot() > 30.0f);
             if (wantsLanding) {
                 double altitude = getAltitudeAboveTerrain();
                 if (altitude != Double.POSITIVE_INFINITY && altitude >= -0.25D && altitude <= LANDING_BLEND_ALTITUDE) {
@@ -2971,7 +3003,7 @@ public class Raevyx extends RideableDragonBase implements FlyingAnimal, RangedAt
 
         // Trigger landing blend when descending close to ground while ridden
         if (this.isVehicle() && this.getControllingPassenger() instanceof Player player) {
-            boolean wantsLanding = isGoingDown() || player.getXRot() > 30.0f;
+            boolean wantsLanding = isGoingDown() || (!isRiderPitchKeyMode() && player.getXRot() > 30.0f);
             if (wantsLanding) {
                 double altitude = getAltitudeAboveTerrain();
                 if (altitude != Double.POSITIVE_INFINITY && altitude >= -0.25D && altitude <= LANDING_BLEND_ALTITUDE) {
@@ -3954,6 +3986,7 @@ public class Raevyx extends RideableDragonBase implements FlyingAnimal, RangedAt
 
         // Sleep state is ephemeral - not persisted (sleep goal re-evaluates on load)
         tag.putBoolean("ManualSitCommand", this.manualSitCommand);
+        tag.putBoolean("RiderPitchKeyMode", isRiderPitchKeyMode());
 
         // Persist feeding cooldown (synced via entity data but saved for redundancy)
         tag.putInt("FeedingCooldownTicks", Math.max(0, this.entityData.get(DATA_FEEDING_COOLDOWN)));
@@ -3973,9 +4006,14 @@ public class Raevyx extends RideableDragonBase implements FlyingAnimal, RangedAt
         this.lastLandingGameTime = tag.contains("LastLandingGameTime") ? tag.getLong("LastLandingGameTime") : Long.MIN_VALUE;
         this.landingFlag = tag.contains("LandingFlag") && tag.getBoolean("LandingFlag");
         this.landingTimer = tag.contains("LandingTimer") ? tag.getInt("LandingTimer") : 0;
-
+        if (tag.contains("RiderPitchKeyMode")) {
+            setRiderPitchKeyMode(tag.getBoolean("RiderPitchKeyMode"));
+        }
         // Reset tick counters to prevent state inconsistencies (like Cindervane)
         // This prevents the dragon from thinking it just started flying when reloading mid-flight
+        if (tag.contains("RiderPitchKeyMode")) {
+            setRiderPitchKeyMode(tag.getBoolean("RiderPitchKeyMode"));
+        }
         if (!savedFlying) {
             landingTimer = 0;
         }

@@ -136,6 +136,7 @@ public class Cindervane extends RideableDragonBase implements DragonFlightCapabl
     // ===== HARDCODED GROUND SPEEDS =====
     public static final double RIDER_WALK_SPEED = 0.18D;
     public static final double RIDER_RUN_SPEED = 0.26D;
+    public static final float RIDER_KEY_PITCH_DEG = 25.0f;
 
     private int targetCooldown;
     private int airTicks;
@@ -383,6 +384,8 @@ public class Cindervane extends RideableDragonBase implements DragonFlightCapabl
             SynchedEntityData.defineId(Cindervane.class, EntityDataSerializers.BOOLEAN);
     private static final EntityDataAccessor<Float> DATA_FLIGHT_PITCH =
             SynchedEntityData.defineId(Cindervane.class, EntityDataSerializers.FLOAT);
+    private static final EntityDataAccessor<Boolean> DATA_PITCH_KEY_MODE =
+            SynchedEntityData.defineId(Cindervane.class, EntityDataSerializers.BOOLEAN);
 
     // Sleep system entity data accessors
     private static final EntityDataAccessor<Boolean> DATA_SLEEPING =
@@ -403,6 +406,7 @@ public class Cindervane extends RideableDragonBase implements DragonFlightCapabl
         builder.define(DATA_SCREEN_SHAKE_AMOUNT, 0f);
         builder.define(DATA_RIDER_LANDING_BLEND, false);
         builder.define(DATA_FLIGHT_PITCH, 0f);
+        builder.define(DATA_PITCH_KEY_MODE, false);
         builder.define(DATA_SLEEPING, false);
         builder.define(DATA_SLEEPING_ENTERING, false);
         builder.define(DATA_SLEEPING_EXITING, false);
@@ -979,27 +983,41 @@ public class Cindervane extends RideableDragonBase implements DragonFlightCapabl
         float targetPitchRad = 0f;
 
         if (this.isVehicle() && this.getControllingPassenger() instanceof Player player) {
-            // RIDING: Use player camera for visual pitch WHEN MOVING
-            float riderForward = player.zza;
-            float riderStrafe = player.xxa;
-            boolean hasMovementInput = Math.abs(riderForward) > 0.01f || Math.abs(riderStrafe) > 0.01f;
+            boolean useKeyPitch = isRiderPitchKeyMode();
 
-            if (hasMovementInput) {
-                // Player is pressing WASD → use camera pitch for visuals
-                // Negate because Minecraft xRot is positive=down, but we want dragon to pitch up when looking up
-                float rawPlayerPitchRad = -(float)Math.toRadians(player.getXRot());
+            if (useKeyPitch) {
+                float rawKeyPitchRad = 0f;
+                if (isGoingUp()) {
+                    rawKeyPitchRad = (float) Math.toRadians(RIDER_KEY_PITCH_DEG);
+                } else if (isGoingDown()) {
+                    rawKeyPitchRad = (float) -Math.toRadians(RIDER_KEY_PITCH_DEG);
+                }
 
-                // Exponential smoothing on player pitch input to avoid jitter (matches banking system)
-                smoothedPlayerPitchRad = smoothedPlayerPitchRad * 0.65f + rawPlayerPitchRad * 0.35f;
-
+                smoothedPlayerPitchRad = smoothedPlayerPitchRad * 0.65f + rawKeyPitchRad * 0.35f;
                 targetPitchRad = Mth.clamp(smoothedPlayerPitchRad, -Mth.HALF_PI, Mth.HALF_PI);
             } else {
-                // Hovering (no WASD) → pitch = 0, even if ascending/descending with Spacebar/L-Alt
-                smoothedPlayerPitchRad = 0f; // Reset smoothing when not moving
-                targetPitchRad = 0f;
+                // RIDING: Use player camera for visual pitch WHEN MOVING
+                float riderForward = this.entityData.get(DATA_RIDER_FORWARD);
+                float riderStrafe = this.entityData.get(DATA_RIDER_STRAFE);
+                boolean hasMovementInput = Math.abs(riderForward) > 0.01f || Math.abs(riderStrafe) > 0.01f;
+
+                if (hasMovementInput) {
+                    // Player is pressing WASD  use camera pitch for visuals
+                    // Negate because Minecraft xRot is positive=down, but we want dragon to pitch up when looking up
+                    float rawPlayerPitchRad = -(float)Math.toRadians(player.getXRot());
+
+                    // Exponential smoothing on player pitch input to avoid jitter (matches banking system)
+                    smoothedPlayerPitchRad = smoothedPlayerPitchRad * 0.65f + rawPlayerPitchRad * 0.35f;
+
+                    targetPitchRad = Mth.clamp(smoothedPlayerPitchRad, -Mth.HALF_PI, Mth.HALF_PI);
+                } else {
+                    // Hovering (no WASD)  pitch = 0, even if ascending/descending with Spacebar/L-Alt
+                    smoothedPlayerPitchRad = 0f; // Reset smoothing when not moving
+                    targetPitchRad = 0f;
+                }
             }
 
-            boolean wantsLanding = isGoingDown() || player.getXRot() > 30.0f;
+            boolean wantsLanding = isGoingDown() || (!useKeyPitch && player.getXRot() > 30.0f);
             if (wantsLanding) {
                 double altitude = getAltitudeAboveTerrain();
                 if (altitude != Double.POSITIVE_INFINITY && altitude >= -0.25D && altitude <= LANDING_BLEND_ALTITUDE) {
@@ -1025,7 +1043,7 @@ public class Cindervane extends RideableDragonBase implements DragonFlightCapabl
 
         // Trigger landing blend when descending close to ground while ridden
         if (this.isVehicle() && this.getControllingPassenger() instanceof Player player) {
-            boolean wantsLanding = isGoingDown() || player.getXRot() > 30.0f;
+            boolean wantsLanding = isGoingDown() || (!isRiderPitchKeyMode() && player.getXRot() > 30.0f);
             if (wantsLanding) {
                 double altitude = getAltitudeAboveTerrain();
                 if (altitude != Double.POSITIVE_INFINITY && altitude >= -0.25D && altitude <= LANDING_BLEND_ALTITUDE) {
@@ -1143,6 +1161,14 @@ public class Cindervane extends RideableDragonBase implements DragonFlightCapabl
     }
     public float getFlightPitchRadians(float partialTick) {
         return Mth.lerp(partialTick, prevFlightPitchRad, flightPitchRad);
+    }
+
+    public boolean isRiderPitchKeyMode() {
+        return this.entityData.get(DATA_PITCH_KEY_MODE);
+    }
+
+    public void setRiderPitchKeyMode(boolean enabled) {
+        this.entityData.set(DATA_PITCH_KEY_MODE, enabled);
     }
 
     public int getTimeFlying() {
@@ -1447,6 +1473,11 @@ public class Cindervane extends RideableDragonBase implements DragonFlightCapabl
             case ABILITY_STOP -> {
                 if (abilityName != null && !abilityName.isEmpty()) {
                     forceEndActiveAbility();
+                }
+            }
+            case TOGGLE_PITCH_MODE -> {
+                if (!locked) {
+                    setRiderPitchKeyMode(!isRiderPitchKeyMode());
                 }
             }
             default -> { }
@@ -2156,6 +2187,7 @@ public class Cindervane extends RideableDragonBase implements DragonFlightCapabl
         super.addAdditionalSaveData(tag);
         tag.putInt("TimeFlying", timeFlying);
         saveRideableData(tag);
+        tag.putBoolean("RiderPitchKeyMode", isRiderPitchKeyMode());
 
         // Persist feeding cooldown (synced via entity data but saved for redundancy)
         tag.putInt("FeedingCooldownTicks", Math.max(0, this.entityData.get(DATA_FEEDING_COOLDOWN)));
@@ -2168,6 +2200,9 @@ public class Cindervane extends RideableDragonBase implements DragonFlightCapabl
         loadRideableData(tag);
         boolean savedFlying = tag.getBoolean("Flying");
         this.timeFlying = tag.getInt("TimeFlying");
+        if (tag.contains("RiderPitchKeyMode")) {
+            setRiderPitchKeyMode(tag.getBoolean("RiderPitchKeyMode"));
+        }
 
         // Reset all tick counters to prevent state inconsistencies
         // Reset ground ticks when flying
