@@ -7,7 +7,7 @@ import com.leon.saintsdragons.server.ai.goals.base.DragonSleepBehavior;
 import com.leon.saintsdragons.server.entity.ability.DragonAbility;
 import com.leon.saintsdragons.server.entity.ability.DragonAbilityType;
 import com.leon.saintsdragons.server.entity.handler.DragonCombatHandler;
-import com.leon.saintsdragons.server.entity.behavior.DragonSleepBehavior;
+import com.leon.saintsdragons.server.ai.goals.base.DragonSleepBehavior;
 import com.leon.saintsdragons.server.entity.interfaces.DragonSoundProfile;
 import com.leon.saintsdragons.server.entity.handler.DragonAllyManager;
 import com.leon.saintsdragons.common.network.DragonAnimTickets;

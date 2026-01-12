@@ -4547,9 +4547,9 @@ public class Raevyx extends RideableDragonBase implements FlyingAnimal, RangedAt
     // Note: Most sleep methods already exist in LightningDragonEntity
     
     @Override
-    public com.leon.saintsdragons.server.entity.behavior.DragonSleepBehavior.DragonSleepPreferences getSleepPreferences() {
+    public DragonSleepBehavior.DragonSleepPreferences getSleepPreferences() {
         // Raevyx are daylight sleepers (avoid thunderstorms)
-        return com.leon.saintsdragons.server.entity.behavior.DragonSleepBehavior.DragonSleepPreferences.DIURNAL();
+        return DragonSleepBehavior.DragonSleepPreferences.DIURNAL();
     }
     
     @Override
