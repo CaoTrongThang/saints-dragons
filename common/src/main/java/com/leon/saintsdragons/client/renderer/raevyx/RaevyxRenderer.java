@@ -56,6 +56,13 @@ public class RaevyxRenderer extends GeoEntityRenderer<Raevyx> {
     @Override
     public void render(@NotNull Raevyx entity, float entityYaw, float partialTick,
                        @NotNull PoseStack poseStack, @NotNull MultiBufferSource bufferSource, int packedLight) {
+        // Baby dragons have smaller shadows
+        if (entity.isBaby()) {
+            this.shadowRadius = 1.25f;
+        } else {
+            this.shadowRadius = 2.0f;
+        }
+
         this.lastBakedModel = this.getGeoModel().getBakedModel(this.getGeoModel().getModelResource(entity));
         if (this.lastBakedModel != null) {
             enableTrackingForBones(this.lastBakedModel);

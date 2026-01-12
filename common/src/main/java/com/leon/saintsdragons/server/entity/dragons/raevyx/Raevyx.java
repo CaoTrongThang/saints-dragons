@@ -274,6 +274,7 @@ public class Raevyx extends RideableDragonBase implements FlyingAnimal, RangedAt
     private double lastCheckedZ = 0;
     private int ticksSinceLastMovement = 0;
 
+    private static final double BABY_MAX_HEALTH = 60.0D;
     private static final Map<String, VocalEntry> VOCAL_ENTRIES = new VocalEntryBuilder()
             .add("grumble1", "action", "animation.raevyx.grumble1", ModSounds.RAEVYX_GRUMBLE_1, 0.8f, 0.95f, 0.1f, false, false, false)
             .add("grumble2", "action", "animation.raevyx.grumble2", ModSounds.RAEVYX_GRUMBLE_2, 0.8f, 0.95f, 0.1f, false, false, false)
@@ -289,8 +290,6 @@ public class Raevyx extends RideableDragonBase implements FlyingAnimal, RangedAt
             .add("roar_air", "action", "animation.raevyx.roar_air", ModSounds.RAEVYX_ROAR, 1.4f, 0.9f, 0.15f, false, false, false)
             .add("raevyx_hurt", "hurt", "animation.raevyx.hurt", ModSounds.RAEVYX_HURT, 1.2f, 0.95f, 0.1f, true, true, true)
             .add("raevyx_die", "action", "animation.raevyx.die", ModSounds.RAEVYX_DIE, 1.5f, 0.95f, 0.1f, false, true, true)
-            .add("baby_raevyx_hurt", "hurt", "animation.raevyx.hurt", ModSounds.BABY_RAEVYX_HURT, 1.4f, 1.05f, 0.15f, true, true, true)
-            .add("baby_raevyx_die", "action", "animation.raevyx.die", ModSounds.BABY_RAEVYX_DIE, 1.3f, 1.0f, 0.1f, false, true, true)
             .build();
 
     private boolean manualSitCommand = false;
@@ -2715,7 +2714,8 @@ public class Raevyx extends RideableDragonBase implements FlyingAnimal, RangedAt
             if (superchargeTicks <= 0) {
                 superchargeTicks = 0;
                 // When supercharge ends, restore normal max health
-                Objects.requireNonNull(this.getAttribute(Attributes.MAX_HEALTH)).setBaseValue(180.0D);
+                DragonAttributeConfig config = DragonAttributeConfigLoader.getInstance().getConfig(DragonAttributeConfigLoader.RAEVYX_ID);
+                Objects.requireNonNull(this.getAttribute(Attributes.MAX_HEALTH)).setBaseValue(getBaseMaxHealth(config));
                 // Don't let health go above the new max
                 if (this.getHealth() > this.getMaxHealth()) {
                     this.setHealth(this.getMaxHealth());
@@ -3021,12 +3021,12 @@ public class Raevyx extends RideableDragonBase implements FlyingAnimal, RangedAt
 
     @Override
     protected DragonAbilityType<?, ?> getHurtAbilityType() {
-        return isBaby() ? RaevyxAbilities.BABY_HURT : RaevyxAbilities.HURT;
+        return RaevyxAbilities.HURT;
     }
 
     @Override
     protected DragonAbilityType<?, ?> getDeathAbilityType() {
-        return isBaby() ? RaevyxAbilities.BABY_DIE : RaevyxAbilities.DIE;
+        return RaevyxAbilities.DIE;
     }
 
     @Override
@@ -3044,9 +3044,6 @@ public class Raevyx extends RideableDragonBase implements FlyingAnimal, RangedAt
      * Plays appropriate ambient sound based on wyvern's current mood and state
      */
     private void playCustomAmbientSound() {
-        if (isBaby()) {
-            return;
-        }
         RandomSource random = getRandom();
 
         // Don't make ambient sounds if we're in combat or using abilities
@@ -3076,7 +3073,7 @@ public class Raevyx extends RideableDragonBase implements FlyingAnimal, RangedAt
                 vocalKey = "grumble1";
             } else if (grumbleChance < 0.7f) {
                 vocalKey = "grumble2";
-            } else if (grumbleChance < 0.9f) {
+            } else if (grumbleChance < 0.9f || isBaby()) {
                 vocalKey = "grumble3";
             } else {
                 vocalKey = "purr";
@@ -3091,7 +3088,7 @@ public class Raevyx extends RideableDragonBase implements FlyingAnimal, RangedAt
      */
     private void handleAmbientSounds() {
         // Suppress ambient sounds during transitions to prevent animation snapping
-        if (isBaby() || isDying() || isSleeping() || isSleepTransitioning() || isInSitTransition() || sleepAmbientCooldownTicks > 0 || areRiderControlsLocked()) return;
+        if (isDying() || isSleeping() || isSleepTransitioning() || isInSitTransition() || sleepAmbientCooldownTicks > 0 || areRiderControlsLocked()) return;
         ambientSoundTimer++;
 
         // Time to make some noise?
@@ -3392,17 +3389,21 @@ public class Raevyx extends RideableDragonBase implements FlyingAnimal, RangedAt
         return spawnData;
     }
 
-    private void applyConfiguredAttributes() {
+    public void applyConfiguredAttributes() {
         DragonAttributeConfig config = DragonAttributeConfigLoader.getInstance().getConfig(DragonAttributeConfigLoader.RAEVYX_ID);
-        setAttributeBase(Attributes.MAX_HEALTH, config.maxHealth());
+        setAttributeBase(Attributes.MAX_HEALTH, getBaseMaxHealth(config));
         setAttributeBase(Attributes.FLYING_SPEED, config.flyingSpeed());
         setAttributeBase(Attributes.ARMOR, config.armor());
         // MOVEMENT_SPEED is hardcoded in createAttributes() - no config needed
 
-        double maxHealth = config.maxHealth();
+        double maxHealth = getBaseMaxHealth(config);
         if (this.getHealth() > maxHealth) {
             this.setHealth((float) maxHealth);
         }
+    }
+
+    private double getBaseMaxHealth(DragonAttributeConfig config) {
+        return isBaby() ? BABY_MAX_HEALTH : config.maxHealth();
     }
 
     private void setAttributeBase(Holder<Attribute> attribute, double value) {
@@ -3429,6 +3430,8 @@ public class Raevyx extends RideableDragonBase implements FlyingAnimal, RangedAt
                 baby.skipRespawnTicks = 5;
                 baby.setBaby(true);
                 baby.setAge(-24000); // Standard baby age
+                baby.applyConfiguredAttributes();
+                baby.setHealth(baby.getMaxHealth());
 
                 // Position baby VERY close to parent (parent is now positioned!)
                 double angle = (Math.PI * 2.0 * i) / babiesToSpawn;
@@ -3484,20 +3487,29 @@ public class Raevyx extends RideableDragonBase implements FlyingAnimal, RangedAt
     protected void registerGoals() {
         this.goalSelector.addGoal(0, new com.leon.saintsdragons.server.ai.goals.base.DragonFloatGoal(this));
         this.goalSelector.addGoal(1, new com.leon.saintsdragons.server.ai.goals.base.DragonWaterEscapeGoal((com.leon.saintsdragons.server.entity.interfaces.DragonFlightCapable)this));
-        // Sleep is handled by DragonSleepBehavior in base class tick
-        this.goalSelector.addGoal(3, new RaevyxAirCombatGoal(this));
-        this.goalSelector.addGoal(3, new RaevyxGroundCombatGoal(this));
+        // Sleep is now handled by DragonSleepBehavior in base class tick
+
+        // Babies don't have combat abilities
+        if (!this.isBaby()) {
+            this.goalSelector.addGoal(3, new RaevyxAirCombatGoal(this));
+            this.goalSelector.addGoal(3, new RaevyxGroundCombatGoal(this));
+        }
+
         this.goalSelector.addGoal(5, new SitWhenOrderedToGoal(this));
         this.goalSelector.addGoal(7, new RaevyxFollowParentGoal(this, 1.15D));
-        this.goalSelector.addGoal(7, new RaevyxBreedGoal(this, 1.0D));
+
+        // Adults can breed, babies cannot
+        if (!this.isBaby()) {
+            this.goalSelector.addGoal(7, new RaevyxBreedGoal(this, 1.0D));
+        }
+
         this.goalSelector.addGoal(8, new RaevyxFollowOwnerGoal(this));   // Lower priority than combat
         this.goalSelector.addGoal(9, new RaevyxGroundWanderGoal(this, 1.0, 60)); // Lower priority than combat
         this.goalSelector.addGoal(10, new RaevyxTemptGoal(this, 1.2,
-                net.minecraft.world.item.crafting.Ingredient.of(net.minecraft.world.item.Items.SALMON, 
+                net.minecraft.world.item.crafting.Ingredient.of(net.minecraft.world.item.Items.SALMON,
                                                                net.minecraft.world.item.Items.COD,
                                                                net.minecraft.world.item.Items.PUFFERFISH), false));
-        
-        this.goalSelector.addGoal(1, new com.leon.saintsdragons.server.ai.goals.base.DragonWaterEscapeGoal((com.leon.saintsdragons.server.entity.interfaces.DragonFlightCapable)this));
+
         this.goalSelector.addGoal(11, new RaevyxFlightGoal(this));
         // Look goals that skip when being ridden (so rider has full control)
         this.goalSelector.addGoal(12, new RandomLookAroundGoal(this) {
@@ -3621,7 +3633,8 @@ public class Raevyx extends RideableDragonBase implements FlyingAnimal, RangedAt
         // When becoming supercharged, double the max health attribute and heal to full
         if (wasNotSupercharged && isSupercharged()) {
             // Double the max health attribute
-            Objects.requireNonNull(this.getAttribute(Attributes.MAX_HEALTH)).setBaseValue(360.0D);
+            DragonAttributeConfig config = DragonAttributeConfigLoader.getInstance().getConfig(DragonAttributeConfigLoader.RAEVYX_ID);
+            Objects.requireNonNull(this.getAttribute(Attributes.MAX_HEALTH)).setBaseValue(getBaseMaxHealth(config) * 2.0D);
             // Heal to full health
             this.setHealth(this.getMaxHealth());
             this.allowGroundBeamDuringStorm = true;
@@ -4190,8 +4203,6 @@ public class Raevyx extends RideableDragonBase implements FlyingAnimal, RangedAt
                 new AnimationController<>(this, "hurt", 3, state -> PlayState.STOP);
         HurtController.triggerableAnim("raevyx_hurt",
                 RawAnimation.begin().thenPlay("animation.raevyx.hurt"));
-        HurtController.triggerableAnim("baby_raevyx_hurt",
-                RawAnimation.begin().thenPlay("animation.raevyx.hurt"));
 
         HurtController.setSoundKeyframeHandler(this::onAnimationSound);
         controllers.add(HurtController);
@@ -4314,6 +4325,7 @@ public class Raevyx extends RideableDragonBase implements FlyingAnimal, RangedAt
     public void ageBoundaryReached() {
         super.ageBoundaryReached();
         // Refresh hitbox dimensions when baby grows into adult
+        applyConfiguredAttributes();
         this.refreshDimensions();
     }
 
@@ -4369,6 +4381,9 @@ public class Raevyx extends RideableDragonBase implements FlyingAnimal, RangedAt
             // IMPORTANT: Set skip flag BEFORE calling setAge to prevent respawn logic
             baby.skipRespawnTicks = 5; // Skip respawn for 5 ticks (enough for vanilla to finish spawning)
             baby.setAge(-24000);
+            baby.setBaby(true);
+            baby.applyConfiguredAttributes();
+            baby.setHealth(baby.getMaxHealth());
 
             // Position the baby near the parent (this is called when spawn egg is used on adult)
             // Find safe ground position to prevent spawning mid-air

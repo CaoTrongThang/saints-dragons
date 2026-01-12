@@ -2,6 +2,7 @@ package com.leon.saintsdragons.neoforge;
 
 import com.leon.saintsdragons.common.SaintsDragonsCommon;
 import com.leon.saintsdragons.common.config.dragon.DragonAttributeConfigLoader;
+import com.leon.saintsdragons.neoforge.loot.ModLootModifiers;
 import com.leon.saintsdragons.neoforge.world.AddDragonsBiomeModifier;
 import com.mojang.serialization.MapCodec;
 import net.neoforged.bus.api.IEventBus;
@@ -31,6 +32,9 @@ public class SaintsDragonsNeoForge {
 
         // Register BiomeModifier codec
         BIOME_MODIFIERS.register(modEventBus);
+
+        // Register loot modifiers
+        ModLootModifiers.register(modEventBus);
 
         // Initialize common config (spawning config)
         com.leon.saintsdragons.common.config.SaintsDragonsConfig.bootstrap();
