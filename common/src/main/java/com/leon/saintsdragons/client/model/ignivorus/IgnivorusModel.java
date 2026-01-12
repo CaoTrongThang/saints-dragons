@@ -149,8 +149,6 @@ public class IgnivorusModel extends DefaultedEntityGeoModel<Ignivorus> {
     }
 
     private void applyNeckFollow(Ignivorus entity, EntityModelData modelData, float partialTick) {
-
-        // Get body deviation (how much head leads body)
         double bodyDeviation = entity.bodyRotDeviation.get(partialTick);
 
         // Combine look rotation + structural bend (NO CLAMPING - let body control handle it)
@@ -158,14 +156,10 @@ public class IgnivorusModel extends DefaultedEntityGeoModel<Ignivorus> {
         float structuralYawRad = (float)(bodyDeviation * 2.0 * Mth.DEG_TO_RAD);
         float totalYawRad = lookYawRad + structuralYawRad;
 
-        float lookPitchRad;
-        if (entity.isVehicle() && entity.isFlying()) {
-            // Use synced flight pitch for rider look so other clients see the same smoothed motion.
-            lookPitchRad = entity.getFlightPitchRadians(partialTick);
-            float maxPitchRad = 25.0f * Mth.DEG_TO_RAD;
-            lookPitchRad = Mth.clamp(lookPitchRad, -maxPitchRad, maxPitchRad);
-        } else {
-            lookPitchRad = modelData.headPitch() * Mth.DEG_TO_RAD;
+        // Simple pitch conversion (NO CLAMPING - let body control handle it)
+        float lookPitchRad = modelData.headPitch() * Mth.DEG_TO_RAD;
+        if (entity.isFlying()) {
+            lookPitchRad *= 0.5f;
         }
 
         // Distribute rotation across neck segments (DragonBodyControl prevents over-rotation)
