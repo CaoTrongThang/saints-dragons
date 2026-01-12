@@ -12,14 +12,40 @@ import net.minecraft.world.level.storage.loot.providers.number.ConstantValue;
 public class FabricLootTableModifier {
     private static final ResourceLocation PILLAGER_OUTPOST_CHEST =
             ResourceLocation.fromNamespaceAndPath("minecraft", "chests/pillager_outpost");
+    private static final ResourceLocation SHIPWRECK_TREASURE_CHEST =
+            ResourceLocation.fromNamespaceAndPath("minecraft", "chests/shipwreck_treasure");
+    private static final ResourceLocation ANCIENT_CITY_CHEST =
+            ResourceLocation.fromNamespaceAndPath("minecraft", "chests/ancient_city");
 
     public static void register() {
         LootTableEvents.MODIFY.register((key, tableBuilder, source, registries) -> {
-            // Add Raevyx Egg to Pillager Outpost chests
+            // Add Raevyx Egg to Pillager Outpost chests (20% chance)
             if (PILLAGER_OUTPOST_CHEST.equals(key.location())) {
                 LootPool.Builder poolBuilder = LootPool.lootPool()
                         .setRolls(ConstantValue.exactly(1))
-                        .when(LootItemRandomChanceCondition.randomChance(0.2f)) // 20% chance
+                        .when(LootItemRandomChanceCondition.randomChance(0.2f))
+                        .add(LootItem.lootTableItem(ModItems.RAEVYX_EGG.get())
+                                .apply(SetItemCountFunction.setCount(ConstantValue.exactly(1))));
+
+                tableBuilder.pool(poolBuilder.build());
+            }
+
+            // Add Raevyx Egg to Shipwreck Treasure chests (15% chance)
+            if (SHIPWRECK_TREASURE_CHEST.equals(key.location())) {
+                LootPool.Builder poolBuilder = LootPool.lootPool()
+                        .setRolls(ConstantValue.exactly(1))
+                        .when(LootItemRandomChanceCondition.randomChance(0.15f))
+                        .add(LootItem.lootTableItem(ModItems.RAEVYX_EGG.get())
+                                .apply(SetItemCountFunction.setCount(ConstantValue.exactly(1))));
+
+                tableBuilder.pool(poolBuilder.build());
+            }
+
+            // Add Raevyx Egg to Ancient City chests (15% chance)
+            if (ANCIENT_CITY_CHEST.equals(key.location())) {
+                LootPool.Builder poolBuilder = LootPool.lootPool()
+                        .setRolls(ConstantValue.exactly(1))
+                        .when(LootItemRandomChanceCondition.randomChance(0.15f))
                         .add(LootItem.lootTableItem(ModItems.RAEVYX_EGG.get())
                                 .apply(SetItemCountFunction.setCount(ConstantValue.exactly(1))));
 

@@ -3,6 +3,7 @@
 package com.leon.saintsdragons.server.entity.base;
 
 import com.leon.saintsdragons.common.registry.DragonType;
+import com.leon.saintsdragons.server.ai.goals.base.DragonSleepBehavior;
 import com.leon.saintsdragons.server.entity.ability.DragonAbility;
 import com.leon.saintsdragons.server.entity.ability.DragonAbilityType;
 import com.leon.saintsdragons.server.entity.handler.DragonCombatHandler;
@@ -548,6 +549,64 @@ public abstract class DragonEntity extends TamableAnimal implements GeoEntity {
      */
     public boolean isStayOrSitMuted() {
         return false;
+    }
+
+    /**
+     * Check if the wyvern is transitioning between sleep states
+     */
+    public boolean isSleepTransitioning() {
+        return false;
+    }
+
+    /**
+     * Check if the dragon is currently sleeping
+     */
+    public boolean isSleeping() {
+        return false;
+    }
+
+    /**
+     * Start the sleep enter sequence (sit down -> fall asleep -> sleep)
+     */
+    public void startSleepEnter() {
+        // Override in dragons that support sleeping
+    }
+
+    /**
+     * Start the sleep exit sequence (wake up -> sit up -> stand)
+     */
+    public void startSleepExit() {
+        // Override in dragons that support sleeping
+    }
+
+    /**
+     * Wake up immediately (e.g., on damage)
+     */
+    public void wakeUpImmediately() {
+        // Override in dragons that support sleeping
+    }
+
+    /**
+     * Check if sleep is temporarily suppressed (combat cooldown, etc.)
+     */
+    public boolean isSleepSuppressed() {
+        return false;
+    }
+
+    /**
+     * Get this dragon's sleep preferences (day/night, weather, etc.)
+     * Override in each dragon to define their sleep behavior
+     */
+    public DragonSleepBehavior.DragonSleepPreferences getSleepPreferences() {
+        // Default: flexible sleeper (any time)
+        return DragonSleepBehavior.DragonSleepPreferences.FLEXIBLE();
+    }
+
+    /**
+     * Check if dragon can sleep right now (custom per-dragon logic)
+     */
+    public boolean canSleepNow() {
+        return true; // Override for custom logic
     }
 
     /**

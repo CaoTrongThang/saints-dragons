@@ -13,8 +13,10 @@ import com.leon.saintsdragons.server.ai.goals.raevyx.RaevyxFollowOwnerGoal;
 import com.leon.saintsdragons.server.ai.goals.raevyx.RaevyxGroundWanderGoal;
 import com.leon.saintsdragons.server.ai.goals.raevyx.RaevyxTemptGoal;
 import com.leon.saintsdragons.server.ai.goals.raevyx.*;
-import com.leon.saintsdragons.server.ai.goals.raevyx.baby.RaevyxFollowParentGoal;
+import com.leon.saintsdragons.server.ai.goals.base.DragonFollowParentGoal;
+import com.leon.saintsdragons.server.ai.goals.base.DragonProtectBabiesGoal;
 import com.leon.saintsdragons.server.ai.navigation.DragonFlightMoveHelper;
+import com.leon.saintsdragons.server.ai.goals.base.DragonSleepBehavior;
 import com.leon.saintsdragons.server.entity.base.DragonEntity;
 import com.leon.saintsdragons.server.entity.base.DragonGender;
 import com.leon.saintsdragons.server.entity.base.RideableDragonBase;
@@ -3504,7 +3506,7 @@ public class Raevyx extends RideableDragonBase implements FlyingAnimal, RangedAt
         }
 
         this.goalSelector.addGoal(5, new SitWhenOrderedToGoal(this));
-        this.goalSelector.addGoal(7, new RaevyxFollowParentGoal(this, 1.15D));
+        this.goalSelector.addGoal(7, new DragonFollowParentGoal<>(this, Raevyx.class, 1.15D));
 
         // Adults can breed, babies cannot
         if (!this.isBaby()) {
@@ -3536,7 +3538,7 @@ public class Raevyx extends RideableDragonBase implements FlyingAnimal, RangedAt
         // Target selection - use custom goals that respect ally system
         this.targetSelector.addGoal(1, new com.leon.saintsdragons.server.ai.goals.base.DragonOwnerHurtByTargetGoal(this));
         this.targetSelector.addGoal(2, new com.leon.saintsdragons.server.ai.goals.base.DragonOwnerHurtTargetGoal(this));
-        this.targetSelector.addGoal(3, new RaevyxProtectBabiesGoal(this));  // Protect nearby babies
+        this.targetSelector.addGoal(3, new DragonProtectBabiesGoal<>(this, Raevyx.class));  // Protect nearby babies
         this.targetSelector.addGoal(4, new HurtByTargetGoal(this));
         // Neutral behavior: do not proactively target players. Only retaliate when hurt or defend owner.
     }
