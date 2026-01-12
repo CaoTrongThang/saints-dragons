@@ -1,0 +1,16 @@
+{
+  "required": true,
+  "minVersion": "0.8",
+  "package": "com.leon.saintsdragons.neoforge.mixin",
+  "compatibilityLevel": "JAVA_21",
+  "mixins": [
+    "IgnivorusMultipartMixin",
+    "ServerboundInteractPacketAccessor",
+    "ServerGamePacketListenerMixin"
+  ],
+  "client": [],
+  "server": [],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}

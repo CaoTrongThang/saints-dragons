@@ -29,7 +29,6 @@ import com.leon.saintsdragons.server.entity.conductivity.ElectricalConductivityP
 import com.leon.saintsdragons.server.entity.conductivity.ElectricalConductivityState;
 import com.leon.saintsdragons.server.entity.controller.raevyx.RaevyxRiderController;
 import com.leon.saintsdragons.server.entity.handler.DragonSoundHandler;
-import com.leon.saintsdragons.util.DragonMathUtil;
 import com.leon.saintsdragons.server.entity.ability.DragonAbility;
 import com.leon.saintsdragons.server.entity.ability.DragonAbilityType;
 import com.leon.saintsdragons.common.registry.ModEntities;
@@ -651,6 +650,15 @@ public class Raevyx extends RideableDragonBase implements FlyingAnimal, RangedAt
     @Override
     public float maxUpStep() {
         return dynamicMaxUpStep;
+    }
+
+    @Override
+    public @NotNull EntityDimensions getDefaultDimensions(@NotNull Pose pose) {
+        // Baby dragons have smaller hitboxes (50% of adult size)
+        if (this.isBaby()) {
+            return EntityDimensions.scalable(1.2F, 0.75F);
+        }
+        return super.getDefaultDimensions(pose);
     }
 
     // Cooldown to prevent hurt sound spam when ridden or under rapid hits

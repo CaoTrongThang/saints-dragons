@@ -56,9 +56,9 @@ public class RaevyxRenderer extends GeoEntityRenderer<Raevyx> {
     @Override
     public void render(@NotNull Raevyx entity, float entityYaw, float partialTick,
                        @NotNull PoseStack poseStack, @NotNull MultiBufferSource bufferSource, int packedLight) {
-        // Baby dragons have smaller shadows
+        // Baby dragons have smaller shadows (proportional to hitbox size)
         if (entity.isBaby()) {
-            this.shadowRadius = 1.25f;
+            this.shadowRadius = 0.8f;
         } else {
             this.shadowRadius = 2.0f;
         }
