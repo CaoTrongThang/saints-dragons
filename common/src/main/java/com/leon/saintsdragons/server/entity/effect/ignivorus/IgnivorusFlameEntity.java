@@ -3,9 +3,6 @@ package com.leon.saintsdragons.server.entity.effect.ignivorus;
 import com.leon.saintsdragons.common.registry.ModEntities;
 import com.leon.saintsdragons.server.entity.dragons.util.DragonDestructionManager;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.network.protocol.Packet;
-import net.minecraft.network.protocol.game.ClientGamePacketListener;
-import net.minecraft.network.protocol.game.ClientboundAddEntityPacket;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
@@ -62,9 +59,9 @@ public class IgnivorusFlameEntity extends Entity {
     }
 
     @Override
-    protected void defineSynchedData() {
-        this.entityData.define(DATA_SCALE, 1.0F);
-        this.entityData.define(DATA_LIFETIME, 20);
+    protected void defineSynchedData(SynchedEntityData.Builder builder) {
+        builder.define(DATA_SCALE, 1.0F);
+        builder.define(DATA_LIFETIME, 20);
     }
 
     public void setScale(float scale) {
@@ -154,7 +151,7 @@ public class IgnivorusFlameEntity extends Entity {
                 }
 
                 target.hurt(damageSource, damage);
-                target.setSecondsOnFire(3);
+                target.igniteForSeconds(3);
             }
         }
     }
@@ -196,11 +193,6 @@ public class IgnivorusFlameEntity extends Entity {
         if (this.ownerUUID != null) {
             tag.putUUID("Owner", this.ownerUUID);
         }
-    }
-
-    @Override
-    public @NotNull Packet<ClientGamePacketListener> getAddEntityPacket() {
-        return new ClientboundAddEntityPacket(this);
     }
 
     @Override

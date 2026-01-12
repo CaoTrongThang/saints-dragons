@@ -12,7 +12,6 @@ import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
 import org.jetbrains.annotations.NotNull;
-import org.joml.Matrix3f;
 import org.joml.Matrix4f;
 
 /**
@@ -72,39 +71,36 @@ public class IgnivorusFlameRenderer extends EntityRenderer<IgnivorusFlameEntity>
         // Get matrix for rendering
         PoseStack.Pose pose = poseStack.last();
         Matrix4f matrix4f = pose.pose();
-        Matrix3f matrix3f = pose.normal();
-
         // Get vertex consumer - use entityCutoutNoCull for better visibility during testing
         VertexConsumer vertexConsumer = bufferSource.getBuffer(RenderType.entityCutoutNoCull(texture));
 
         // Render quad (camera-facing billboard)
-        renderBillboard(vertexConsumer, matrix4f, matrix3f, packedLight, alpha);
+        renderBillboard(vertexConsumer, pose, matrix4f, packedLight, alpha);
 
         poseStack.popPose();
 
         super.render(entity, entityYaw, partialTicks, poseStack, bufferSource, packedLight);
     }
 
-    private void renderBillboard(VertexConsumer consumer, Matrix4f matrix4f, Matrix3f matrix3f, int packedLight, float alpha) {
+    private void renderBillboard(VertexConsumer consumer, PoseStack.Pose pose, Matrix4f matrix4f, int packedLight, float alpha) {
         float size = 1.0F; // Increased from 0.5F for bigger flames
 
         // Render both front and back faces to ensure visibility
         // Front face (counter-clockwise when viewed from front)
-        addVertex(consumer, matrix4f, matrix3f, -size, -size, 0.0F, 0.0F, 1.0F, alpha);
-        addVertex(consumer, matrix4f, matrix3f, -size, size, 0.0F, 0.0F, 0.0F, alpha);
-        addVertex(consumer, matrix4f, matrix3f, size, size, 0.0F, 1.0F, 0.0F, alpha);
-        addVertex(consumer, matrix4f, matrix3f, size, -size, 0.0F, 1.0F, 1.0F, alpha);
+        addVertex(consumer, pose, matrix4f, -size, -size, 0.0F, 0.0F, 1.0F, alpha);
+        addVertex(consumer, pose, matrix4f, -size, size, 0.0F, 0.0F, 0.0F, alpha);
+        addVertex(consumer, pose, matrix4f, size, size, 0.0F, 1.0F, 0.0F, alpha);
+        addVertex(consumer, pose, matrix4f, size, -size, 0.0F, 1.0F, 1.0F, alpha);
     }
 
-    private void addVertex(VertexConsumer consumer, Matrix4f matrix4f, Matrix3f matrix3f,
+    private void addVertex(VertexConsumer consumer, PoseStack.Pose pose, Matrix4f matrix4f,
                           float x, float y, float z, float u, float v, float alpha) {
-        consumer.vertex(matrix4f, x, y, z)
-                .color(1.0F, 1.0F, 1.0F, alpha)
-                .uv(u, v)
-                .overlayCoords(OverlayTexture.NO_OVERLAY)
-                .uv2(240) // Full brightness
-                .normal(matrix3f, 0.0F, 0.0F, 1.0F) // Normal pointing forward
-                .endVertex();
+        consumer.addVertex(matrix4f, x, y, z)
+                .setColor(1.0F, 1.0F, 1.0F, alpha)
+                .setUv(u, v)
+                .setOverlay(OverlayTexture.NO_OVERLAY)
+                .setLight(240)
+                .setNormal(pose, 0.0F, 0.0F, 1.0F);
     }
 
     @Override
