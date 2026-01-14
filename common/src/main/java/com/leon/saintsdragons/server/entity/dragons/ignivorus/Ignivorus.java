@@ -163,6 +163,10 @@ public class Ignivorus extends RideableDragonBase implements DragonFlightCapable
             SynchedEntityData.defineId(Ignivorus.class, EntityDataSerializers.BOOLEAN);
     private static final EntityDataAccessor<Integer> DATA_FIRE_BREATH_PROGRESS =
             SynchedEntityData.defineId(Ignivorus.class, EntityDataSerializers.INT);
+    private static final EntityDataAccessor<Float> DATA_FIRE_BREATH_ENERGY =
+            SynchedEntityData.defineId(Ignivorus.class, EntityDataSerializers.FLOAT);
+    private static final EntityDataAccessor<Boolean> DATA_FIRE_BREATH_DEPLETED =
+            SynchedEntityData.defineId(Ignivorus.class, EntityDataSerializers.BOOLEAN);
     private static final EntityDataAccessor<Boolean> DATA_FIRE_START_SET =
             SynchedEntityData.defineId(Ignivorus.class, EntityDataSerializers.BOOLEAN);
     private static final EntityDataAccessor<Float> DATA_FIRE_START_X =
@@ -193,6 +197,7 @@ public class Ignivorus extends RideableDragonBase implements DragonFlightCapable
             SynchedEntityData.defineId(Ignivorus.class, EntityDataSerializers.BOOLEAN);
 
     private static final double MODEL_SCALE = 1.0D;
+    private static final float FIRE_BREATH_ENERGY_REGEN = 0.0025f;
 
     public static final double RIDER_GLIDE_ALTITUDE_THRESHOLD = 40.0D;
     public static final double RIDER_GLIDE_ALTITUDE_EXIT = 30.0D;
@@ -386,6 +391,8 @@ public class Ignivorus extends RideableDragonBase implements DragonFlightCapable
         super.defineSynchedData(builder);
         builder.define(DATA_FIRE_BREATHING, false);
         builder.define(DATA_FIRE_BREATH_PROGRESS, 0);
+        builder.define(DATA_FIRE_BREATH_ENERGY, 1.0F);
+        builder.define(DATA_FIRE_BREATH_DEPLETED, false);
         builder.define(DATA_FIRE_START_SET, false);
         builder.define(DATA_FIRE_START_X, 0F);
         builder.define(DATA_FIRE_START_Y, 0F);
@@ -540,6 +547,7 @@ public class Ignivorus extends RideableDragonBase implements DragonFlightCapable
                 tamingAbortCalmTicks--;
             }
             tamingController.tickServer();
+            tickFireBreathEnergy();
             tickTerrainClearing();
             handleAmbientSounds();
             if (isFlying() && tickCount % 2 == 0) {
@@ -2519,6 +2527,50 @@ public class Ignivorus extends RideableDragonBase implements DragonFlightCapable
         this.entityData.set(DATA_FIRE_BREATH_PROGRESS, Mth.clamp(progress, 0, 40));
     }
 
+    public float getFireBreathEnergy() {
+        return this.entityData.get(DATA_FIRE_BREATH_ENERGY);
+    }
+
+    public void setFireBreathEnergy(float energy) {
+        float clamped = Mth.clamp(energy, 0.0f, 1.0f);
+        this.entityData.set(DATA_FIRE_BREATH_ENERGY, clamped);
+        if (clamped >= 0.999f && isFireBreathDepleted()) {
+            setFireBreathDepleted(false);
+        }
+    }
+
+    public boolean hasFireBreathEnergy() {
+        return getFireBreathEnergy() > 0.01f;
+    }
+
+    public boolean isFireBreathEnergyFull() {
+        return getFireBreathEnergy() >= 0.999f;
+    }
+
+    public boolean isFireBreathDepleted() {
+        return this.entityData.get(DATA_FIRE_BREATH_DEPLETED);
+    }
+
+    public void setFireBreathDepleted(boolean depleted) {
+        this.entityData.set(DATA_FIRE_BREATH_DEPLETED, depleted);
+    }
+
+    public boolean canUseFireBreath() {
+        return hasFireBreathEnergy() && !isFireBreathDepleted();
+    }
+
+    private void tickFireBreathEnergy() {
+        if (!isBreathingFire() && getFireBreathEnergy() < 1.0f) {
+            float regen = (float) com.leon.saintsdragons.common.config.dragon.DragonAttributeConfigLoader.getInstance()
+                    .getConfig(com.leon.saintsdragons.common.config.dragon.DragonAttributeConfigLoader.IGNIVORUS_ID)
+                    .extraDouble("fire_breath_regen_per_tick", FIRE_BREATH_ENERGY_REGEN);
+            regen = Math.max(0.0f, regen);
+            if (regen > 0.0f) {
+                setFireBreathEnergy(getFireBreathEnergy() + regen);
+            }
+        }
+    }
+
     public void syncFireBreathPath(@Nullable Vec3 start, @Nullable Vec3 end) {
         setFireBreathStart(start);
         setFireBreathTarget(end);
@@ -3518,6 +3570,8 @@ public class Ignivorus extends RideableDragonBase implements DragonFlightCapable
         tag.putBoolean("Leaping", leaping);
         tag.putInt("LeapAnimState", leapAnimState);
         tag.putInt("LeapCooldownTicks", Math.max(0, leapCooldownTicks));
+        tag.putFloat("FireBreathEnergy", getFireBreathEnergy());
+        tag.putBoolean("FireBreathDepleted", isFireBreathDepleted());
         tamingController.save(tag);
     }
 
@@ -3560,6 +3614,16 @@ public class Ignivorus extends RideableDragonBase implements DragonFlightCapable
         }
         if (tag.contains("LeapCooldownTicks")) {
             leapCooldownTicks = Math.max(0, tag.getInt("LeapCooldownTicks"));
+        }
+        if (tag.contains("FireBreathEnergy")) {
+            setFireBreathEnergy(tag.getFloat("FireBreathEnergy"));
+        } else {
+            setFireBreathEnergy(1.0f);
+        }
+        if (tag.contains("FireBreathDepleted")) {
+            setFireBreathDepleted(tag.getBoolean("FireBreathDepleted"));
+        } else {
+            setFireBreathDepleted(false);
         }
         // Treat initial load as "no prior rider" so we don't auto-clear these states before passengers are restored.
         bulldozeWasVehicle = false;
