@@ -17,14 +17,14 @@ import net.minecraft.resources.ResourceLocation;
  */
 public class DragonRideHealthBar {
     // Raevyx textures (128x32 horizontal)
-    private static final ResourceLocation RAEVYX_BASE = new ResourceLocation(SaintsDragonsCommon.MOD_ID, "textures/gui/healthbar/raevyx/raevyx_base.png");
-    private static final ResourceLocation RAEVYX_OVERLAY = new ResourceLocation(SaintsDragonsCommon.MOD_ID, "textures/gui/healthbar/raevyx/raevyx_overlay.png");
-    private static final ResourceLocation IGNIVORUS_BASE = new ResourceLocation(SaintsDragonsCommon.MOD_ID, "textures/gui/healthbar/ignivorus/ignivorus_base.png");
-    private static final ResourceLocation IGNIVORUS_OVERLAY = new ResourceLocation(SaintsDragonsCommon.MOD_ID, "textures/gui/healthbar/ignivorus/ignivorus_overlay.png");
-    private static final ResourceLocation CINDERVANE_BASE = new ResourceLocation(SaintsDragonsCommon.MOD_ID, "textures/gui/healthbar/cindervane/cindervane_base.png");
-    private static final ResourceLocation CINDERVANE_OVERLAY = new ResourceLocation(SaintsDragonsCommon.MOD_ID, "textures/gui/healthbar/cindervane/cindervane_overlay.png");
-    private static final ResourceLocation NULLJAW_BASE = new ResourceLocation(SaintsDragonsCommon.MOD_ID, "textures/gui/healthbar/nulljaw/nulljaw_base.png");
-    private static final ResourceLocation NULLJAW_OVERLAY = new ResourceLocation(SaintsDragonsCommon.MOD_ID, "textures/gui/healthbar/nulljaw/nulljaw_overlay.png");
+    private static final ResourceLocation RAEVYX_BASE = SaintsDragonsCommon.rl("textures/gui/healthbar/raevyx/raevyx_base.png");
+    private static final ResourceLocation RAEVYX_OVERLAY = SaintsDragonsCommon.rl("textures/gui/healthbar/raevyx/raevyx_overlay.png");
+    private static final ResourceLocation IGNIVORUS_BASE = SaintsDragonsCommon.rl("textures/gui/healthbar/ignivorus/ignivorus_base.png");
+    private static final ResourceLocation IGNIVORUS_OVERLAY = SaintsDragonsCommon.rl("textures/gui/healthbar/ignivorus/ignivorus_overlay.png");
+    private static final ResourceLocation CINDERVANE_BASE = SaintsDragonsCommon.rl("textures/gui/healthbar/cindervane/cindervane_base.png");
+    private static final ResourceLocation CINDERVANE_OVERLAY = SaintsDragonsCommon.rl("textures/gui/healthbar/cindervane/cindervane_overlay.png");
+    private static final ResourceLocation NULLJAW_BASE = SaintsDragonsCommon.rl("textures/gui/healthbar/nulljaw/nulljaw_base.png");
+    private static final ResourceLocation NULLJAW_OVERLAY = SaintsDragonsCommon.rl("textures/gui/healthbar/nulljaw/nulljaw_overlay.png");
 
     // Bar dimensions
     private static final int BAR_WIDTH = 182;

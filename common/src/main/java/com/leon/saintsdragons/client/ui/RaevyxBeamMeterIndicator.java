@@ -10,11 +10,11 @@ import net.minecraft.resources.ResourceLocation;
  * Shows depletion as the beam is used, with cooldown regeneration.
  */
 public class RaevyxBeamMeterIndicator {
-    private static final ResourceLocation BEAM_BASE = new ResourceLocation(SaintsDragonsCommon.MOD_ID, "textures/gui/raevyx/raevyx_beam_base.png");
-    private static final ResourceLocation BEAM_OVERLAY = new ResourceLocation(SaintsDragonsCommon.MOD_ID, "textures/gui/raevyx/raevyx_beam_overlay.png");
-    private static final ResourceLocation BEAM_FLASH_RED = new ResourceLocation(SaintsDragonsCommon.MOD_ID, "textures/gui/raevyx/raevyx_beam_overlay_flashes_red.png");
-    private static final ResourceLocation BEAM_FLASH_WHITE = new ResourceLocation(SaintsDragonsCommon.MOD_ID, "textures/gui/raevyx/raevyx_beam_overlay_flashes_white.png");
-    private static final ResourceLocation BEAM_ICON = new ResourceLocation(SaintsDragonsCommon.MOD_ID, "textures/gui/raevyx/red_lightning.png");
+    private static final ResourceLocation BEAM_BASE = SaintsDragonsCommon.rl( "textures/gui/raevyx/raevyx_beam_base.png");
+    private static final ResourceLocation BEAM_OVERLAY = SaintsDragonsCommon.rl("textures/gui/raevyx/raevyx_beam_overlay.png");
+    private static final ResourceLocation BEAM_FLASH_RED = SaintsDragonsCommon.rl( "textures/gui/raevyx/raevyx_beam_overlay_flashes_red.png");
+    private static final ResourceLocation BEAM_FLASH_WHITE = SaintsDragonsCommon.rl( "textures/gui/raevyx/raevyx_beam_overlay_flashes_white.png");
+    private static final ResourceLocation BEAM_ICON = SaintsDragonsCommon.rl( "textures/gui/raevyx/red_lightning.png");
 
     // Texture dimensions (matching Ignivorus bar)
     private static final int BAR_WIDTH = 182;

@@ -184,7 +184,7 @@ public class IgnivorusFlameEntity extends Entity {
 
             // Only set on fire if target doesn't have Fire Resistance
             if (!closestTarget.fireImmune()) {
-                closestTarget.setSecondsOnFire(3);
+                closestTarget.igniteForSeconds(3);
             }
 
             return true; // Signal that we hit something

@@ -17,8 +17,6 @@ public class DragonStatusUI {
 
     private final Minecraft minecraft;
     private final List<DragonUIElement> elements = new ArrayList<>();
-    private final DragonHealthBar healthBar;
-    private final DragonSpeedIndicator speedIndicator;
     private final MeleeModeNotification meleeModeNotification;
     private final FireballChargeIndicator fireballChargeIndicator;
     private final RaevyxBeamMeterIndicator raevyxBeamMeterIndicator;
@@ -36,21 +34,14 @@ public class DragonStatusUI {
     private boolean animationActive = false;
     private boolean animatingIn = false;
     private long animationStartTime = 0L;
-    private int healthBarSlideDistance = 0;
-    private int speedIndicatorSlideDistance = 0;
 
     public DragonStatusUI() {
         this.minecraft = Minecraft.getInstance();
-        this.healthBar = new DragonHealthBar(0, 0);
-        this.speedIndicator = new DragonSpeedIndicator(0, 0);
         this.meleeModeNotification = new MeleeModeNotification();
         this.fireballChargeIndicator = new FireballChargeIndicator();
         this.raevyxBeamMeterIndicator = new RaevyxBeamMeterIndicator();
         this.ignivorusFireBreathMeterIndicator = new IgnivorusFireBreathMeterIndicator();
         this.rideHealthBar = new DragonRideHealthBar();
-
-        elements.add(healthBar);
-        elements.add(speedIndicator);
 
         updateElementPositions();
         loadPositions();
@@ -80,25 +71,10 @@ public class DragonStatusUI {
         cachedScreenWidth = screenWidth;
         cachedScreenHeight = screenHeight;
 
-        int leftMargin = Math.max(12, (int) (screenWidth * 0.02f));
-        int topMargin = Math.max(14, (int) (screenHeight * 0.025f));
-
-        // Everything on the left side now - simple vertical stack
-        int healthBarX = leftMargin;
-        int healthBarY = topMargin;
-
-        int spacing = Math.max(8, (int) (screenHeight * 0.018f));
-        int speedY = healthBarY + healthBar.getHeight() + spacing;
-
-        healthBar.setPosition(healthBarX, healthBarY);
-        speedIndicator.setPosition(leftMargin, speedY);
-
         updateSlideDistances();
     }
 
     private void applyFallbackLayout() {
-        healthBar.setPosition(10, 10);
-        speedIndicator.setPosition(10, 120);
         updateSlideDistances();
     }
 
@@ -109,8 +85,6 @@ public class DragonStatusUI {
         this.currentDragon = dragon;
 
         if (dragon != null) {
-            healthBar.setDragon(dragon);
-            speedIndicator.setDragon(dragon);
             rideHealthBar.setDragon(dragon);
             // When mounting a dragon, default to showing dragon health bar
             showPlayerStats = false;
@@ -146,25 +120,8 @@ public class DragonStatusUI {
             screenWidth = cachedScreenWidth > 0 ? cachedScreenWidth : 400;
         }
 
-        int healthOffsetX = 0;
-        int speedOffsetX = 0;
-
-        if (animating) {
-            int healthMagnitude = Math.round((1.0f - easedProgress) * healthBarSlideDistance);
-            int speedMagnitude = Math.round((1.0f - easedProgress) * speedIndicatorSlideDistance);
-
-            healthOffsetX = drawsFromRight(healthBar, screenWidth) ? healthMagnitude : -healthMagnitude;
-            speedOffsetX = drawsFromRight(speedIndicator, screenWidth) ? speedMagnitude : -speedMagnitude;
-        }
-
         for (DragonUIElement element : elements) {
-            if (element == healthBar) {
-                healthBar.renderWithOffset(guiGraphics, mouseX, mouseY, partialTicks, healthOffsetX, 0);
-            } else if (element == speedIndicator) {
-                speedIndicator.renderWithOffset(guiGraphics, mouseX, mouseY, partialTicks, speedOffsetX, 0);
-            } else {
-                element.render(guiGraphics, mouseX, mouseY, partialTicks);
-            }
+            element.render(guiGraphics, mouseX, mouseY, partialTicks);
         }
 
         if (animating && animationProgress >= 1.0f) {
@@ -347,7 +304,7 @@ public class DragonStatusUI {
 
     private void startEnterAnimation() {
         updateSlideDistances();
-        if (healthBarSlideDistance == 0 && speedIndicatorSlideDistance == 0) {
+        if (elements.isEmpty()) {
             animationActive = false;
             animatingIn = false;
             return;
@@ -364,8 +321,9 @@ public class DragonStatusUI {
             screenWidth = cachedScreenWidth > 0 ? cachedScreenWidth : 400;
         }
 
-        healthBarSlideDistance = computeSlideDistance(healthBar, screenWidth);
-        speedIndicatorSlideDistance = computeSlideDistance(speedIndicator, screenWidth);
+        if (!elements.isEmpty()) {
+            // Keep for future elements if added back.
+        }
     }
 
     private int computeSlideDistance(DragonUIElement element, int screenWidth) {

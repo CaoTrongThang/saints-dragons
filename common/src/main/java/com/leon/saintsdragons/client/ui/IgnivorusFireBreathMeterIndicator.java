@@ -10,11 +10,11 @@ import net.minecraft.resources.ResourceLocation;
  * Mirrors the Raevyx beam meter visuals with Ignivorus textures.
  */
 public class IgnivorusFireBreathMeterIndicator {
-    private static final ResourceLocation FIRE_BASE = new ResourceLocation(SaintsDragonsCommon.MOD_ID, "textures/gui/ignivorus/ignivorus_fire_base.png");
-    private static final ResourceLocation FIRE_OVERLAY = new ResourceLocation(SaintsDragonsCommon.MOD_ID, "textures/gui/ignivorus/ignivorus_fire_overlay.png");
-    private static final ResourceLocation FIRE_FLASH_RED = new ResourceLocation(SaintsDragonsCommon.MOD_ID, "textures/gui/ignivorus/ignivorus_fire_overlay_flashes_red.png");
-    private static final ResourceLocation FIRE_FLASH_WHITE = new ResourceLocation(SaintsDragonsCommon.MOD_ID, "textures/gui/ignivorus/ignivorus_fire_overlay_flashes_white.png");
-    private static final ResourceLocation FIRE_ICON = new ResourceLocation(SaintsDragonsCommon.MOD_ID, "textures/gui/ignivorus/red_flame.png");
+    private static final ResourceLocation FIRE_BASE = SaintsDragonsCommon.rl( "textures/gui/ignivorus/ignivorus_fire_base.png");
+    private static final ResourceLocation FIRE_OVERLAY = SaintsDragonsCommon.rl( "textures/gui/ignivorus/ignivorus_fire_overlay.png");
+    private static final ResourceLocation FIRE_FLASH_RED = SaintsDragonsCommon.rl( "textures/gui/ignivorus/ignivorus_fire_overlay_flashes_red.png");
+    private static final ResourceLocation FIRE_FLASH_WHITE = SaintsDragonsCommon.rl("textures/gui/ignivorus/ignivorus_fire_overlay_flashes_white.png");
+    private static final ResourceLocation FIRE_ICON = SaintsDragonsCommon.rl("textures/gui/ignivorus/red_flame.png");
 
     private static final int BAR_WIDTH = 182;
     private static final int BAR_HEIGHT = 30;

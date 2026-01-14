@@ -1,6 +1,8 @@
 package com.leon.saintsdragons.neoforge.client;
 
+import com.leon.saintsdragons.client.DragonStatusUIManager;
 import com.leon.saintsdragons.client.input.DragonRideInputHandler;
+import com.leon.saintsdragons.client.ui.DragonStatusUI;
 import com.leon.saintsdragons.common.SaintsDragonsCommon;
 import com.leon.saintsdragons.neoforge.client.event.NeoForgeClientEventHandler;
 import com.leon.saintsdragons.server.entity.dragons.cindervane.Cindervane;
@@ -8,6 +10,7 @@ import com.leon.saintsdragons.server.entity.dragons.ignivorus.Ignivorus;
 import com.leon.saintsdragons.server.entity.dragons.nulljaw.Nulljaw;
 import com.leon.saintsdragons.server.entity.dragons.raevyx.Raevyx;
 import net.minecraft.client.Minecraft;
+import net.neoforged.neoforge.client.gui.VanillaGuiLayers;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.SubscribeEvent;
@@ -146,5 +149,27 @@ public final class NeoForgeClientGameEvents {
     public static void onRenderGuiLayer(RenderGuiLayerEvent.Post event) {
         // Render dragon status UI overlay
         NeoForgeDragonUI.renderHud(event);
+    }
+
+    @SubscribeEvent
+    public static void onRenderGuiLayerPre(RenderGuiLayerEvent.Pre event) {
+        Minecraft minecraft = Minecraft.getInstance();
+        if (minecraft.player == null) {
+            return;
+        }
+
+        DragonStatusUI ui = DragonStatusUIManager.getInstance().getDragonStatusUI();
+        if (!ui.isRidingDragon() || ui.shouldShowPlayerStats()) {
+            return;
+        }
+
+        if (event.getName().equals(VanillaGuiLayers.PLAYER_HEALTH)
+                || event.getName().equals(VanillaGuiLayers.ARMOR_LEVEL)
+                || event.getName().equals(VanillaGuiLayers.EXPERIENCE_BAR)
+                || event.getName().equals(VanillaGuiLayers.VEHICLE_HEALTH)
+                || event.getName().equals(VanillaGuiLayers.FOOD_LEVEL)
+                || event.getName().equals(VanillaGuiLayers.AIR_LEVEL)) {
+            event.setCanceled(true);
+        }
     }
 }

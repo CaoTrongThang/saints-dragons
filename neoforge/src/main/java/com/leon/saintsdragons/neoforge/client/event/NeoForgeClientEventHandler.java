@@ -22,8 +22,8 @@ public class NeoForgeClientEventHandler {
     private static final double[] randomTremorOffsets = new double[3];
 
     // Raevyx takeoff camera zoom transition
-    private static float raevyxCameraZoom = 18F; // Base zoom
-    private static float raevyxCameraZoomTarget = 10F;
+    private static float raevyxCameraZoom = 15F; // Base zoom
+    private static float raevyxCameraZoomTarget = 15F;
 
     // Raevyx camera shift smoothing (banking response)
     private static double raevyxCameraShift = 0.0;
@@ -67,7 +67,7 @@ public class NeoForgeClientEventHandler {
             // Determine target zoom based on flight state
             boolean isFlying = raevyx.isFlying();
 
-            // Flying: zoom to 18F, grounded: 18F base
+            // Flying: zoom to 13F, grounded: 15F base
             raevyxCameraZoomTarget = isFlying ? 13F : 15F;
 
             // Smooth transition (slower blend rate for more gradual zoom)

@@ -2,9 +2,10 @@ package com.leon.saintsdragons.neoforge.client;
 
 import com.leon.saintsdragons.client.DragonStatusUIManager;
 import com.leon.saintsdragons.client.ui.DragonStatusUI;
-import com.leon.saintsdragons.common.SaintsDragonsCommon;
 import com.leon.saintsdragons.client.ui.FireballChargeIndicator;
+import com.leon.saintsdragons.common.SaintsDragonsCommon;
 import com.leon.saintsdragons.server.entity.dragons.ignivorus.Ignivorus;
+import com.leon.saintsdragons.server.entity.dragons.raevyx.Raevyx;
 import com.mojang.blaze3d.platform.InputConstants;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
@@ -57,6 +58,8 @@ public final class NeoForgeDragonUI {
 
         manager.getDragonStatusUI().getMeleeModeNotification().tick();
         manager.getDragonStatusUI().getFireballChargeIndicator().tick();
+        manager.getDragonStatusUI().getRaevyxBeamMeterIndicator().tick();
+        manager.getDragonStatusUI().getIgnivorusFireBreathMeterIndicator().tick();
     }
 
     /**
@@ -85,6 +88,24 @@ public final class NeoForgeDragonUI {
             FireballChargeIndicator chargeIndicator = ui.getFireballChargeIndicator();
             chargeIndicator.setChargeLevel(ignivorus.getFireballChargeLevel());
             chargeIndicator.render(event.getGuiGraphics(), width, height, partialTick);
+
+            if (ui.isRidingDragon() && !ui.shouldShowPlayerStats()) {
+                var fireBreathMeter = ui.getIgnivorusFireBreathMeterIndicator();
+                fireBreathMeter.setBreathEnergy(ignivorus.getFireBreathEnergy());
+                fireBreathMeter.setBreathing(ignivorus.isBreathingFire());
+                fireBreathMeter.render(event.getGuiGraphics(), width, height, partialTick);
+            }
+        }
+
+        if (ui.isRidingDragon() && !ui.shouldShowPlayerStats() && ui.getCurrentDragon() instanceof Raevyx raevyx) {
+            var beamMeter = ui.getRaevyxBeamMeterIndicator();
+            beamMeter.setBeamEnergy(raevyx.getBeamEnergy());
+            beamMeter.setBeaming(raevyx.isBeaming());
+            beamMeter.render(event.getGuiGraphics(), width, height, partialTick);
+        }
+
+        if (ui.isRidingDragon() && !ui.shouldShowPlayerStats()) {
+            ui.getRideHealthBar().render(event.getGuiGraphics(), width, height, partialTick);
         }
     }
 }

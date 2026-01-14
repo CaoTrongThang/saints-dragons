@@ -327,13 +327,6 @@ public class Raevyx extends RideableDragonBase implements FlyingAnimal, RangedAt
         this.commandChangeManual = false;
         this.setCommand(command);
     }
-    public boolean shouldForceOwnerFollow() {
-        return dismountRecallTicks > 0;
-    }
-    public void clearForcedOwnerFollow() {
-        this.dismountRecallTicks = 0;
-    }
-
     // ===== AMBIENT SOUND SYSTEM =====
     private int ambientSoundTimer;
     private int nextAmbientSoundDelay;
@@ -4513,15 +4506,8 @@ public class Raevyx extends RideableDragonBase implements FlyingAnimal, RangedAt
 
     @Override
     public void removePassenger(@Nonnull Entity passenger) {
-        boolean shouldRecallOwner = !this.level().isClientSide
-                && passenger == getControllingPassenger()
-                && passenger == getOwner()
-                && !this.onGround();
         // Call parent implementation to handle standard rideable dragon cleanup (including clearing rider control lock)
         super.removePassenger(passenger);
-        if (shouldRecallOwner) {
-            triggerForcedOwnerFollow();
-        }
     }
     // Cooldown for aggro growl to prevent spam while ridden or under repeated retargeting
     private int aggroGrowlCooldown = 0;

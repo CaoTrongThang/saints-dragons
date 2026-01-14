@@ -29,7 +29,10 @@ public class EntityRenderDispatcherMixin {
             PoseStack poseStack,
             VertexConsumer vertexConsumer,
             Entity entity,
-            float partialTicks,
+            float red,
+            float green,
+            float blue,
+            float alpha,
             CallbackInfo ci
     ) {
         if (entity instanceof FabricDragonPart) {
