@@ -55,6 +55,29 @@ public class IgnivorusRenderer extends GeoEntityRenderer<Ignivorus> {
         return 0.0F;
     }
 
+    @Override
+    public void preRender(PoseStack poseStack,
+                          Ignivorus entity,
+                          BakedGeoModel model,
+                          MultiBufferSource bufferSource,
+                          VertexConsumer buffer,
+                          boolean isReRender,
+                          float partialTick,
+                          int packedLight,
+                          int packedOverlay,
+                          int packedColor) {
+
+        float scale = 1.0f;
+        poseStack.scale(scale, scale, scale);
+        this.shadowRadius = entity.isBaby() ? 1.5F : 5.0f;
+
+        this.lastBakedModel = model;
+        enableTrackingForBones(model);
+
+        super.preRender(poseStack, entity, model, bufferSource, buffer, isReRender,
+                partialTick, packedLight, packedOverlay, packedColor);
+    }
+
     private void enableTrackingForBones(BakedGeoModel model) {
         if (model == null) {
             return;
@@ -85,13 +108,19 @@ public class IgnivorusRenderer extends GeoEntityRenderer<Ignivorus> {
     @Override
     public void render(@NotNull Ignivorus entity, float entityYaw, float partialTick,
                        @NotNull PoseStack poseStack, @NotNull MultiBufferSource bufferSource, int packedLight) {
-        this.lastBakedModel = this.getGeoModel().getBakedModel(this.getGeoModel().getModelResource(entity));
-        if (this.lastBakedModel != null) {
-            enableTrackingForBones(this.lastBakedModel);
-        }
         super.render(entity, entityYaw, partialTick, poseStack, bufferSource, packedLight);
 
         if (this.lastBakedModel == null) {
+            return;
+        }
+
+        if (entity.isBaby()) {
+            this.lastBakedModel.getBone(PASSENGER_BONE).ifPresent(b -> {
+                net.minecraft.world.phys.Vec3 world = transformLocator(b, PASSENGER_X, PASSENGER_Y, PASSENGER_Z);
+                if (world != null) {
+                    entity.setClientLocatorPosition("passengerLocator", world);
+                }
+            });
             return;
         }
 
