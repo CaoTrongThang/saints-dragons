@@ -52,57 +52,48 @@ public class IgnivorusNovaRingRenderer extends EntityRenderer<IgnivorusNovaRingE
 
         PoseStack.Pose pose = poseStack.last();
         Matrix4f matrix = pose.pose();
-        Matrix3f normalMatrix = pose.normal();
 
         float size = scale * 16.0F;
 
-        renderHorizontalSquare(consumer, matrix, normalMatrix, size, opacity);
+        renderHorizontalSquare(consumer, pose, matrix, size, opacity);
 
         poseStack.popPose();
 
         super.render(entity, entityYaw, partialTicks, poseStack, bufferSource, packedLight);
     }
 
-    private void renderHorizontalSquare(VertexConsumer consumer, Matrix4f matrix, Matrix3f normalMatrix,
+    private void renderHorizontalSquare(VertexConsumer consumer, PoseStack.Pose pose, Matrix4f matrix,
                                         float size, float opacity) {
         float half = size;
-
-        Vector3f normalVec = new Vector3f(0.0F, 1.0F, 0.0F);
-        normalMatrix.transform(normalVec);
-
         float y = 0.1F;
 
-        consumer.vertex(matrix, -half, y, -half)
-                .color(1.0F, 1.0F, 1.0F, opacity)
-                .uv(0, 0)
-                .overlayCoords(OverlayTexture.NO_OVERLAY)
-                .uv2(240)
-                .normal(normalVec.x(), normalVec.y(), normalVec.z())
-                .endVertex();
+        consumer.addVertex(matrix, -half, y, -half)
+                .setColor(1.0F, 1.0F, 1.0F, opacity)
+                .setUv(0, 0)
+                .setOverlay(OverlayTexture.NO_OVERLAY)
+                .setLight(240)
+                .setNormal(pose, 0.0F, 1.0F, 0.0F);
 
-        consumer.vertex(matrix, -half, y, half)
-                .color(1.0F, 1.0F, 1.0F, opacity)
-                .uv(0, 1)
-                .overlayCoords(OverlayTexture.NO_OVERLAY)
-                .uv2(240)
-                .normal(normalVec.x(), normalVec.y(), normalVec.z())
-                .endVertex();
+        consumer.addVertex(matrix, -half, y, half)
+                .setColor(1.0F, 1.0F, 1.0F, opacity)
+                .setUv(0, 1)
+                .setOverlay(OverlayTexture.NO_OVERLAY)
+                .setLight(240)
+                .setNormal(pose, 0.0F, 1.0F, 0.0F);
 
-        consumer.vertex(matrix, half, y, half)
-                .color(1.0F, 1.0F, 1.0F, opacity)
-                .uv(1, 1)
-                .overlayCoords(OverlayTexture.NO_OVERLAY)
-                .uv2(240)
-                .normal(normalVec.x(), normalVec.y(), normalVec.z())
-                .endVertex();
+        consumer.addVertex(matrix, half, y, half)
+                .setColor(1.0F, 1.0F, 1.0F, opacity)
+                .setUv(1, 1)
+                .setOverlay(OverlayTexture.NO_OVERLAY)
+                .setLight(240)
+                .setNormal(pose, 0.0F, 1.0F, 0.0F);
 
-        consumer.vertex(matrix, half, y, -half)
-                .color(1.0F, 1.0F, 1.0F, opacity)
-                .uv(1, 0)
-                .overlayCoords(OverlayTexture.NO_OVERLAY)
-                .uv2(240)
-                .normal(normalVec.x(), normalVec.y(), normalVec.z())
-                .endVertex();
+        consumer.addVertex(matrix, half, y, -half)
+                .setColor(1.0F, 1.0F, 1.0F, opacity)
+                .setUv(1, 0)
+                .setOverlay(OverlayTexture.NO_OVERLAY)
+                .setLight(240)
+                .setNormal(pose, 0.0F, 1.0F, 0.0F);
     }
 
     @Override

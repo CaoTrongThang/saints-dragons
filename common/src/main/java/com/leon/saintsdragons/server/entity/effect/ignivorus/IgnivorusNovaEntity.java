@@ -51,8 +51,8 @@ public class IgnivorusNovaEntity extends Entity {
     }
 
     @Override
-    protected void defineSynchedData() {
-        this.entityData.define(DATA_DAMAGE, 100.0F);
+    protected void defineSynchedData(SynchedEntityData.Builder builder) {
+        builder.define(DATA_DAMAGE, 100.0F);
     }
 
     public void setDamage(float damage) {
@@ -125,7 +125,7 @@ public class IgnivorusNovaEntity extends Entity {
 
             if (distanceSqr <= radiusSqr) {
                 target.hurt(damageSource, getDamage());
-                target.setSecondsOnFire(8);
+                target.igniteForSeconds(8);
 
                 Vec3 knockback = target.position().subtract(position()).normalize().scale(1.2);
                 target.push(knockback.x, 0.4, knockback.z);
@@ -160,11 +160,6 @@ public class IgnivorusNovaEntity extends Entity {
         if (this.ownerUUID != null) {
             tag.putUUID("Owner", this.ownerUUID);
         }
-    }
-
-    @Override
-    public @NotNull Packet<ClientGamePacketListener> getAddEntityPacket() {
-        return new ClientboundAddEntityPacket(this);
     }
 
     @Override

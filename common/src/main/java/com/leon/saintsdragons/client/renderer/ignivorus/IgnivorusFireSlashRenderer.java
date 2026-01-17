@@ -58,49 +58,44 @@ public class IgnivorusFireSlashRenderer extends EntityRenderer<IgnivorusFireSlas
 
         PoseStack.Pose pose = poseStack.last();
         Matrix4f matrix4f = pose.pose();
-        Matrix3f matrix3f = pose.normal();
 
         VertexConsumer consumer = bufferSource.getBuffer(RenderType.entityTranslucent(TEXTURE));
-        renderBillboard(consumer, matrix4f, matrix3f, alpha);
+        renderBillboard(consumer, pose, matrix4f, alpha);
 
         poseStack.popPose();
         super.render(entity, entityYaw, partialTicks, poseStack, bufferSource, packedLight);
     }
 
-    private void renderBillboard(VertexConsumer consumer, Matrix4f matrix4f, Matrix3f matrix3f, float alpha) {
+    private void renderBillboard(VertexConsumer consumer, PoseStack.Pose pose, Matrix4f matrix4f, float alpha) {
         float size = 1.0F;
 
-        consumer.vertex(matrix4f, -size, -size, 0.0F)
-                .color(1.0F, 1.0F, 1.0F, alpha)
-                .uv(0.0F, 1.0F)
-                .overlayCoords(OverlayTexture.NO_OVERLAY)
-                .uv2(240)
-                .normal(matrix3f, 0.0F, 0.0F, 1.0F)
-                .endVertex();
+        consumer.addVertex(matrix4f, -size, -size, 0.0F)
+                .setColor(1.0F, 1.0F, 1.0F, alpha)
+                .setUv(0.0F, 1.0F)
+                .setOverlay(OverlayTexture.NO_OVERLAY)
+                .setLight(240)
+                .setNormal(pose, 0.0F, 0.0F, 1.0F);
 
-        consumer.vertex(matrix4f, -size, size, 0.0F)
-                .color(1.0F, 1.0F, 1.0F, alpha)
-                .uv(0.0F, 0.0F)
-                .overlayCoords(OverlayTexture.NO_OVERLAY)
-                .uv2(240)
-                .normal(matrix3f, 0.0F, 0.0F, 1.0F)
-                .endVertex();
+        consumer.addVertex(matrix4f, -size, size, 0.0F)
+                .setColor(1.0F, 1.0F, 1.0F, alpha)
+                .setUv(0.0F, 0.0F)
+                .setOverlay(OverlayTexture.NO_OVERLAY)
+                .setLight(240)
+                .setNormal(pose, 0.0F, 0.0F, 1.0F);
 
-        consumer.vertex(matrix4f, size, size, 0.0F)
-                .color(1.0F, 1.0F, 1.0F, alpha)
-                .uv(1.0F, 0.0F)
-                .overlayCoords(OverlayTexture.NO_OVERLAY)
-                .uv2(240)
-                .normal(matrix3f, 0.0F, 0.0F, 1.0F)
-                .endVertex();
+        consumer.addVertex(matrix4f, size, size, 0.0F)
+                .setColor(1.0F, 1.0F, 1.0F, alpha)
+                .setUv(1.0F, 0.0F)
+                .setOverlay(OverlayTexture.NO_OVERLAY)
+                .setLight(240)
+                .setNormal(pose, 0.0F, 0.0F, 1.0F);
 
-        consumer.vertex(matrix4f, size, -size, 0.0F)
-                .color(1.0F, 1.0F, 1.0F, alpha)
-                .uv(1.0F, 1.0F)
-                .overlayCoords(OverlayTexture.NO_OVERLAY)
-                .uv2(240)
-                .normal(matrix3f, 0.0F, 0.0F, 1.0F)
-                .endVertex();
+        consumer.addVertex(matrix4f, size, -size, 0.0F)
+                .setColor(1.0F, 1.0F, 1.0F, alpha)
+                .setUv(1.0F, 1.0F)
+                .setOverlay(OverlayTexture.NO_OVERLAY)
+                .setLight(240)
+                .setNormal(pose, 0.0F, 0.0F, 1.0F);
     }
 
     @Override

@@ -42,9 +42,9 @@ public class IgnivorusFireSlashEntity extends Entity {
     }
 
     @Override
-    protected void defineSynchedData() {
-        this.entityData.define(DATA_SCALE, 1.0F);
-        this.entityData.define(DATA_LIFETIME, 20);
+    protected void defineSynchedData(SynchedEntityData.Builder builder) {
+        builder.define(DATA_SCALE, 1.0F);
+        builder.define(DATA_LIFETIME, 20);
     }
 
     public void setScale(float scale) {
@@ -97,11 +97,6 @@ public class IgnivorusFireSlashEntity extends Entity {
         tag.putInt("Age", this.age);
         tag.putInt("MaxAge", this.maxAge);
         tag.putFloat("Scale", getScale());
-    }
-
-    @Override
-    public @NotNull Packet<ClientGamePacketListener> getAddEntityPacket() {
-        return new ClientboundAddEntityPacket(this);
     }
 
     @Override

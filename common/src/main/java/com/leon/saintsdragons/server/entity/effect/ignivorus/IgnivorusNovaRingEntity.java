@@ -28,7 +28,7 @@ public class IgnivorusNovaRingEntity extends Entity {
     }
 
     @Override
-    protected void defineSynchedData() {
+    protected void defineSynchedData(net.minecraft.network.syncher.SynchedEntityData.Builder builder) {
     }
 
     public int getAge() {
@@ -69,11 +69,6 @@ public class IgnivorusNovaRingEntity extends Entity {
     @Override
     protected void addAdditionalSaveData(@NotNull CompoundTag tag) {
         tag.putInt("Age", this.age);
-    }
-
-    @Override
-    public @NotNull Packet<ClientGamePacketListener> getAddEntityPacket() {
-        return new ClientboundAddEntityPacket(this);
     }
 
     @Override

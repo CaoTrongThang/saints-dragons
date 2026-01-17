@@ -44,45 +44,42 @@ public class IgnivorusNovaOutlineRenderer extends EntityRenderer<IgnivorusNovaOu
 
         PoseStack.Pose pose = poseStack.last();
         Matrix4f matrix = pose.pose();
-        Matrix3f normal = pose.normal();
 
         float s = scale * 16.0F;
 
-        renderCubeOutline(consumer, matrix, normal, s, opacity);
+        renderCubeOutline(consumer, pose, matrix, s, opacity);
 
         poseStack.popPose();
 
         super.render(entity, entityYaw, partialTicks, poseStack, bufferSource, packedLight);
     }
 
-    private void renderCubeOutline(VertexConsumer consumer, Matrix4f matrix, Matrix3f normal, float s, float opacity) {
-        addLine(consumer, matrix, normal, -s, -s, -s, s, -s, -s, opacity);
-        addLine(consumer, matrix, normal, s, -s, -s, s, s, -s, opacity);
-        addLine(consumer, matrix, normal, s, s, -s, -s, s, -s, opacity);
-        addLine(consumer, matrix, normal, -s, s, -s, -s, -s, -s, opacity);
+    private void renderCubeOutline(VertexConsumer consumer, PoseStack.Pose pose, Matrix4f matrix, float s, float opacity) {
+        addLine(consumer, pose, matrix, -s, -s, -s, s, -s, -s, opacity);
+        addLine(consumer, pose, matrix, s, -s, -s, s, s, -s, opacity);
+        addLine(consumer, pose, matrix, s, s, -s, -s, s, -s, opacity);
+        addLine(consumer, pose, matrix, -s, s, -s, -s, -s, -s, opacity);
 
-        addLine(consumer, matrix, normal, -s, -s, s, s, -s, s, opacity);
-        addLine(consumer, matrix, normal, s, -s, s, s, s, s, opacity);
-        addLine(consumer, matrix, normal, s, s, s, -s, s, s, opacity);
-        addLine(consumer, matrix, normal, -s, s, s, -s, -s, s, opacity);
+        addLine(consumer, pose, matrix, -s, -s, s, s, -s, s, opacity);
+        addLine(consumer, pose, matrix, s, -s, s, s, s, s, opacity);
+        addLine(consumer, pose, matrix, s, s, s, -s, s, s, opacity);
+        addLine(consumer, pose, matrix, -s, s, s, -s, -s, s, opacity);
 
-        addLine(consumer, matrix, normal, -s, -s, -s, -s, -s, s, opacity);
-        addLine(consumer, matrix, normal, s, -s, -s, s, -s, s, opacity);
-        addLine(consumer, matrix, normal, s, s, -s, s, s, s, opacity);
-        addLine(consumer, matrix, normal, -s, s, -s, -s, s, s, opacity);
+        addLine(consumer, pose, matrix, -s, -s, -s, -s, -s, s, opacity);
+        addLine(consumer, pose, matrix, s, -s, -s, s, -s, s, opacity);
+        addLine(consumer, pose, matrix, s, s, -s, s, s, s, opacity);
+        addLine(consumer, pose, matrix, -s, s, -s, -s, s, s, opacity);
     }
 
-    private void addLine(VertexConsumer consumer, Matrix4f matrix, Matrix3f normal,
+    private void addLine(VertexConsumer consumer, PoseStack.Pose pose, Matrix4f matrix,
                         float x1, float y1, float z1,
                         float x2, float y2, float z2, float opacity) {
-        consumer.vertex(matrix, x1, y1, z1)
-                .color(1.0F, 1.0F, 0.8F, opacity)
-                .normal(normal, 0, 1, 0)
-                .endVertex();
-        consumer.vertex(matrix, x2, y2, z2)
-                .color(1.0F, 1.0F, 0.8F, opacity)
-                .normal(normal, 0, 1, 0)
-                .endVertex();
+        consumer.addVertex(matrix, x1, y1, z1)
+                .setColor(1.0F, 1.0F, 0.8F, opacity)
+                .setNormal(pose, 0, 1, 0);
+        consumer.addVertex(matrix, x2, y2, z2)
+                .setColor(1.0F, 1.0F, 0.8F, opacity)
+                .setNormal(pose, 0, 1, 0);
     }
 
     @Override
