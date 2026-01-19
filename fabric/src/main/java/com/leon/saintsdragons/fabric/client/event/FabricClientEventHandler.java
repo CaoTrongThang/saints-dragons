@@ -143,7 +143,7 @@ public class FabricClientEventHandler {
 
                     // Convert bank angle to shift
                     // Scale: at 45° bank with full velocity, shift ~5.5 blocks (more aggressive than Cindervane)
-                    targetCameraShift = -(bankAngle / 45.0) * 5.5 * velocityFactor;
+                    targetCameraShift = (bankAngle / 45.0) * 5.5 * velocityFactor;
                 }
 
                 // Smooth the camera shift for gradual, natural movement
@@ -158,8 +158,7 @@ public class FabricClientEventHandler {
 
                 // Apply the smoothed zoom and lateral shift using the mixin accessor
                 CameraAccessor cameraAccessor = (CameraAccessor) camera;
-                double maxZoom = cameraAccessor.saintsdragons$invokeGetMaxZoom(raevyxCameraZoom);
-                cameraAccessor.saintsdragons$invokeMove(-maxZoom, 0, 0);
+                cameraAccessor.saintsdragons$invokeMove(-raevyxCameraZoom, 0, 0);
                 // Apply lateral and vertical shifts
                 cameraAccessor.saintsdragons$invokeMove(0, verticalCameraShift, raevyxCameraShift);
                 // Slight downward tilt for better forward visibility

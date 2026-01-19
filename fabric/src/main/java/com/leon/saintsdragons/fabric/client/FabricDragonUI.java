@@ -75,6 +75,9 @@ public final class FabricDragonUI {
             int width = client.getWindow().getGuiScaledWidth();
             int height = client.getWindow().getGuiScaledHeight();
 
+            // Extract float from DeltaTracker (1.21+ API change)
+            float partialTick = tickDelta.getGameTimeDeltaPartialTick(client.isPaused());
+
             // Get current dragon if riding
             DragonEntity currentDragon = null;
             if (client.player.getVehicle() instanceof DragonEntity dragon) {
@@ -94,22 +97,22 @@ public final class FabricDragonUI {
             if (currentDragon instanceof Ignivorus ignivorus) {
                 // Fireball charge indicator
                 fireballChargeIndicator.setChargeLevel(ignivorus.getFireballChargeLevel());
-                fireballChargeIndicator.render(graphics, width, height, tickDelta);
+                fireballChargeIndicator.render(graphics, width, height, partialTick);
 
                 // Fire breath meter
                 ignivorusFireBreathMeterIndicator.setBreathEnergy(ignivorus.getFireBreathEnergy());
                 ignivorusFireBreathMeterIndicator.setBreathing(ignivorus.isBreathingFire());
-                ignivorusFireBreathMeterIndicator.render(graphics, width, height, tickDelta);
+                ignivorusFireBreathMeterIndicator.render(graphics, width, height, partialTick);
             } else if (currentDragon instanceof Raevyx raevyx) {
                 // Beam meter for Raevyx
                 raevyxBeamMeterIndicator.setBeamEnergy(raevyx.getBeamEnergy());
                 raevyxBeamMeterIndicator.setBeaming(raevyx.isBeaming());
-                raevyxBeamMeterIndicator.render(graphics, width, height, tickDelta);
+                raevyxBeamMeterIndicator.render(graphics, width, height, partialTick);
             }
 
             // Render dragon ride health bar when riding any dragon
             if (currentDragon != null) {
-                rideHealthBar.render(graphics, width, height, tickDelta);
+                rideHealthBar.render(graphics, width, height, partialTick);
             }
         });
     }

@@ -127,7 +127,7 @@ public class NeoForgeClientEventHandler {
 
                     // Convert bank angle to shift
                     // Scale: at 45° bank with full velocity, shift ~5.5 blocks (more aggressive than Cindervane)
-                    targetCameraShift = -(bankAngle / 45.0) * 5.5 * velocityFactor;
+                    targetCameraShift = (bankAngle / 45.0) * 5.5 * velocityFactor;
                 }
 
                 // Smooth the camera shift for gradual, natural movement
@@ -141,8 +141,7 @@ public class NeoForgeClientEventHandler {
                 verticalCameraShift += (targetVerticalShift - verticalCameraShift) * verticalBlendRate;
 
                 // Apply the smoothed zoom and lateral shift using the accessor
-                double maxZoom = CameraAccessor.invokeGetMaxZoom(camera, raevyxCameraZoom);
-                CameraAccessor.invokeMove(camera, -maxZoom, 0, 0);
+                CameraAccessor.invokeMove(camera, -raevyxCameraZoom, 0, 0);
                 // Apply lateral and vertical shifts
                 CameraAccessor.invokeMove(camera, 0, verticalCameraShift, raevyxCameraShift);
                 // Slight downward tilt for better forward visibility

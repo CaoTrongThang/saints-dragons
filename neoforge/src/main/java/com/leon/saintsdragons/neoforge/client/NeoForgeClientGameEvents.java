@@ -1,9 +1,9 @@
 package com.leon.saintsdragons.neoforge.client;
 
-import com.leon.saintsdragons.client.DragonStatusUIManager;
 import com.leon.saintsdragons.client.input.DragonRideInputHandler;
-import com.leon.saintsdragons.client.ui.DragonStatusUI;
+import com.leon.saintsdragons.client.ui.DragonUIRegistry;
 import com.leon.saintsdragons.common.SaintsDragonsCommon;
+import com.leon.saintsdragons.server.entity.base.DragonEntity;
 import com.leon.saintsdragons.neoforge.client.event.NeoForgeClientEventHandler;
 import com.leon.saintsdragons.server.entity.dragons.cindervane.Cindervane;
 import com.leon.saintsdragons.server.entity.dragons.ignivorus.Ignivorus;
@@ -158,8 +158,9 @@ public final class NeoForgeClientGameEvents {
             return;
         }
 
-        DragonStatusUI ui = DragonStatusUIManager.getInstance().getDragonStatusUI();
-        if (!ui.isRidingDragon() || ui.shouldShowPlayerStats()) {
+        // Only hide vanilla HUD if riding a dragon AND dragon UI is visible (F4 toggle)
+        // When dragon UI is hidden, show vanilla HUD instead
+        if (!(minecraft.player.getVehicle() instanceof DragonEntity) || !DragonUIRegistry.isUIVisible()) {
             return;
         }
 

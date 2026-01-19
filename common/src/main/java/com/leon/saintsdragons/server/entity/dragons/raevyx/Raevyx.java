@@ -4668,13 +4668,13 @@ public class Raevyx extends RideableDragonBase implements FlyingAnimal, RangedAt
     }
 
     @Override
-    protected void dropAllDeathLoot(DamageSource source) {
+    protected void dropAllDeathLoot(@NotNull net.minecraft.server.level.ServerLevel level, @NotNull DamageSource source) {
         // Don't drop loot until death animation completes
         if (deathTime < getDeathAnimationDurationTicks()) {
             return;
         }
 
-        super.dropAllDeathLoot(source);
+        super.dropAllDeathLoot(level, source);
 
         // Female dragons have 12% chance to drop one egg on death
         if (!level().isClientSide && getGender() == DragonGender.FEMALE && this.random.nextFloat() < 0.12f) {
