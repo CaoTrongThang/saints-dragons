@@ -9,6 +9,7 @@ import com.leon.saintsdragons.common.config.dragon.DragonAttributeConfig;
 import com.leon.saintsdragons.common.config.dragon.DragonAttributeConfigLoader;
 import com.leon.saintsdragons.common.registry.raevyx.RaevyxAbilities;
 import com.leon.saintsdragons.common.registry.ModBlocks;
+import com.leon.saintsdragons.common.registry.ModItems;
 import com.leon.saintsdragons.server.ai.goals.raevyx.RaevyxFlightGoal;
 import com.leon.saintsdragons.server.ai.goals.raevyx.RaevyxTemptGoal;
 import com.leon.saintsdragons.server.ai.goals.raevyx.*;
@@ -951,10 +952,10 @@ public class Raevyx extends RideableDragonBase implements FlyingAnimal, RangedAt
         double pitch = Math.toRadians(pitchDeg);
 
         // Local offsets (Right=X, Up=Y, Forward=Z)
-        // Small rightward nudge (negative flips to the other side in world yaw math)
+        // Use the beamBone pivot from the model as the fallback origin to match visuals.
         double R = (-0.5 / 16.0) * MODEL_SCALE;
-        double U = (6.6 / 16.0) * MODEL_SCALE;
-        double F = (14.65 / 16.0) * MODEL_SCALE;
+        double U = (47.26875 / 16.0) * MODEL_SCALE;
+        double F = (98.75 / 16.0) * MODEL_SCALE;
 
         // Pitch around X axis - transform Up and Forward components
         double cp = Math.cos(pitch), sp = Math.sin(pitch);
@@ -4664,5 +4665,20 @@ public class Raevyx extends RideableDragonBase implements FlyingAnimal, RangedAt
     public void triggerScreenShake(float intensity) {
         this.screenShakeAmount = Math.max(this.screenShakeAmount, intensity);
         this.entityData.set(DATA_SCREEN_SHAKE_AMOUNT, this.screenShakeAmount);
+    }
+
+    @Override
+    protected void dropAllDeathLoot(DamageSource source) {
+        // Don't drop loot until death animation completes
+        if (deathTime < getDeathAnimationDurationTicks()) {
+            return;
+        }
+
+        super.dropAllDeathLoot(source);
+
+        // Female dragons have 12% chance to drop one egg on death
+        if (!level().isClientSide && getGender() == DragonGender.FEMALE && this.random.nextFloat() < 0.12f) {
+            this.spawnAtLocation(ModItems.RAEVYX_EGG.get());
+        }
     }
 }
