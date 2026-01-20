@@ -38,6 +38,37 @@ public class CindervaneRenderer extends GeoEntityRenderer<Cindervane> {
         return 0.0F;
     }
 
+    @Override
+    public void preRender(PoseStack poseStack,
+                          Cindervane entity,
+                          BakedGeoModel model,
+                          MultiBufferSource bufferSource,
+                          VertexConsumer buffer,
+                          boolean isReRender,
+                          float partialTick,
+                          int packedLight,
+                          int packedOverlay,
+                          float red, float green, float blue, float alpha) {
+
+        float scale = 1.0f;
+        poseStack.scale(scale, scale, scale);
+
+        // Baby dragons have smaller shadows
+        if (entity.isBaby()) {
+            this.shadowRadius = 0.8f;
+        } else {
+            this.shadowRadius = 2.0f * scale;
+        }
+
+        // Store the model for later use in render()
+        this.lastBakedModel = model;
+
+        // Enable matrix tracking for passenger bones
+        enableTrackingForBones(model);
+
+        super.preRender(poseStack, entity, model, bufferSource, buffer, isReRender,
+                partialTick, packedLight, packedOverlay, red, green, blue, alpha);
+    }
     private void enableTrackingForBones(BakedGeoModel model) {
         // Enable tracking for both passenger seat bones
         model.getBone("passengerBone1").ifPresent(b -> b.setTrackingMatrices(true));

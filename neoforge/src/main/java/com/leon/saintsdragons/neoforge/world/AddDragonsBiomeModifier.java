@@ -5,13 +5,17 @@ import com.leon.saintsdragons.common.config.SaintsDragonsConfig;
 import com.leon.saintsdragons.common.registry.ModEntities;
 import com.mojang.serialization.MapCodec;
 import net.minecraft.core.Holder;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.MobCategory;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.biome.MobSpawnSettings;
+import net.minecraft.world.level.levelgen.GenerationStep;
+import net.minecraft.world.level.levelgen.placement.PlacedFeature;
 import net.neoforged.neoforge.common.world.BiomeModifier;
 import net.neoforged.neoforge.common.world.ModifiableBiomeInfo;
 
@@ -32,6 +36,8 @@ public final class AddDragonsBiomeModifier implements BiomeModifier {
             TagKey.create(Registries.BIOME, SaintsDragonsCommon.rl("has_nulljaw"));
     private static final TagKey<Biome> HAS_IGNIVORUS =
             TagKey.create(Registries.BIOME, SaintsDragonsCommon.rl("has_ignivorus"));
+    private static final ResourceKey<PlacedFeature> CINDERVANE_EGG_PATCH =
+            ResourceKey.create(Registries.PLACED_FEATURE, SaintsDragonsCommon.rl("cindervane_egg_patch"));
 
     private AddDragonsBiomeModifier() {
     }
@@ -68,6 +74,7 @@ public final class AddDragonsBiomeModifier implements BiomeModifier {
                         SaintsDragonsConfig.CINDERVANE_SPAWN_WEIGHT.get(),
                         SaintsDragonsConfig.CINDERVANE_MIN_GROUP_SIZE.get(),
                         SaintsDragonsConfig.CINDERVANE_MAX_GROUP_SIZE.get());
+                addFeature(builder, CINDERVANE_EGG_PATCH);
             }
 
             if (biome.is(HAS_NULLJAW) || isInConfigBiomes(biome, SaintsDragonsConfig.NULLJAW_ADDITIONAL_BIOMES)) {
@@ -135,6 +142,12 @@ public final class AddDragonsBiomeModifier implements BiomeModifier {
         if (!alreadyPresent) {
             spawnSettings.addSpawn(category, spawnerData);
         }
+    }
+
+    private static void addFeature(ModifiableBiomeInfo.BiomeInfo.Builder builder,
+                                   ResourceKey<PlacedFeature> featureKey) {
+        BuiltInRegistries.PLACED_FEATURE.getHolder(featureKey).ifPresent(feature ->
+                builder.getGenerationSettings().addFeature(GenerationStep.Decoration.VEGETAL_DECORATION, feature));
     }
 
     @Override
