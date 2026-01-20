@@ -48,7 +48,7 @@ public class CindervaneRenderer extends GeoEntityRenderer<Cindervane> {
                           float partialTick,
                           int packedLight,
                           int packedOverlay,
-                          float red, float green, float blue, float alpha) {
+                          int packedColor) {
 
         float scale = 1.0f;
         poseStack.scale(scale, scale, scale);
@@ -67,7 +67,7 @@ public class CindervaneRenderer extends GeoEntityRenderer<Cindervane> {
         enableTrackingForBones(model);
 
         super.preRender(poseStack, entity, model, bufferSource, buffer, isReRender,
-                partialTick, packedLight, packedOverlay, red, green, blue, alpha);
+                partialTick, packedLight, packedOverlay, packedColor);
     }
     private void enableTrackingForBones(BakedGeoModel model) {
         // Enable tracking for both passenger seat bones

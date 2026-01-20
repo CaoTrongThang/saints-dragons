@@ -200,7 +200,7 @@ public final class FabricDragonSpawns {
 
             for (String biomeIdStr : biomes) {
                 try {
-                    net.minecraft.resources.ResourceLocation biomeId = new net.minecraft.resources.ResourceLocation(biomeIdStr);
+                    net.minecraft.resources.ResourceLocation biomeId = net.minecraft.resources.ResourceLocation.parse(biomeIdStr);
                     net.minecraft.resources.ResourceKey<net.minecraft.world.level.biome.Biome> biomeKey =
                             net.minecraft.resources.ResourceKey.create(Registries.BIOME, biomeId);
 

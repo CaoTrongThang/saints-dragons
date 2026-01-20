@@ -238,6 +238,19 @@ public final class DragonAttributeConfigLoader extends SimpleJsonResourceReloadL
             // NeoForge config not available (Fabric or config not loaded yet)
         }
 
+        Map<String, Double> extra = new HashMap<>();
+        extra.put("run_speed", 0.60D);  // Hardcoded for AI/rider compatibility
+        extra.put("walk_speed", 0.225D);  // Hardcoded for AI/rider compatibility
+        extra.put("ultimate_penalty_health", ultimatePenaltyHealth);
+        extra.put("taming_chance_base", tamingChanceBase);
+        extra.put("taming_chance_hearty", tamingChanceHearty);
+        extra.put("fire_breath_drain_per_tick", 0.00625D);
+        extra.put("fire_breath_regen_per_tick", 0.0025D);
+        extra.put("fire_breath_flame_spawn_multiplier", 1.0D);
+        extra.put("fire_breath_flame_speed_multiplier", 1.0D);
+        extra.put("fire_breath_flame_lifetime_multiplier", 1.0D);
+        extra.put("fire_breath_ignite_block_chance", 1.0D);
+
         return new DragonAttributeConfig(
                 maxHealth,
                 armor,
@@ -252,19 +265,7 @@ public final class DragonAttributeConfigLoader extends SimpleJsonResourceReloadL
                         "stomp", DragonAbilityOverride.ofDamage(stompDamage),
                         "ultimate", DragonAbilityOverride.ofDamage(ultimateDamage)
                 ),
-                Map.of(
-                        "run_speed", 0.60D,  // Hardcoded for AI/rider compatibility
-                        "walk_speed", 0.225D,  // Hardcoded for AI/rider compatibility
-                        "ultimate_penalty_health", ultimatePenaltyHealth,
-                        "taming_chance_base", tamingChanceBase,
-                        "taming_chance_hearty", tamingChanceHearty,
-                        "fire_breath_drain_per_tick", 0.00625D,
-                        "fire_breath_regen_per_tick", 0.0025D,
-                        "fire_breath_flame_spawn_multiplier", 1.0D,
-                        "fire_breath_flame_speed_multiplier", 1.0D,
-                        "fire_breath_flame_lifetime_multiplier", 1.0D,
-                        "fire_breath_ignite_block_chance", 1.0D
-                ),
+                extra,
                 Map.of(
                         "legacy_taming", legacyTaming
                 )

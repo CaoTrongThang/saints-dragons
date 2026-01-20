@@ -3,6 +3,7 @@ package com.leon.saintsdragons.common.block;
 import com.leon.saintsdragons.common.registry.ModEntities;
 import com.leon.saintsdragons.server.entity.base.DragonGender;
 import com.leon.saintsdragons.server.entity.dragons.cindervane.Cindervane;
+import com.mojang.serialization.MapCodec;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.server.level.ServerLevel;
@@ -40,7 +41,7 @@ public class CindervaneEggBlock extends BaseEntityBlock {
     public static final int MAX_HATCH_LEVEL = 2;
     public static final int MAX_EGGS = 3;
     public static final IntegerProperty HATCH = BlockStateProperties.HATCH;
-    public static final IntegerProperty EGGS = BlockStateProperties.EGGS;
+    public static final IntegerProperty EGGS = IntegerProperty.create("eggs", 1, MAX_EGGS);
 
     // Hatching speeds (lower = faster)
     private static final int NORMAL_HATCH_CHANCE = 2;      // ~7 minutes total (1/2 per random tick)
@@ -56,6 +57,11 @@ public class CindervaneEggBlock extends BaseEntityBlock {
         this.registerDefaultState(this.stateDefinition.any()
             .setValue(HATCH, 0)
             .setValue(EGGS, 1));
+    }
+
+    @Override
+    protected MapCodec<? extends BaseEntityBlock> codec() {
+        return simpleCodec(CindervaneEggBlock::new);
     }
 
     @Override
@@ -156,7 +162,7 @@ public class CindervaneEggBlock extends BaseEntityBlock {
                 if (eggEntity != null) {
                     if (eggEntity.getOwnerUUID() != null) {
                         baby.setOwnerUUID(eggEntity.getOwnerUUID());
-                        baby.setTame(true);
+                        baby.setTame(true, true);
                     }
                     if (eggEntity.getBabyGender() != null) {
                         baby.setGender(eggEntity.getBabyGender());
