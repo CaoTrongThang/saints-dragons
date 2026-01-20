@@ -3528,24 +3528,21 @@ public class Ignivorus extends RideableDragonBase implements DragonFlightCapable
     public void registerControllers(AnimatableManager.ControllerRegistrar controllers) {
         // Movement controller handles idle/walk/run/flight/sit animations
         AnimationController<Ignivorus> movementController =
-            new AnimationController<>(this, "movement", 5, animationHandler::handleMovementAnimation);
+            new AnimationController<>(this, "movement", 8, animationHandler::handleMovementAnimation);
         movementController.setSoundKeyframeHandler(this::onAnimationSound);
-
-        // Banking controller for flight dynamics
-        AnimationController<Ignivorus> bankingController =
-            new AnimationController<>(this, "banking", 8, animationHandler::bankingPredicate);
 
         // Action controller for triggerable animations (sit transitions, fire breath, etc.)
         AnimationController<Ignivorus> actionController =
-            new AnimationController<>(this, "action", 5, state -> {
-              if (isTamingStunned()) {
-                  return PlayState.STOP;
-              }
-              return PlayState.STOP;
+            new AnimationController<>(this, "action", 6, state -> {
+                // CRITICAL: Stop action controller during taming stun to prevent animation bleeding
+                if (isTamingStunned()) {
+                    return PlayState.STOP;
+                }
+                return PlayState.STOP;
             });
 
         AnimationController<Ignivorus> hurtController =
-            new AnimationController<>(this, "hurt", 3, state -> software.bernie.geckolib.animation.PlayState.STOP);
+            new AnimationController<>(this, "hurt", 5, state -> PlayState.STOP);
         hurtController.triggerableAnim("ignivorus_hurt",
             software.bernie.geckolib.animation.RawAnimation.begin().thenPlay("animation.ignivorus.hurt"));
         hurtController.setSoundKeyframeHandler(this::onAnimationSound);
@@ -3554,7 +3551,7 @@ public class Ignivorus extends RideableDragonBase implements DragonFlightCapable
         animationHandler.setupActionController(actionController);
         actionController.setSoundKeyframeHandler(this::onAnimationSound);
 
-        controllers.add(movementController, bankingController, hurtController, actionController);
+        controllers.add(movementController, hurtController, actionController);
     }
 
     private void onAnimationSound(SoundKeyframeEvent<Ignivorus> event) {
