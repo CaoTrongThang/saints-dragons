@@ -300,8 +300,8 @@ public class Nulljaw extends RideableDragonBase implements SemiAquaticDragon, Sh
     }
 
     @Override
-    public @NotNull net.minecraft.world.entity.EntityDimensions getDimensions(@NotNull net.minecraft.world.entity.Pose pose) {
-        net.minecraft.world.entity.EntityDimensions baseDimensions = super.getDimensions(pose);
+    public @NotNull net.minecraft.world.entity.EntityDimensions getDefaultDimensions(@NotNull net.minecraft.world.entity.Pose pose) {
+        net.minecraft.world.entity.EntityDimensions baseDimensions = super.getDefaultDimensions(pose);
         if (isBaby()) {
             return baseDimensions.scale(BABY_HITBOX_SCALE);
         }
