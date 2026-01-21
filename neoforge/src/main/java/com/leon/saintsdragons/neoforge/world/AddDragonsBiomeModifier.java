@@ -37,8 +37,12 @@ public final class AddDragonsBiomeModifier implements BiomeModifier {
             TagKey.create(Registries.BIOME, SaintsDragonsCommon.rl("has_nulljaw"));
     private static final TagKey<Biome> HAS_IGNIVORUS =
             TagKey.create(Registries.BIOME, SaintsDragonsCommon.rl("has_ignivorus"));
+    private static final TagKey<Biome> HAS_NULLJAW_EGGS =
+            TagKey.create(Registries.BIOME, SaintsDragonsCommon.rl("has_nulljaw_eggs"));
     private static final ResourceKey<PlacedFeature> CINDERVANE_EGG_PATCH =
             ResourceKey.create(Registries.PLACED_FEATURE, SaintsDragonsCommon.rl("cindervane_egg_patch"));
+    private static final ResourceKey<PlacedFeature> NULLJAW_EGG_PATCH =
+            ResourceKey.create(Registries.PLACED_FEATURE, SaintsDragonsCommon.rl("nulljaw_egg_patch"));
 
     private AddDragonsBiomeModifier() {
     }
@@ -80,13 +84,19 @@ public final class AddDragonsBiomeModifier implements BiomeModifier {
                         SaintsDragonsConfig.CINDERVANE_MAX_GROUP_SIZE.get());
             }
 
-            if (biome.is(HAS_NULLJAW) || isInConfigBiomes(biome, SaintsDragonsConfig.NULLJAW_ADDITIONAL_BIOMES)) {
+            boolean hasNulljawBiome = biome.is(HAS_NULLJAW)
+                    || isInConfigBiomes(biome, SaintsDragonsConfig.NULLJAW_ADDITIONAL_BIOMES);
+            if (hasNulljawBiome) {
                 addSpawn(builder,
                         MobCategory.CREATURE,
                         ModEntities.NULLJAW.get(),
                         SaintsDragonsConfig.NULLJAW_SPAWN_WEIGHT.get(),
                         SaintsDragonsConfig.NULLJAW_MIN_GROUP_SIZE.get(),
                         SaintsDragonsConfig.NULLJAW_MAX_GROUP_SIZE.get());
+            }
+
+            if (biome.is(HAS_NULLJAW_EGGS)) {
+                addFeature(builder, NULLJAW_EGG_PATCH);
             }
 
             if (biome.is(HAS_IGNIVORUS) || isInConfigBiomes(biome, SaintsDragonsConfig.IGNIVORUS_ADDITIONAL_BIOMES)) {
