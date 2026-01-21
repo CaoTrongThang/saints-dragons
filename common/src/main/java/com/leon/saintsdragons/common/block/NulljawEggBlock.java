@@ -3,6 +3,7 @@ package com.leon.saintsdragons.common.block;
 import com.leon.saintsdragons.common.registry.ModEntities;
 import com.leon.saintsdragons.server.entity.base.DragonGender;
 import com.leon.saintsdragons.server.entity.dragons.nulljaw.Nulljaw;
+import com.mojang.serialization.MapCodec;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;
@@ -45,6 +46,11 @@ public class NulljawEggBlock extends BaseEntityBlock {
     public NulljawEggBlock(Properties properties) {
         super(properties);
         this.registerDefaultState(this.stateDefinition.any().setValue(HATCH, 0));
+    }
+
+    @Override
+    protected MapCodec<? extends BaseEntityBlock> codec() {
+        return simpleCodec(NulljawEggBlock::new);
     }
 
     @Override
@@ -92,7 +98,7 @@ public class NulljawEggBlock extends BaseEntityBlock {
             if (blockEntity instanceof NulljawEggBlockEntity eggEntity) {
                 if (eggEntity.getOwnerUUID() != null) {
                     baby.setOwnerUUID(eggEntity.getOwnerUUID());
-                    baby.setTame(true);
+                    baby.setTame(true, true);
                 }
                 if (eggEntity.getBabyGender() != null) {
                     baby.setGender(eggEntity.getBabyGender());

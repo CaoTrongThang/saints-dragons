@@ -1052,7 +1052,7 @@ public class Nulljaw extends RideableDragonBase implements SemiAquaticDragon, Sh
             java.util.UUID ownerId = this.getOwnerUUID();
             if (ownerId != null) {
                 baby.setOwnerUUID(ownerId);
-                baby.setTame(true);
+                baby.setTame(true, true);
             }
 
             baby.skipRespawnTicks = 5;
