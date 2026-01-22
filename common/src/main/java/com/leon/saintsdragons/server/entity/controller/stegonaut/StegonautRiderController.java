@@ -91,7 +91,7 @@ public record StegonautRiderController(Stegonaut drake) {
             moveFunction.accept(passenger, passengerCurrentPos.x, passengerCurrentPos.y, passengerCurrentPos.z);
         } else {
             double x = drake.getX();
-            double y = drake.getY() + getPassengersRidingOffset() + passenger.getMyRidingOffset();
+            double y = drake.getY() + getPassengersRidingOffset() + passenger.getBbHeight() * 0.5D;
             double z = drake.getZ();
             moveFunction.accept(passenger, x, y, z);
         }

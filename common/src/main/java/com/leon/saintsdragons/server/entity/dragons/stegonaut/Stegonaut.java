@@ -231,7 +231,8 @@ public class Stegonaut extends RideableDragonBase implements SoundHandledDragon 
     public static AttributeSupplier.Builder createAttributes() {
         return Mob.createMobAttributes()
                 .add(Attributes.MAX_HEALTH, 100.0D)
-                .add(Attributes.MOVEMENT_SPEED, 0.50D) // Increased for pack animal duties
+                .add(Attributes.MOVEMENT_SPEED, 0.50D)// Increased for pack animal duties
+                .add(Attributes.KNOCKBACK_RESISTANCE, 1.0D)
                 .add(Attributes.ATTACK_DAMAGE, 2.0D)
                 .add(Attributes.ARMOR, 15.0D)
                 .add(Attributes.FOLLOW_RANGE, 16.0D);
@@ -369,7 +370,7 @@ public class Stegonaut extends RideableDragonBase implements SoundHandledDragon 
             java.util.UUID ownerId = this.getOwnerUUID();
             if (ownerId != null) {
                 baby.setOwnerUUID(ownerId);
-                baby.setTame(true);
+                baby.setTame(true, true);
             }
 
             // Set baby attributes
@@ -400,7 +401,7 @@ public class Stegonaut extends RideableDragonBase implements SoundHandledDragon 
         }
     }
 
-    private void setAttributeBase(net.minecraft.world.entity.ai.attributes.Attribute attribute, double value) {
+    private void setAttributeBase(net.minecraft.core.Holder<net.minecraft.world.entity.ai.attributes.Attribute> attribute, double value) {
         net.minecraft.world.entity.ai.attributes.AttributeInstance instance = this.getAttribute(attribute);
         if (instance != null) {
             instance.setBaseValue(value);
@@ -415,8 +416,8 @@ public class Stegonaut extends RideableDragonBase implements SoundHandledDragon 
     }
 
     @Override
-    public @NotNull net.minecraft.world.entity.EntityDimensions getDimensions(@NotNull net.minecraft.world.entity.Pose pose) {
-        net.minecraft.world.entity.EntityDimensions baseDimensions = super.getDimensions(pose);
+    public @NotNull net.minecraft.world.entity.EntityDimensions getDefaultDimensions(@NotNull net.minecraft.world.entity.Pose pose) {
+        net.minecraft.world.entity.EntityDimensions baseDimensions = super.getDefaultDimensions(pose);
         if (isBaby()) {
             return baseDimensions.scale(BABY_HITBOX_SCALE);
         }
@@ -531,7 +532,7 @@ public class Stegonaut extends RideableDragonBase implements SoundHandledDragon 
             // Trigger advancement for taming Primitive Drake
             if (player instanceof net.minecraft.server.level.ServerPlayer serverPlayer) {
                 var advancement = serverPlayer.server.getAdvancements()
-                        .getAdvancement(com.leon.saintsdragons.common.SaintsDragonsCommon.rl("tame_stegonaut"));
+                        .get(com.leon.saintsdragons.common.SaintsDragonsCommon.rl("tame_stegonaut"));
                 if (advancement != null) {
                     serverPlayer.getAdvancements().award(advancement, "tame_stegonaut");
                 }

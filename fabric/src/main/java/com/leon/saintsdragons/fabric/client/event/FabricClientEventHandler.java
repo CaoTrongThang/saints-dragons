@@ -356,13 +356,12 @@ public class FabricClientEventHandler {
             }
         }
 
-        if (player.isPassenger() && player.getVehicle() instanceof Stegonaut stegonaut && camera.isDetached()) {
+        if (player.isPassenger() && player.getVehicle() instanceof Stegonaut && camera.isDetached()) {
             stegonautCameraZoomTarget = 8F;
             float blendRate = 0.05F;
             stegonautCameraZoom += (stegonautCameraZoomTarget - stegonautCameraZoom) * blendRate;
             CameraAccessor cameraAccessor = (CameraAccessor) camera;
-            double maxZoom = cameraAccessor.saintsdragons$invokeGetMaxZoom(stegonautCameraZoom);
-            cameraAccessor.saintsdragons$invokeMove(-maxZoom, 0, 0);
+            cameraAccessor.saintsdragons$invokeMove(-stegonautCameraZoom, 0, 0);
         } else if (!(player.getVehicle() instanceof Stegonaut)) {
             stegonautCameraZoom = 8F;
             stegonautCameraZoomTarget = 8F;

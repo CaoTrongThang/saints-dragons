@@ -3,6 +3,7 @@ package com.leon.saintsdragons.common.block;
 import com.leon.saintsdragons.common.registry.ModEntities;
 import com.leon.saintsdragons.server.entity.base.DragonGender;
 import com.leon.saintsdragons.server.entity.dragons.stegonaut.Stegonaut;
+import com.mojang.serialization.MapCodec;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;
@@ -43,6 +44,11 @@ public class StegonautEggBlock extends BaseEntityBlock {
     public StegonautEggBlock(Properties properties) {
         super(properties);
         this.registerDefaultState(this.stateDefinition.any().setValue(HATCH, 0));
+    }
+
+    @Override
+    protected MapCodec<? extends BaseEntityBlock> codec() {
+        return simpleCodec(StegonautEggBlock::new);
     }
 
     @Override
@@ -107,7 +113,7 @@ public class StegonautEggBlock extends BaseEntityBlock {
             if (eggEntity != null) {
                 if (eggEntity.getOwnerUUID() != null) {
                     baby.setOwnerUUID(eggEntity.getOwnerUUID());
-                    baby.setTame(true);
+                    baby.setTame(true, true);
                 }
                 if (eggEntity.getBabyGender() != null) {
                     baby.setGender(eggEntity.getBabyGender());
