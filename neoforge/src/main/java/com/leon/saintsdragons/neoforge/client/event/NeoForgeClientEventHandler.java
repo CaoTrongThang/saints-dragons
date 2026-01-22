@@ -58,8 +58,8 @@ public class NeoForgeClientEventHandler {
     private static float nulljawCameraPitch = 0.0f;
 
     // Stegonaut camera zoom transition
-    private static float stegonautCameraZoom = 12F; // Base zoom
-    private static float stegonautCameraZoomTarget = 12F;
+    private static float stegonautCameraZoom = 8F; // Base zoom
+    private static float stegonautCameraZoomTarget = 8F;
 
     public static void onClientTick(Minecraft minecraft) {
         RaevyxLightningBeamSoundController.tick(minecraft);
@@ -349,13 +349,13 @@ public class NeoForgeClientEventHandler {
         }
 
         if (player.isPassenger() && player.getVehicle() instanceof Stegonaut && camera.isDetached()) {
-            stegonautCameraZoomTarget = 12F;
+            stegonautCameraZoomTarget = 8F;
             float blendRate = 0.05F;
             stegonautCameraZoom += (stegonautCameraZoomTarget - stegonautCameraZoom) * blendRate;
             CameraAccessor.invokeMove(camera, -stegonautCameraZoom, 0, 0);
         } else if (!(player.getVehicle() instanceof Stegonaut)) {
-            stegonautCameraZoom = 12F;
-            stegonautCameraZoomTarget = 12F;
+            stegonautCameraZoom = 8F;
+            stegonautCameraZoomTarget = 8F;
         }
 
         // Screen shake detection and application
