@@ -14,7 +14,6 @@ import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.resources.ResourceLocation;
 import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.blaze3d.vertex.VertexConsumer;
 import net.minecraft.client.renderer.MultiBufferSource;
 import com.leon.saintsdragons.client.renderer.layer.raevyx.RaevyxLightningBeamLayer;
 import com.leon.saintsdragons.client.renderer.layer.raevyx.RaevyxGlowLayer;
@@ -56,12 +55,7 @@ public class RaevyxRenderer extends GeoEntityRenderer<Raevyx> {
     @Override
     public void render(@NotNull Raevyx entity, float entityYaw, float partialTick,
                        @NotNull PoseStack poseStack, @NotNull MultiBufferSource bufferSource, int packedLight) {
-        // Baby dragons have smaller shadows (proportional to hitbox size)
-        if (entity.isBaby()) {
-            this.shadowRadius = 0.8f;
-        } else {
-            this.shadowRadius = 2.0f;
-        }
+        this.shadowRadius = entity.isBaby() ? 1.25F : 3.0f;
 
         this.lastBakedModel = this.getGeoModel().getBakedModel(this.getGeoModel().getModelResource(entity));
         if (this.lastBakedModel != null) {

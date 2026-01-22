@@ -9,7 +9,6 @@ import software.bernie.geckolib.cache.object.BakedGeoModel;
 import software.bernie.geckolib.renderer.GeoEntityRenderer;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.blaze3d.vertex.VertexConsumer;
 import net.minecraft.client.renderer.MultiBufferSource;
 
 @Environment(EnvType.CLIENT)
@@ -20,6 +19,11 @@ public class StegonautRenderer extends GeoEntityRenderer<Stegonaut> {
     private static final float MOUTH_X = 0.0f;
     private static final float MOUTH_Y = -0.2f; // Slightly below head center
     private static final float MOUTH_Z = 0.8f;  // Forward from head center
+
+    private static final String PASSENGER_BONE = "passengerBone";
+    private static final float PASSENGER_X = 0.0f;
+    private static final float PASSENGER_Y = -3.0f;
+    private static final float PASSENGER_Z = 0.0f;
     
     public StegonautRenderer(EntityRendererProvider.Context renderManager) {
         super(renderManager, new StegonautModel());
@@ -41,17 +45,33 @@ public class StegonautRenderer extends GeoEntityRenderer<Stegonaut> {
     @Override
     public void render(@NotNull Stegonaut entity, float entityYaw, float partialTick,
                        @NotNull PoseStack poseStack, @NotNull MultiBufferSource bufferSource, int packedLight) {
-        // Store the current model for locator sampling
+        this.shadowRadius = entity.isBaby() ? 1.0F : 2.25f;
         this.lastBakedModel = this.getGeoModel().getBakedModel(this.getGeoModel().getModelResource(entity));
-        
+        if (this.lastBakedModel != null) {
+            enableTrackingForBones(this.lastBakedModel);
+        }
+
         super.render(entity, entityYaw, partialTick, poseStack, bufferSource, packedLight);
         
         // After bones have been processed, sample accurate world positions for mouth locator
         sampleAndStashLocatorsAccurate(entity);
     }
+
+    private void enableTrackingForBones(BakedGeoModel model) {
+        if (model == null) {
+            return;
+        }
+        model.getBone(PASSENGER_BONE).ifPresent(b -> b.setTrackingMatrices(true));
+        model.getBone("head").ifPresent(b -> b.setTrackingMatrices(true));
+    }
     
     private void sampleAndStashLocatorsAccurate(Stegonaut entity) {
         if (this.lastBakedModel == null || entity == null) return;
+
+        this.lastBakedModel.getBone(PASSENGER_BONE).ifPresent(b -> {
+            net.minecraft.world.phys.Vec3 world = transformLocator(b, PASSENGER_X, PASSENGER_Y, PASSENGER_Z);
+            if (world != null) entity.setClientLocatorPosition("passengerLocator", world);
+        });
         
         // Sample mouth origin from head bone
         this.lastBakedModel.getBone("head").ifPresent(b -> {

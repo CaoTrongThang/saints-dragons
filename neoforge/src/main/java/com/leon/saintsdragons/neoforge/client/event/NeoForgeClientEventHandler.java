@@ -7,6 +7,7 @@ import com.leon.saintsdragons.server.entity.dragons.cindervane.Cindervane;
 import com.leon.saintsdragons.server.entity.dragons.ignivorus.Ignivorus;
 import com.leon.saintsdragons.server.entity.dragons.nulljaw.Nulljaw;
 import com.leon.saintsdragons.server.entity.dragons.raevyx.Raevyx;
+import com.leon.saintsdragons.server.entity.dragons.stegonaut.Stegonaut;
 import com.leon.saintsdragons.server.entity.interfaces.ShakesScreen;
 import net.minecraft.client.Camera;
 import net.minecraft.client.Minecraft;
@@ -55,6 +56,10 @@ public class NeoForgeClientEventHandler {
     private static float cindervaneCameraPitch = 0.0f;
     private static float ignivorusCameraPitch = 0.0f;
     private static float nulljawCameraPitch = 0.0f;
+
+    // Stegonaut camera zoom transition
+    private static float stegonautCameraZoom = 12F; // Base zoom
+    private static float stegonautCameraZoomTarget = 12F;
 
     public static void onClientTick(Minecraft minecraft) {
         RaevyxLightningBeamSoundController.tick(minecraft);
@@ -343,42 +348,52 @@ public class NeoForgeClientEventHandler {
             }
         }
 
+        if (player.isPassenger() && player.getVehicle() instanceof Stegonaut && camera.isDetached()) {
+            stegonautCameraZoomTarget = 12F;
+            float blendRate = 0.05F;
+            stegonautCameraZoom += (stegonautCameraZoomTarget - stegonautCameraZoom) * blendRate;
+            CameraAccessor.invokeMove(camera, -stegonautCameraZoom, 0, 0);
+        } else if (!(player.getVehicle() instanceof Stegonaut)) {
+            stegonautCameraZoom = 12F;
+            stegonautCameraZoomTarget = 12F;
+        }
+
         // Screen shake detection and application
         applyScreenShake(camera, player, partialTicks);
     }
 
     private static void applyScreenShake(Camera camera, Entity player, float partialTicks) {
-    double shakeDistanceScale = 64.0;
-    double distance = Double.MAX_VALUE;
-    float tremorAmount = 0.0F; // Reset tremor amount each frame
+        double shakeDistanceScale = 64.0;
+        double distance = Double.MAX_VALUE;
+        float tremorAmount = 0.0F; // Reset tremor amount each frame
 
-    AABB aabb = player.getBoundingBox().inflate(shakeDistanceScale);
-    var level = Minecraft.getInstance().level;
-    if (level == null) return;
+        AABB aabb = player.getBoundingBox().inflate(shakeDistanceScale);
+        var level = Minecraft.getInstance().level;
+        if (level == null) return;
 
-    for (Mob screenShaker : level.getEntitiesOfClass(Mob.class, aabb, (mob -> mob instanceof ShakesScreen))) {
-        ShakesScreen shakesScreen = (ShakesScreen) screenShaker;
-        if (shakesScreen.canFeelShake(player) && screenShaker.distanceTo(player) < distance) {
-            distance = screenShaker.distanceTo(player);
-            float shakeAmount = shakesScreen.getScreenShakeAmount(partialTicks);
-            tremorAmount = Math.min((1F - (float) Math.min(1, distance / shakesScreen.getShakeDistance())) * Math.max(shakeAmount, 0F), 2.0F);
+        for (Mob screenShaker : level.getEntitiesOfClass(Mob.class, aabb, (mob -> mob instanceof ShakesScreen))) {
+            ShakesScreen shakesScreen = (ShakesScreen) screenShaker;
+            if (shakesScreen.canFeelShake(player) && screenShaker.distanceTo(player) < distance) {
+                distance = screenShaker.distanceTo(player);
+                float shakeAmount = shakesScreen.getScreenShakeAmount(partialTicks);
+                tremorAmount = Math.min((1F - (float) Math.min(1, distance / shakesScreen.getShakeDistance())) * Math.max(shakeAmount, 0F), 2.0F);
+            }
         }
-    }
 
-    if (tremorAmount > 0) {
-        // Generate random offsets for camera movement
-        double intensity = tremorAmount * Minecraft.getInstance().options.screenEffectScale().get();
+        if (tremorAmount > 0) {
+            // Generate random offsets for camera movement
+            double intensity = tremorAmount * Minecraft.getInstance().options.screenEffectScale().get();
 
-        CameraAccessor.invokeMove(camera,
-                randomTremorOffsets[0] * 0.2F * intensity,
-                randomTremorOffsets[1] * 0.2F * intensity,
-                randomTremorOffsets[2] * 0.5F * intensity
-        );
+            CameraAccessor.invokeMove(camera,
+                    randomTremorOffsets[0] * 0.2F * intensity,
+                    randomTremorOffsets[1] * 0.2F * intensity,
+                    randomTremorOffsets[2] * 0.5F * intensity
+            );
 
-        // Update random offsets for next frame
-        randomTremorOffsets[0] = (Math.random() - 0.5) * 2.0;
-        randomTremorOffsets[1] = (Math.random() - 0.5) * 2.0;
-        randomTremorOffsets[2] = (Math.random() - 0.5) * 2.0;
-    }
+            // Update random offsets for next frame
+            randomTremorOffsets[0] = (Math.random() - 0.5) * 2.0;
+            randomTremorOffsets[1] = (Math.random() - 0.5) * 2.0;
+            randomTremorOffsets[2] = (Math.random() - 0.5) * 2.0;
+        }
     }
 }
