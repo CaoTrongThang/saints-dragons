@@ -12,7 +12,8 @@ import net.minecraft.world.entity.ai.control.BodyRotationControl;
  * - When STANDING: Body gradually follows head rotation
  * - Prevents jitter by locking body rotation during movement
  */
-public class DragonBodyControl extends BodyRotationControl {
+public class BodyControl extends BodyRotationControl {
+    private static final double MOVING_EPSILON_SQ = 2.5E-7;
     private static final int HISTORY_SIZE = 10;
     private final Mob entity;
     private float targetYawHead;
@@ -29,13 +30,13 @@ public class DragonBodyControl extends BodyRotationControl {
     private final float bodyLagStillSpeed;   // How fast body follows head while standing
     private final float bodyMaxDelta;        // Max degrees body can rotate per tick
 
-    public DragonBodyControl(Mob entity, float turnSpeed) {
+    public BodyControl(Mob entity, float turnSpeed) {
         // Slightly faster standing spin (bodyLagStillSpeed 0.1 -> body catches up quicker when idle)
         this(entity, turnSpeed, 50.0f, 0.3f, 0.10f, 45.0f);
     }
 
-    public DragonBodyControl(Mob entity, float turnSpeed, float maxHeadBodyDiff,
-                             float headLagSpeed, float bodyLagStillSpeed, float bodyMaxDelta) {
+    public BodyControl(Mob entity, float turnSpeed, float maxHeadBodyDiff,
+                       float headLagSpeed, float bodyLagStillSpeed, float bodyMaxDelta) {
         super(entity);
         this.entity = entity;
         this.turnSpeed = turnSpeed;
@@ -67,7 +68,7 @@ public class DragonBodyControl extends BodyRotationControl {
         double distSq = dx * dx + dz * dz;
 
         // If moving (velocity detected)
-        if (distSq > 2.5E-7) {
+        if (distSq > MOVING_EPSILON_SQ) {
             // Calculate movement direction
             double moveAngle = Math.toDegrees(Mth.atan2(dz, dx)) - 90.0;
 
@@ -114,7 +115,7 @@ public class DragonBodyControl extends BodyRotationControl {
         double distSq = dx * dx + dz * dz;
 
         // If moving (velocity detected)
-        if (distSq > 2.5E-7) {
+        if (distSq > MOVING_EPSILON_SQ) {
             // Calculate movement direction
             double moveAngle = Math.toDegrees(Mth.atan2(dz, dx)) - 90.0;
 

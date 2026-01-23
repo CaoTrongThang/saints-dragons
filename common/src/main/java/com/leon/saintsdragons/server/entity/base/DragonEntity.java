@@ -6,6 +6,7 @@ import com.leon.saintsdragons.common.registry.DragonType;
 import com.leon.saintsdragons.server.ai.goals.base.DragonSleepBehavior;
 import com.leon.saintsdragons.server.entity.ability.DragonAbility;
 import com.leon.saintsdragons.server.entity.ability.DragonAbilityType;
+import com.leon.saintsdragons.server.entity.controller.BodyControl;
 import com.leon.saintsdragons.server.entity.handler.DragonCombatHandler;
 import com.leon.saintsdragons.server.ai.goals.base.DragonSleepBehavior;
 import com.leon.saintsdragons.server.entity.interfaces.DragonSoundProfile;
@@ -121,7 +122,7 @@ public abstract class DragonEntity extends TamableAnimal implements GeoEntity {
     private float clientTailDragVelocity = 0f;
 
     // Store reference to our custom body control for server-side rotation updates
-    private com.leon.saintsdragons.server.entity.controller.DragonBodyControl dragonBodyControl;
+    private BodyControl dragonBodyControl;
 
     protected DragonEntity(EntityType<? extends TamableAnimal> entityType, Level level) {
         super(entityType, level);
@@ -134,7 +135,7 @@ public abstract class DragonEntity extends TamableAnimal implements GeoEntity {
 
     @Override
     protected net.minecraft.world.entity.ai.control.@NotNull BodyRotationControl createBodyControl() {
-        this.dragonBodyControl = new com.leon.saintsdragons.server.entity.controller.DragonBodyControl(this, getBodyTurnSpeed());
+        this.dragonBodyControl = new BodyControl(this, getBodyTurnSpeed());
         return this.dragonBodyControl;
     }
 
