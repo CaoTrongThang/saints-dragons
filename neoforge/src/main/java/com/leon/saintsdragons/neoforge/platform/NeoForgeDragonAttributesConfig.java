@@ -28,6 +28,8 @@ public final class NeoForgeDragonAttributesConfig {
     public static ModConfigSpec.DoubleValue RAEVYX_BITE_DAMAGE;
     public static ModConfigSpec.DoubleValue RAEVYX_LIGHTNING_BEAM_DAMAGE;
     public static ModConfigSpec.DoubleValue RAEVYX_HORN_GORE_DAMAGE;
+    public static ModConfigSpec.DoubleValue RAEVYX_BEAM_DRAIN_PER_TICK;
+    public static ModConfigSpec.DoubleValue RAEVYX_BEAM_REGEN_PER_TICK;
     public static ModConfigSpec.DoubleValue RAEVYX_TAMING_CHANCE_BASE;
     public static ModConfigSpec.DoubleValue RAEVYX_TAMING_CHANCE_HEARTY;
     public static ModConfigSpec.BooleanValue RAEVYX_LEGACY_TAMING;
@@ -41,6 +43,8 @@ public final class NeoForgeDragonAttributesConfig {
     public static ModConfigSpec.DoubleValue NULLJAW_HORN_GORE_PHASE2_DAMAGE;
     public static ModConfigSpec.DoubleValue NULLJAW_SWIM_SPEED;
     public static ModConfigSpec.DoubleValue NULLJAW_TAMING_CHANCE;
+    public static ModConfigSpec.DoubleValue NULLJAW_TAMING_CHANCE_BASE;
+    public static ModConfigSpec.DoubleValue NULLJAW_TAMING_CHANCE_HEARTY;
     public static ModConfigSpec.BooleanValue NULLJAW_LEGACY_TAMING;
 
     // Ignivorus
@@ -50,8 +54,17 @@ public final class NeoForgeDragonAttributesConfig {
     public static ModConfigSpec.DoubleValue IGNIVORUS_BITE_DAMAGE;
     public static ModConfigSpec.DoubleValue IGNIVORUS_BODY_SLAM_DAMAGE;
     public static ModConfigSpec.DoubleValue IGNIVORUS_FIRE_BREATH_DAMAGE;
+    public static ModConfigSpec.DoubleValue IGNIVORUS_FIREBALL_DAMAGE;
+    public static ModConfigSpec.DoubleValue IGNIVORUS_WING_SWIPE_DAMAGE;
+    public static ModConfigSpec.DoubleValue IGNIVORUS_STOMP_DAMAGE;
     public static ModConfigSpec.DoubleValue IGNIVORUS_ULTIMATE_DAMAGE;
     public static ModConfigSpec.DoubleValue IGNIVORUS_ULTIMATE_PENALTY_HEALTH;
+    public static ModConfigSpec.DoubleValue IGNIVORUS_FIRE_BREATH_DRAIN_PER_TICK;
+    public static ModConfigSpec.DoubleValue IGNIVORUS_FIRE_BREATH_REGEN_PER_TICK;
+    public static ModConfigSpec.DoubleValue IGNIVORUS_FIRE_BREATH_FLAME_SPAWN_MULTIPLIER;
+    public static ModConfigSpec.DoubleValue IGNIVORUS_FIRE_BREATH_FLAME_SPEED_MULTIPLIER;
+    public static ModConfigSpec.DoubleValue IGNIVORUS_FIRE_BREATH_FLAME_LIFETIME_MULTIPLIER;
+    public static ModConfigSpec.DoubleValue IGNIVORUS_FIRE_BREATH_IGNITE_BLOCK_CHANCE;
     public static ModConfigSpec.DoubleValue IGNIVORUS_TAMING_CHANCE_BASE;
     public static ModConfigSpec.DoubleValue IGNIVORUS_TAMING_CHANCE_HEARTY;
     public static ModConfigSpec.BooleanValue IGNIVORUS_LEGACY_TAMING;
@@ -90,6 +103,10 @@ public final class NeoForgeDragonAttributesConfig {
         RAEVYX_LIGHTNING_BEAM_DAMAGE = builder.defineInRange("lightning_beam_damage", 35.0, 0.0, 100.0);
         RAEVYX_HORN_GORE_DAMAGE = builder.defineInRange("horn_gore_damage", 15.0, 0.0, 100.0);
 
+        builder.comment("Beam Energy Tuning");
+        RAEVYX_BEAM_DRAIN_PER_TICK = builder.defineInRange("beam_drain_per_tick", 0.014, 0.0, 1.0);
+        RAEVYX_BEAM_REGEN_PER_TICK = builder.defineInRange("beam_regen_per_tick", 0.0025, 0.0, 1.0);
+
         builder.comment("Taming Chances (lower = easier)");
         RAEVYX_TAMING_CHANCE_BASE = builder.defineInRange("taming_chance_base", 5.0, 1.0, 20.0);
         RAEVYX_TAMING_CHANCE_HEARTY = builder.defineInRange("taming_chance_hearty", 3.0, 1.0, 20.0);
@@ -115,6 +132,8 @@ public final class NeoForgeDragonAttributesConfig {
 
         builder.comment("Taming Chance (lower = easier)");
         NULLJAW_TAMING_CHANCE = builder.defineInRange("taming_chance", 6.0, 1.0, 20.0);
+        NULLJAW_TAMING_CHANCE_BASE = builder.defineInRange("taming_chance_base", 6.0, 1.0, 20.0);
+        NULLJAW_TAMING_CHANCE_HEARTY = builder.defineInRange("taming_chance_hearty", 3.0, 1.0, 20.0);
 
         builder.comment("Legacy taming (true = simple food taming, false = special mechanics)");
         NULLJAW_LEGACY_TAMING = builder.define("legacy_taming", false);
@@ -132,11 +151,22 @@ public final class NeoForgeDragonAttributesConfig {
         builder.comment("Ability Damage");
         IGNIVORUS_BITE_DAMAGE = builder.defineInRange("bite_damage", 50.0, 0.0, 200.0);
         IGNIVORUS_BODY_SLAM_DAMAGE = builder.defineInRange("body_slam_damage", 40.0, 0.0, 200.0);
-        IGNIVORUS_FIRE_BREATH_DAMAGE = builder.defineInRange("fire_breath_damage", 4.0, 0.0, 100.0);
+        IGNIVORUS_FIRE_BREATH_DAMAGE = builder.defineInRange("fire_breath_damage", 80.0, 0.0, 200.0);
+        IGNIVORUS_FIREBALL_DAMAGE = builder.defineInRange("fireball_damage", 70.0, 0.0, 200.0);
+        IGNIVORUS_WING_SWIPE_DAMAGE = builder.defineInRange("wing_swipe_damage", 15.0, 0.0, 200.0);
+        IGNIVORUS_STOMP_DAMAGE = builder.defineInRange("stomp_damage", 18.0, 0.0, 200.0);
         IGNIVORUS_ULTIMATE_DAMAGE = builder.defineInRange("ultimate_damage", 200.0, 0.0, 500.0);
 
         builder.comment("Ultimate ability health penalty");
         IGNIVORUS_ULTIMATE_PENALTY_HEALTH = builder.defineInRange("ultimate_penalty_health", 50.0, 1.0, 500.0);
+
+        builder.comment("Fire Breath Tuning");
+        IGNIVORUS_FIRE_BREATH_DRAIN_PER_TICK = builder.defineInRange("fire_breath_drain_per_tick", 0.00625, 0.0, 1.0);
+        IGNIVORUS_FIRE_BREATH_REGEN_PER_TICK = builder.defineInRange("fire_breath_regen_per_tick", 0.0025, 0.0, 1.0);
+        IGNIVORUS_FIRE_BREATH_FLAME_SPAWN_MULTIPLIER = builder.defineInRange("fire_breath_flame_spawn_multiplier", 1.0, 0.0, 5.0);
+        IGNIVORUS_FIRE_BREATH_FLAME_SPEED_MULTIPLIER = builder.defineInRange("fire_breath_flame_speed_multiplier", 1.0, 0.0, 5.0);
+        IGNIVORUS_FIRE_BREATH_FLAME_LIFETIME_MULTIPLIER = builder.defineInRange("fire_breath_flame_lifetime_multiplier", 1.0, 0.0, 5.0);
+        IGNIVORUS_FIRE_BREATH_IGNITE_BLOCK_CHANCE = builder.defineInRange("fire_breath_ignite_block_chance", 1.0, 0.0, 1.0);
 
         builder.comment("Taming Chances (lower = easier)");
         IGNIVORUS_TAMING_CHANCE_BASE = builder.defineInRange("taming_chance_base", 7.0, 1.0, 20.0);

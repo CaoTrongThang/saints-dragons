@@ -86,9 +86,8 @@ public record NulljawInteractionHandler(Nulljaw drake) {
             // Taming chance logic
             DragonAttributeConfig config = DragonAttributeConfigLoader.getInstance()
                     .getConfig(DragonAttributeConfigLoader.NULLJAW_ID);
-            double tameChance = heartyMeal
-                    ? config.extraDoubles().getOrDefault("taming_chance", 6.0) / 2.0  // Hearty meal doubles chance
-                    : config.extraDoubles().getOrDefault("taming_chance", 6.0);
+            double baseChance = getBaseTamingChance(config);
+            double tameChance = heartyMeal ? getHeartyTamingChance(config, baseChance) : baseChance;
             int tameRoll = (int) Math.round(tameChance);
             boolean success = drake.getRandom().nextInt(Math.max(1, tameRoll)) == 0;
 
@@ -275,8 +274,8 @@ public record NulljawInteractionHandler(Nulljaw drake) {
             }
 
             double tameChance = heartyMeal
-                    ? config.extraDoubles().getOrDefault("taming_chance", 6.0) / 2.0
-                    : config.extraDoubles().getOrDefault("taming_chance", 6.0);
+                    ? getHeartyTamingChance(config, getBaseTamingChance(config))
+                    : getBaseTamingChance(config);
             int tameRoll = (int) Math.round(tameChance);
             boolean success = drake.getRandom().nextInt(Math.max(1, tameRoll)) == 0;
 
@@ -360,6 +359,14 @@ public record NulljawInteractionHandler(Nulljaw drake) {
         if (player instanceof ServerPlayer serverPlayer) {
             serverPlayer.displayClientMessage(Component.translatable(key, drake.getName()), true);
         }
+    }
+
+    private double getBaseTamingChance(DragonAttributeConfig config) {
+        return config.extraDouble("taming_chance_base", config.extraDouble("taming_chance", 6.0));
+    }
+
+    private double getHeartyTamingChance(DragonAttributeConfig config, double baseChance) {
+        return config.extraDouble("taming_chance_hearty", baseChance / 2.0);
     }
 
     private boolean isInteractionItem(ItemStack itemstack) {

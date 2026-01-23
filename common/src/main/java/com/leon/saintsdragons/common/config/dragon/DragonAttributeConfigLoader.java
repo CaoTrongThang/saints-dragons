@@ -38,6 +38,7 @@ public final class DragonAttributeConfigLoader extends SimpleJsonResourceReloadL
     public static final ResourceLocation STEGONAUT_ID = SaintsDragonsCommon.rl("stegonaut");
 
     private static final DragonAttributeConfigLoader INSTANCE = new DragonAttributeConfigLoader();
+    private static final boolean IS_NEOFORGE = Services.PLATFORM.isModLoaded("neoforge");
 
     private final Map<ResourceLocation, DragonAttributeConfig> defaults;
     private final Path configDirectory;
@@ -48,14 +49,8 @@ public final class DragonAttributeConfigLoader extends SimpleJsonResourceReloadL
         this.configDirectory = Services.PLATFORM.getConfigDirectory()
                 .resolve(SaintsDragonsCommon.MOD_ID)
                 .resolve("dragon_attributes");
-        Map<ResourceLocation, DragonAttributeConfig> base = new HashMap<>();
-        base.put(CINDERVANE_ID, cindervaneDefaults());
-        base.put(RAEVYX_ID, raevyxDefaults());
-        base.put(NULLJAW_ID, nulljawDefaults());
-        base.put(IGNIVORUS_ID, ignivorusDefaults());
-        base.put(STEGONAUT_ID, stegonautDefaults());
-        this.defaults = ImmutableMap.copyOf(base);
-        this.configs = this.defaults;
+        this.defaults = ImmutableMap.copyOf(buildDefaultConfigs());
+        this.configs = IS_NEOFORGE ? ImmutableMap.copyOf(buildDefaultConfigs()) : this.defaults;
     }
 
     private static DragonAttributeConfig cindervaneDefaults() {
@@ -110,6 +105,8 @@ public final class DragonAttributeConfigLoader extends SimpleJsonResourceReloadL
         double tamingChanceBase = 5.0D;
         double tamingChanceHearty = 3.0D;
         boolean legacyTaming = false;
+        double beamDrainPerTick = 0.014D;
+        double beamRegenPerTick = 0.0025D;
 
         // NeoForge config override (if available)
         try {
@@ -120,6 +117,8 @@ public final class DragonAttributeConfigLoader extends SimpleJsonResourceReloadL
             biteDamage = (double) configClass.getField("RAEVYX_BITE_DAMAGE").get(null).getClass().getMethod("get").invoke(configClass.getField("RAEVYX_BITE_DAMAGE").get(null));
             lightningBeamDamage = (double) configClass.getField("RAEVYX_LIGHTNING_BEAM_DAMAGE").get(null).getClass().getMethod("get").invoke(configClass.getField("RAEVYX_LIGHTNING_BEAM_DAMAGE").get(null));
             hornGoreDamage = (double) configClass.getField("RAEVYX_HORN_GORE_DAMAGE").get(null).getClass().getMethod("get").invoke(configClass.getField("RAEVYX_HORN_GORE_DAMAGE").get(null));
+            beamDrainPerTick = (double) configClass.getField("RAEVYX_BEAM_DRAIN_PER_TICK").get(null).getClass().getMethod("get").invoke(configClass.getField("RAEVYX_BEAM_DRAIN_PER_TICK").get(null));
+            beamRegenPerTick = (double) configClass.getField("RAEVYX_BEAM_REGEN_PER_TICK").get(null).getClass().getMethod("get").invoke(configClass.getField("RAEVYX_BEAM_REGEN_PER_TICK").get(null));
             tamingChanceBase = (double) configClass.getField("RAEVYX_TAMING_CHANCE_BASE").get(null).getClass().getMethod("get").invoke(configClass.getField("RAEVYX_TAMING_CHANCE_BASE").get(null));
             tamingChanceHearty = (double) configClass.getField("RAEVYX_TAMING_CHANCE_HEARTY").get(null).getClass().getMethod("get").invoke(configClass.getField("RAEVYX_TAMING_CHANCE_HEARTY").get(null));
             legacyTaming = (boolean) configClass.getField("RAEVYX_LEGACY_TAMING").get(null).getClass().getMethod("get").invoke(configClass.getField("RAEVYX_LEGACY_TAMING").get(null));
@@ -142,8 +141,8 @@ public final class DragonAttributeConfigLoader extends SimpleJsonResourceReloadL
                         "walk_speed", 0.25D,  // Hardcoded for AI/rider compatibility
                         "taming_chance_base", tamingChanceBase,
                         "taming_chance_hearty", tamingChanceHearty,
-                        "beam_drain_per_tick", 0.014D,
-                        "beam_regen_per_tick", 0.0025D
+                        "beam_drain_per_tick", beamDrainPerTick,
+                        "beam_regen_per_tick", beamRegenPerTick
                 ),
                 Map.of(
                         "legacy_taming", legacyTaming
@@ -160,6 +159,8 @@ public final class DragonAttributeConfigLoader extends SimpleJsonResourceReloadL
         double hornPhase2Damage = 20.8D;
         double swimSpeed = 1.45D;
         double tamingChance = 6.0D;
+        double tamingChanceBase = 6.0D;
+        double tamingChanceHearty = 3.0D;
         boolean legacyTaming = false;
 
         // NeoForge config override (if available)
@@ -173,6 +174,8 @@ public final class DragonAttributeConfigLoader extends SimpleJsonResourceReloadL
             hornPhase2Damage = (double) configClass.getField("NULLJAW_HORN_GORE_PHASE2_DAMAGE").get(null).getClass().getMethod("get").invoke(configClass.getField("NULLJAW_HORN_GORE_PHASE2_DAMAGE").get(null));
             swimSpeed = (double) configClass.getField("NULLJAW_SWIM_SPEED").get(null).getClass().getMethod("get").invoke(configClass.getField("NULLJAW_SWIM_SPEED").get(null));
             tamingChance = (double) configClass.getField("NULLJAW_TAMING_CHANCE").get(null).getClass().getMethod("get").invoke(configClass.getField("NULLJAW_TAMING_CHANCE").get(null));
+            tamingChanceBase = (double) configClass.getField("NULLJAW_TAMING_CHANCE_BASE").get(null).getClass().getMethod("get").invoke(configClass.getField("NULLJAW_TAMING_CHANCE_BASE").get(null));
+            tamingChanceHearty = (double) configClass.getField("NULLJAW_TAMING_CHANCE_HEARTY").get(null).getClass().getMethod("get").invoke(configClass.getField("NULLJAW_TAMING_CHANCE_HEARTY").get(null));
             legacyTaming = (boolean) configClass.getField("NULLJAW_LEGACY_TAMING").get(null).getClass().getMethod("get").invoke(configClass.getField("NULLJAW_LEGACY_TAMING").get(null));
         } catch (Exception ignored) {
             // NeoForge config not available (Fabric or config not loaded yet)
@@ -193,7 +196,9 @@ public final class DragonAttributeConfigLoader extends SimpleJsonResourceReloadL
                         "run_speed", 0.28D,  // Hardcoded for AI/rider compatibility
                         "walk_speed", 0.14D,  // Hardcoded for AI/rider compatibility
                         "swim_speed", swimSpeed,
-                        "taming_chance", tamingChance
+                        "taming_chance", tamingChance,
+                        "taming_chance_base", tamingChanceBase,
+                        "taming_chance_hearty", tamingChanceHearty
                 ),
                 Map.of(
                         "legacy_taming", legacyTaming
@@ -216,6 +221,12 @@ public final class DragonAttributeConfigLoader extends SimpleJsonResourceReloadL
         double tamingChanceBase = 7.0D;
         double tamingChanceHearty = 4.0D;
         boolean legacyTaming = false;
+        double fireBreathDrainPerTick = 0.00625D;
+        double fireBreathRegenPerTick = 0.0025D;
+        double fireBreathFlameSpawnMultiplier = 1.0D;
+        double fireBreathFlameSpeedMultiplier = 1.0D;
+        double fireBreathFlameLifetimeMultiplier = 1.0D;
+        double fireBreathIgniteBlockChance = 1.0D;
 
         // NeoForge config override (if available)
         try {
@@ -231,6 +242,12 @@ public final class DragonAttributeConfigLoader extends SimpleJsonResourceReloadL
             stompDamage = (double) configClass.getField("IGNIVORUS_STOMP_DAMAGE").get(null).getClass().getMethod("get").invoke(configClass.getField("IGNIVORUS_STOMP_DAMAGE").get(null));
             ultimateDamage = (double) configClass.getField("IGNIVORUS_ULTIMATE_DAMAGE").get(null).getClass().getMethod("get").invoke(configClass.getField("IGNIVORUS_ULTIMATE_DAMAGE").get(null));
             ultimatePenaltyHealth = (double) configClass.getField("IGNIVORUS_ULTIMATE_PENALTY_HEALTH").get(null).getClass().getMethod("get").invoke(configClass.getField("IGNIVORUS_ULTIMATE_PENALTY_HEALTH").get(null));
+            fireBreathDrainPerTick = (double) configClass.getField("IGNIVORUS_FIRE_BREATH_DRAIN_PER_TICK").get(null).getClass().getMethod("get").invoke(configClass.getField("IGNIVORUS_FIRE_BREATH_DRAIN_PER_TICK").get(null));
+            fireBreathRegenPerTick = (double) configClass.getField("IGNIVORUS_FIRE_BREATH_REGEN_PER_TICK").get(null).getClass().getMethod("get").invoke(configClass.getField("IGNIVORUS_FIRE_BREATH_REGEN_PER_TICK").get(null));
+            fireBreathFlameSpawnMultiplier = (double) configClass.getField("IGNIVORUS_FIRE_BREATH_FLAME_SPAWN_MULTIPLIER").get(null).getClass().getMethod("get").invoke(configClass.getField("IGNIVORUS_FIRE_BREATH_FLAME_SPAWN_MULTIPLIER").get(null));
+            fireBreathFlameSpeedMultiplier = (double) configClass.getField("IGNIVORUS_FIRE_BREATH_FLAME_SPEED_MULTIPLIER").get(null).getClass().getMethod("get").invoke(configClass.getField("IGNIVORUS_FIRE_BREATH_FLAME_SPEED_MULTIPLIER").get(null));
+            fireBreathFlameLifetimeMultiplier = (double) configClass.getField("IGNIVORUS_FIRE_BREATH_FLAME_LIFETIME_MULTIPLIER").get(null).getClass().getMethod("get").invoke(configClass.getField("IGNIVORUS_FIRE_BREATH_FLAME_LIFETIME_MULTIPLIER").get(null));
+            fireBreathIgniteBlockChance = (double) configClass.getField("IGNIVORUS_FIRE_BREATH_IGNITE_BLOCK_CHANCE").get(null).getClass().getMethod("get").invoke(configClass.getField("IGNIVORUS_FIRE_BREATH_IGNITE_BLOCK_CHANCE").get(null));
             tamingChanceBase = (double) configClass.getField("IGNIVORUS_TAMING_CHANCE_BASE").get(null).getClass().getMethod("get").invoke(configClass.getField("IGNIVORUS_TAMING_CHANCE_BASE").get(null));
             tamingChanceHearty = (double) configClass.getField("IGNIVORUS_TAMING_CHANCE_HEARTY").get(null).getClass().getMethod("get").invoke(configClass.getField("IGNIVORUS_TAMING_CHANCE_HEARTY").get(null));
             legacyTaming = (boolean) configClass.getField("IGNIVORUS_LEGACY_TAMING").get(null).getClass().getMethod("get").invoke(configClass.getField("IGNIVORUS_LEGACY_TAMING").get(null));
@@ -244,12 +261,12 @@ public final class DragonAttributeConfigLoader extends SimpleJsonResourceReloadL
         extra.put("ultimate_penalty_health", ultimatePenaltyHealth);
         extra.put("taming_chance_base", tamingChanceBase);
         extra.put("taming_chance_hearty", tamingChanceHearty);
-        extra.put("fire_breath_drain_per_tick", 0.00625D);
-        extra.put("fire_breath_regen_per_tick", 0.0025D);
-        extra.put("fire_breath_flame_spawn_multiplier", 1.0D);
-        extra.put("fire_breath_flame_speed_multiplier", 1.0D);
-        extra.put("fire_breath_flame_lifetime_multiplier", 1.0D);
-        extra.put("fire_breath_ignite_block_chance", 1.0D);
+        extra.put("fire_breath_drain_per_tick", fireBreathDrainPerTick);
+        extra.put("fire_breath_regen_per_tick", fireBreathRegenPerTick);
+        extra.put("fire_breath_flame_spawn_multiplier", fireBreathFlameSpawnMultiplier);
+        extra.put("fire_breath_flame_speed_multiplier", fireBreathFlameSpeedMultiplier);
+        extra.put("fire_breath_flame_lifetime_multiplier", fireBreathFlameLifetimeMultiplier);
+        extra.put("fire_breath_ignite_block_chance", fireBreathIgniteBlockChance);
 
         return new DragonAttributeConfig(
                 maxHealth,
@@ -314,6 +331,10 @@ public final class DragonAttributeConfigLoader extends SimpleJsonResourceReloadL
     }
 
     public DragonAttributeConfig getConfig(ResourceLocation id) {
+        if (IS_NEOFORGE) {
+            DragonAttributeConfig config = configs.get(id);
+            return config != null ? config : DragonAttributeConfig.EMPTY;
+        }
         DragonAttributeConfig config = configs.get(id);
         if (config != null) {
             return config;
@@ -323,6 +344,10 @@ public final class DragonAttributeConfigLoader extends SimpleJsonResourceReloadL
     }
 
     public DragonAttributeConfig getDefaultConfig(ResourceLocation id) {
+        if (IS_NEOFORGE) {
+            DragonAttributeConfig config = configs.get(id);
+            return config != null ? config : DragonAttributeConfig.EMPTY;
+        }
         return defaults.getOrDefault(id, DragonAttributeConfig.EMPTY);
     }
 
@@ -330,6 +355,12 @@ public final class DragonAttributeConfigLoader extends SimpleJsonResourceReloadL
     protected void apply(Map<ResourceLocation, JsonElement> jsonMap,
                          @NotNull ResourceManager resourceManager,
                          @NotNull ProfilerFiller profiler) {
+        if (IS_NEOFORGE) {
+            this.configs = ImmutableMap.copyOf(buildDefaultConfigs());
+            SaintsDragonsCommon.LOGGER.info("Loaded {} dragon attribute configuration(s) from NeoForge config",
+                    this.configs.size());
+            return;
+        }
         Map<ResourceLocation, DragonAttributeConfig> merged = new HashMap<>(defaults);
         Map<ResourceLocation, JsonObject> rawJson = new HashMap<>();
         for (Map.Entry<ResourceLocation, JsonElement> entry : jsonMap.entrySet()) {
@@ -459,10 +490,30 @@ public final class DragonAttributeConfigLoader extends SimpleJsonResourceReloadL
     }
 
     public void overwriteConfig(ResourceLocation id, DragonAttributeConfig config) {
+        if (IS_NEOFORGE) {
+            return;
+        }
         writeConfigFile(configPath(id), serializeConfig(id, config));
         Map<ResourceLocation, DragonAttributeConfig> updated = new HashMap<>(this.configs);
         updated.put(id, config);
         this.configs = ImmutableMap.copyOf(updated);
+    }
+
+    public void refreshFromNeoForgeConfig() {
+        if (!IS_NEOFORGE) {
+            return;
+        }
+        this.configs = ImmutableMap.copyOf(buildDefaultConfigs());
+    }
+
+    private static Map<ResourceLocation, DragonAttributeConfig> buildDefaultConfigs() {
+        Map<ResourceLocation, DragonAttributeConfig> base = new HashMap<>();
+        base.put(CINDERVANE_ID, cindervaneDefaults());
+        base.put(RAEVYX_ID, raevyxDefaults());
+        base.put(NULLJAW_ID, nulljawDefaults());
+        base.put(IGNIVORUS_ID, ignivorusDefaults());
+        base.put(STEGONAUT_ID, stegonautDefaults());
+        return base;
     }
 
     private static void ensureLegacyTamingFlag(ResourceLocation id, JsonObject json) {

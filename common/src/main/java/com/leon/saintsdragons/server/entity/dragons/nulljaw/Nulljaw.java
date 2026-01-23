@@ -1799,7 +1799,7 @@ public class Nulljaw extends RideableDragonBase implements SemiAquaticDragon, Sh
             // Load taming chance from config
             DragonAttributeConfig config = DragonAttributeConfigLoader.getInstance()
                     .getConfig(DragonAttributeConfigLoader.NULLJAW_ID);
-            double tamingChanceConfig = config.extraDoubles().getOrDefault("taming_chance", 6.0);
+            double tamingChanceConfig = config.extraDouble("taming_chance_base", config.extraDouble("taming_chance", 6.0));
 
             // Convert config value to per-tick success chance
             // Higher values = much harder to tame (exponential scaling)
