@@ -643,6 +643,7 @@ public class SaintsDragonsModMenuIntegration implements ModMenuApi {
         DragonAttributeConfig updated = new DragonAttributeConfig(
                 cindervaneBuffer.maxHealth,
                 cindervaneBuffer.armor,
+                0.0,
                 cindervaneBuffer.flyingSpeed,
                 abilities,
                 Map.of(
@@ -656,7 +657,8 @@ public class SaintsDragonsModMenuIntegration implements ModMenuApi {
         DragonAttributeConfig updatedStegonaut = new DragonAttributeConfig(
                 stegonautBuffer.maxHealth,
                 stegonautBuffer.armor,
-                0.0D,
+                0.0D, // movementSpeed
+                0.0D, // flyingSpeed (Stegonaut doesn't fly)
                 Map.of(),
                 Map.of(
                         "taming_chance_base", stegonautBuffer.tamingChanceBase,
@@ -674,6 +676,7 @@ public class SaintsDragonsModMenuIntegration implements ModMenuApi {
         DragonAttributeConfig updatedRaevyx = new DragonAttributeConfig(
                 raevyxBuffer.maxHealth,
                 raevyxBuffer.armor,
+                0.0,
                 raevyxBuffer.flyingSpeed,
                 raevyxAbilities,
                 Map.of(
@@ -696,7 +699,8 @@ public class SaintsDragonsModMenuIntegration implements ModMenuApi {
         DragonAttributeConfig updatedNulljaw = new DragonAttributeConfig(
                 nulljawBuffer.maxHealth,
                 nulljawBuffer.armor,
-                0.0D,
+                0.0D, // movementSpeed
+                0.0D, // flyingSpeed (Nulljaw doesn't fly)
                 nulljawAbilities,
                 Map.of(
                         "swim_speed", nulljawBuffer.swimSpeed,
@@ -720,6 +724,7 @@ public class SaintsDragonsModMenuIntegration implements ModMenuApi {
         DragonAttributeConfig updatedIgnivorus = new DragonAttributeConfig(
                 ignivorusBuffer.maxHealth,
                 ignivorusBuffer.armor,
+                0.0,
                 ignivorusBuffer.flyingSpeed,
                 ignivorusAbilities,
                 Map.of(

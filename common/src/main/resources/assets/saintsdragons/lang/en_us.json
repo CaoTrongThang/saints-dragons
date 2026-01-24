@@ -540,12 +540,16 @@
   "saintsdragons.configuration.taming_chance_hearty.tooltip": "Lower is easier. 1 = 100%, 100 = 1%.",
   "saintsdragons.configuration.taming_chance.tooltip": "Lower is easier. 1 = 100%, 100 = 1%.",
   "saintsdragons.configuration.legacy_taming.tooltip": "Use the legacy food-based taming rules.",
+  "saintsdragons.configuration.ivy_restock_interval": "Ivy Restock Interval",
+  "saintsdragons.configuration.ivy_restock_interval.tooltip": "Time in ticks between Ivy's trade restocks (20 ticks = 1 second, 24000 = 20 minutes).",
 
   "saintsdragons.configuration.spawning": "Spawning",
   "saintsdragons.configuration.cindervane": "Cindervane",
   "saintsdragons.configuration.raevyx": "Raevyx",
   "saintsdragons.configuration.nulljaw": "Nulljaw",
   "saintsdragons.configuration.ignivorus": "Ignivorus",
+  "saintsdragons.configuration.stegonaut": "Stegonaut",
+  "saintsdragons.configuration.others": "Others",
 
   "saintsdragons.configuration.section.saintsdragonsspawning.toml": "Dragon Spawning",
   "saintsdragons.configuration.section.saintsdragonsspawning.toml.title": "Dragon Spawning",
@@ -557,12 +561,16 @@
   "saintsdragons.configuration.raevyx.button": "Configure",
   "saintsdragons.configuration.nulljaw.button": "Configure",
   "saintsdragons.configuration.ignivorus.button": "Configure",
+  "saintsdragons.configuration.stegonaut.button": "Configure",
+  "saintsdragons.configuration.others.button": "Configure",
 
   "saintsdragons.configuration.spawning.tooltip": "Edit spawn weights, group sizes, and biome lists.",
   "saintsdragons.configuration.cindervane.tooltip": "Edit Cindervane attributes and tuning.",
   "saintsdragons.configuration.raevyx.tooltip": "Edit Raevyx attributes and tuning.",
   "saintsdragons.configuration.nulljaw.tooltip": "Edit Nulljaw attributes and tuning.",
   "saintsdragons.configuration.ignivorus.tooltip": "Edit Ignivorus attributes and tuning.",
+  "saintsdragons.configuration.stegonaut.tooltip": "Edit Stegonaut attributes and taming.",
+  "saintsdragons.configuration.others.tooltip": "Edit miscellaneous settings like NPC behavior.",
 
   "saintsdragons.config.raevyxSpawnWeight": "Raevyx Spawn Weight",
   "saintsdragons.config.raevyxMinGroupSize": "Raevyx Min Group Size",

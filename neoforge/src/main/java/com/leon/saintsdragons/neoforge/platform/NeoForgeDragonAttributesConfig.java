@@ -70,13 +70,13 @@ public final class NeoForgeDragonAttributesConfig {
     public static ModConfigSpec.BooleanValue IGNIVORUS_LEGACY_TAMING;
 
     // Stegonaut
-    public static ForgeConfigSpec.DoubleValue STEGONAUT_MAX_HEALTH;
-    public static ForgeConfigSpec.DoubleValue STEGONAUT_ARMOR;
-    public static ForgeConfigSpec.DoubleValue STEGONAUT_TAMING_CHANCE_BASE;
-    public static ForgeConfigSpec.DoubleValue STEGONAUT_TAMING_CHANCE_HEARTY;
+    public static ModConfigSpec.DoubleValue STEGONAUT_MAX_HEALTH;
+    public static ModConfigSpec.DoubleValue STEGONAUT_ARMOR;
+    public static ModConfigSpec.DoubleValue STEGONAUT_TAMING_CHANCE_BASE;
+    public static ModConfigSpec.DoubleValue STEGONAUT_TAMING_CHANCE_HEARTY;
 
     // Others (NPCs, misc)
-    public static ForgeConfigSpec.IntValue IVY_RESTOCK_INTERVAL;
+    public static ModConfigSpec.IntValue IVY_RESTOCK_INTERVAL;
 
     static {
         ModConfigSpec.Builder builder = new ModConfigSpec.Builder();

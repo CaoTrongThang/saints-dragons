@@ -40,7 +40,7 @@ public class HumanSoundHandler {
      * - With params: "sound_key|volume|pitch" (e.g., "greeting|1.2|0.9")
      * - Full ID: "namespace:sound_id|volume|pitch" (e.g., "minecraft:entity.villager.ambient|1.0|1.0")
      */
-    public void handleAnimationSound(Object keyframeData, software.bernie.geckolib.core.animation.AnimationController<?> controller) {
+    public void handleAnimationSound(Object keyframeData, software.bernie.geckolib.animation.AnimationController<?> controller) {
         // Only handle on client side for local playback
         if (!entity.level().isClientSide) return;
         if (keyframeData == null) return;

@@ -545,7 +545,7 @@ public class Stegonaut extends RideableDragonBase implements SoundHandledDragon 
                 // Trigger advancement for taming Primitive Drake
                 if (player instanceof net.minecraft.server.level.ServerPlayer serverPlayer) {
                     var advancement = serverPlayer.server.getAdvancements()
-                            .getAdvancement(com.leon.saintsdragons.common.SaintsDragonsCommon.rl("tame_stegonaut"));
+                            .get(com.leon.saintsdragons.common.SaintsDragonsCommon.rl("tame_stegonaut"));
                     if (advancement != null) {
                         serverPlayer.getAdvancements().award(advancement, "tame_stegonaut");
                     }
