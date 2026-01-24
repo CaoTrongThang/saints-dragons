@@ -290,16 +290,26 @@ public final class DragonAttributeConfigLoader extends SimpleJsonResourceReloadL
     }
 
     private static DragonAttributeConfig stegonautDefaults() {
-        double maxHealth = 80.0D;
-        double armor = 10.0D;
+        double maxHealth = 100.0D;
+        double armor = 15.0D;
+        double tamingChanceBase = 1.0D;
+        double tamingChanceHearty = 1.0D;
 
         // NeoForge config override (if available)
-        try {
-            Class<?> configClass = Class.forName("com.leon.saintsdragons.neoforge.config.SaintsDragonsNeoForgeConfig");
-            maxHealth = (double) configClass.getField("STEGONAUT_MAX_HEALTH").get(null).getClass().getMethod("get").invoke(configClass.getField("STEGONAUT_MAX_HEALTH").get(null));
-            armor = (double) configClass.getField("STEGONAUT_ARMOR").get(null).getClass().getMethod("get").invoke(configClass.getField("STEGONAUT_ARMOR").get(null));
-        } catch (Exception ignored) {
-            // NeoForge config not available (Fabric or config not loaded yet)
+        if (IS_NEOFORGE) {
+            try {
+                Class<?> configClass = Class.forName("com.leon.saintsdragons.neoforge.platform.NeoForgeDragonAttributesConfig");
+                maxHealth = (double) configClass.getField("STEGONAUT_MAX_HEALTH").get(null).getClass().getMethod("get")
+                        .invoke(configClass.getField("STEGONAUT_MAX_HEALTH").get(null));
+                armor = (double) configClass.getField("STEGONAUT_ARMOR").get(null).getClass().getMethod("get")
+                        .invoke(configClass.getField("STEGONAUT_ARMOR").get(null));
+                tamingChanceBase = (double) configClass.getField("STEGONAUT_TAMING_CHANCE_BASE").get(null).getClass().getMethod("get")
+                        .invoke(configClass.getField("STEGONAUT_TAMING_CHANCE_BASE").get(null));
+                tamingChanceHearty = (double) configClass.getField("STEGONAUT_TAMING_CHANCE_HEARTY").get(null).getClass().getMethod("get")
+                        .invoke(configClass.getField("STEGONAUT_TAMING_CHANCE_HEARTY").get(null));
+            } catch (Exception ignored) {
+                // NeoForge config not available (Fabric or config not loaded yet)
+            }
         }
 
         return new DragonAttributeConfig(
@@ -307,15 +317,10 @@ public final class DragonAttributeConfigLoader extends SimpleJsonResourceReloadL
                 armor,
                 0.0D,  // Movement speed not configurable
                 0.0D,  // No flying speed
+                Map.of(),
                 Map.of(
-                        "bite", DragonAbilityOverride.ofDamage(8.0D),
-                        "tail_swipe", DragonAbilityOverride.ofDamage(10.0D)
-                ),
-                Map.of(
-                        "run_speed", 0.25D,
-                        "walk_speed", 0.15D,
-                        "taming_chance_base", 3.0D,
-                        "taming_chance_hearty", 2.0D
+                        "taming_chance_base", tamingChanceBase,
+                        "taming_chance_hearty", tamingChanceHearty
                 ),
                 Map.of()
         );

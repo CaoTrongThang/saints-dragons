@@ -69,6 +69,15 @@ public final class NeoForgeDragonAttributesConfig {
     public static ModConfigSpec.DoubleValue IGNIVORUS_TAMING_CHANCE_HEARTY;
     public static ModConfigSpec.BooleanValue IGNIVORUS_LEGACY_TAMING;
 
+    // Stegonaut
+    public static ForgeConfigSpec.DoubleValue STEGONAUT_MAX_HEALTH;
+    public static ForgeConfigSpec.DoubleValue STEGONAUT_ARMOR;
+    public static ForgeConfigSpec.DoubleValue STEGONAUT_TAMING_CHANCE_BASE;
+    public static ForgeConfigSpec.DoubleValue STEGONAUT_TAMING_CHANCE_HEARTY;
+
+    // Others (NPCs, misc)
+    public static ForgeConfigSpec.IntValue IVY_RESTOCK_INTERVAL;
+
     static {
         ModConfigSpec.Builder builder = new ModConfigSpec.Builder();
 
@@ -175,6 +184,24 @@ public final class NeoForgeDragonAttributesConfig {
         builder.comment("Legacy taming (true = simple food taming, false = special mechanics)");
         IGNIVORUS_LEGACY_TAMING = builder.define("legacy_taming", false);
 
+        builder.pop();
+
+        // Stegonaut Configuration
+        builder.comment("Stegonaut Dragon Attributes").push("stegonaut");
+        builder.comment("Core Attributes");
+        STEGONAUT_MAX_HEALTH = builder.defineInRange("max_health", 100.0, 1.0, 1000.0);
+        STEGONAUT_ARMOR = builder.defineInRange("armor", 15.0, 0.0, 30.0);
+        builder.comment("Taming Chances (lower = easier)");
+        STEGONAUT_TAMING_CHANCE_BASE = builder.defineInRange("taming_chance_base", 1.0, 1.0, 20.0);
+        STEGONAUT_TAMING_CHANCE_HEARTY = builder.defineInRange("taming_chance_hearty", 1.0, 1.0, 20.0);
+        builder.pop();
+
+        // Others (NPCs and Miscellaneous)
+        builder.comment("Other Configuration (NPCs, etc.)").push("others");
+        builder.comment("Ivy the Dragon Merchant");
+        IVY_RESTOCK_INTERVAL = builder
+                .comment("Ticks between Ivy's trade restocks (20 ticks = 1 second, 24000 = 20 minutes)")
+                .defineInRange("ivy_restock_interval", 24000, 20, 72000);
         builder.pop();
 
         ATTRIBUTES_SPEC = builder.build();
