@@ -1,5 +1,5 @@
 {
-  "item.saintsdragons.dragon_ally_book": "Dragon Ally Book",
+  "item.saintsdragons.dragon_ally_book": "Draconic Codex",
   "item.saintsdragons.stegonaut_binder": "Stegonaut Binder",
   "item.saintsdragons.raevyx_binder": "Raevyx Binder",
   "item.saintsdragons.cindervane_binder": "Cindervane Binder",
@@ -8,9 +8,9 @@
   "item.saintsdragons.hearty_dragon_meal": "Hearty Dragon Meal",
   "item.saintsdragons.ivy_the_merchant_spawn_egg": "Ivy the Merchant Spawn Egg",
   "item.saintsdragons.raevyx_spawn_egg": "Raevyx Spawn Egg",
-  "block.saintsdragons.raevyx_egg": "§4Raevyx Egg§r",
+  "block.saintsdragons.raevyx_egg": "?4Raevyx Egg?r",
   "block.saintsdragons.nulljaw_egg": "Nulljaw Egg",
-  "block.saintsdragons.ignivorus_egg": "§4Ignivorus Egg§r",
+  "block.saintsdragons.ignivorus_egg": "?4Ignivorus Egg?r",
   "block.saintsdragons.cindervane_egg": "Cindervane Egg",
   "block.saintsdragons.stegonaut_egg": "Stegonaut Egg",
   "item.saintsdragons.stegonaut_spawn_egg": "Stegonaut Spawn Egg",
@@ -18,7 +18,6 @@
   "item.saintsdragons.nulljaw_spawn_egg": "Nulljaw Spawn Egg",
   "item.saintsdragons.ignivorus_spawn_egg": "Ignivorus Spawn Egg",
   "itemGroup.saintsdragons": "Saint's Dragons",
-
   "entity.saintsdragons.raevyx": "Raevyx",
   "entity.saintsdragons.raevyx_lightning_chain": "Raevyx's Lightning Chain",
   "entity.saintsdragons.stegonaut": "Stegonaut",
@@ -28,32 +27,25 @@
   "entity.saintsdragons.dragon_merchant": "Ivy Oleander, the Merchant",
   "entity.saintsdragons.ivy_oleander": "Ivy Oleander",
   "merchant.saintsdragons.ivy_oleander": "Ivy Oleander",
-
   "saintsdragons.gui.dragon_ally.title": "Dragon Ally Management",
   "saintsdragons.gui.dragon_ally.username_input": "Enter username...",
   "saintsdragons.gui.dragon_ally.add": "Add Ally",
   "saintsdragons.gui.dragon_ally.remove": "Remove Ally",
   "saintsdragons.gui.dragon_ally.count": "Allies: %d/%d",
-
-  "saintsdragons.tooltip.dragon_ally_book.line1": "Right-click on your dragon to manage allies",
-  "saintsdragons.tooltip.dragon_ally_book.line2": "Allies won't be hurt by dragon attacks",
-  "saintsdragons.tooltip.dragon_ally_book.line3": "Supports up to 10 allies per dragon",
-
-  "saintsdragons.tooltip.stegonaut_binder.description": "§e§lA steadfast core. Strength radiates quietly within.§r§r",
+  "saintsdragons.tooltip.dragon_ally_book.line1": "Right-click to open the Draconic Codex",
+  "saintsdragons.tooltip.dragon_ally_book.line2": "View tamed dragons and manage allies",
+  "saintsdragons.tooltip.dragon_ally_book.line3": "Ally list applies to all your dragons",
+  "saintsdragons.tooltip.stegonaut_binder.description": "?e?lA steadfast core. Strength radiates quietly within.?r?r",
   "saintsdragons.tooltip.stegonaut_binder.empty": "Right-click on a tamed Stegonaut to bind it",
   "saintsdragons.tooltip.stegonaut_binder.right_click_to_release": "Right-click on ground to release bound Stegonaut",
   "saintsdragons.tooltip.stegonaut_binder.bound": "Contains: %s",
   "saintsdragons.tooltip.stegonaut_binder.bound_desc": "Provides resistance buff while carried",
-
-
-  "saintsdragons.tooltip.raevyx_binder.description": "§4Holds the storm at bay. §r§4§l§oFor now.§r§r§r",
+  "saintsdragons.tooltip.raevyx_binder.description": "?4Holds the storm at bay. ?r?4?l?oFor now.?r?r?r",
   "saintsdragons.tooltip.raevyx_binder.empty": "Right-click on a tamed Raevyx to bind it",
   "saintsdragons.tooltip.raevyx_binder.right_click_dragon_to_bind": "Right-click on ground to release bound Raevyx",
   "saintsdragons.tooltip.raevyx_binder.bound": "Contains: %s",
   "saintsdragons.tooltip.raevyx_binder.right_click_to_release": "Right-click on ground to release bound Raevyx",
-
-
-  "saintsdragons.tooltip.cindervane_binder.description": "§6The wind hums within, restless yet graceful.§r",
+  "saintsdragons.tooltip.cindervane_binder.description": "?6The wind hums within, restless yet graceful.?r",
   "saintsdragons.tooltip.cindervane_binder.empty": "Right-click on a tamed Cindervane to bind it",
   "saintsdragons.tooltip.cindervane_binder.right_click_cindervane_to_bind": "Right-click on ground to release bound Cindervane",
   "saintsdragons.tooltip.cindervane_binder.bound": "Contains: %s",
@@ -63,30 +55,24 @@
   "saintsdragons.tooltip.ignivorus_binder.right_click_to_release": "Right-click on ground to release bound Ignivorus",
   "saintsdragons.tooltip.ignivorus_binder.empty": "Right-click on a tamed Ignivorus to bind it",
   "saintsdragons.tooltip.ignivorus_binder.right_click_ignivorus_to_bind": "Ensure the Ignivorus is grounded before binding",
-
-
-  "saintsdragons.tooltip.nulljaw.description": "§lA shard of the abyss hums quietly inside.§r",
+  "saintsdragons.tooltip.nulljaw.description": "?1A shard of the abyss hums quietly inside.?1",
   "saintsdragons.tooltip.nulljaw.empty": "Right-click on a tamed Nulljaw to bind it",
   "saintsdragons.tooltip.nulljaw.right_click_nulljaw_to_bind": "Right-click on ground to release bound Nulljaw",
   "saintsdragons.tooltip.nulljaw.bound": "Contains: %s",
   "saintsdragons.tooltip.nulljaw.right_click_to_release": "Right-click on ground to release bound Nulljaw",
-
   "saintsdragons.message.dragon_not_found": "Dragon not found",
   "saintsdragons.message.not_dragon_owner": "You don't own this dragon",
-
   "saintsdragons.message.stegonaut_captured": "Bound %s in Stegonaut Binder!",
   "saintsdragons.message.stegonaut_released": "Released %s from Stegonaut Binder!",
   "saintsdragons.message.stegonaut_cannot_be_captured": "This drake cannot be bound right now",
   "saintsdragons.message.binder_already_occupied": "This binder already contains a drake",
   "saintsdragons.message.binder_not_bound": "This binder is empty - bind a drake first",
   "saintsdragons.message.binder_data_corrupted": "This binder's data looks corrupted",
-
   "saintsdragons.message.raevyx_captured": "Bound %s in Raevyx Binder!",
   "saintsdragons.message.raevyx_released": "Released %s from Raevyx Binder!",
   "saintsdragons.message.dragon_cannot_be_captured": "This dragon cannot be bound right now",
   "saintsdragons.message.cannot_release_others_dragon": "You can only release dragons you own",
   "saintsdragons.message.raevyx_already_occupied": "This binder already contains a Raevyx",
-
   "saintsdragons.message.cindervane_captured": "Bound %s in Cindervane Binder!",
   "saintsdragons.message.cindervane_released": "Released %s from Cindervane Binder!",
   "saintsdragons.message.nulljaw_captured": "Bound %s in Nulljaw Binder!",
@@ -94,7 +80,6 @@
   "saintsdragons.message.ignivorus_captured": "Bound %s in Ignivorus Binder!",
   "saintsdragons.message.ignivorus_released": "Released %s from Ignivorus Binder!",
   "saintsdragons.message.nulljaw_cannot_be_captured": "This Nulljaw cannot be bound right now",
-
   "saintsdragons.command.ally.add.result": "Dragon %s: %s - %s",
   "saintsdragons.command.ally.remove.result": "Dragon %s: %s - %s",
   "saintsdragons.command.ally.list.header": "Allies for %s (%d/%d):",
@@ -105,39 +90,29 @@
   "saintsdragons.command.tame.not_found": "No dragon with id %s is currently loaded",
   "saintsdragons.command.tame.already": "%s is already tamed for that player",
   "saintsdragons.command.tame.ownership_conflict": "%s is already owned by %s (cannot steal ownership)",
-
   "saintsdragons.command.setgender.success": "Set %s's gender to %s",
   "saintsdragons.command.setgender.unchanged": "%s already has that gender",
   "saintsdragons.command.setgender.not_found": "No dragon with id %s is currently loaded",
   "saintsdragons.command.setgender.invalid_gender": "Gender must be 'male' or 'female'",
-
   "saintsdragons.command.setvariant.success": "Set %s's variant to %s",
   "saintsdragons.command.setvariant.unchanged": "%s already has that variant",
   "saintsdragons.command.setvariant.not_found": "No dragon with id %s is currently loaded",
   "saintsdragons.command.setvariant.invalid_variant": "Variant must be 'default' or 'crimson'",
   "saintsdragons.command.setvariant.not_ignivorus": "Only Ignivorus dragons have variants",
-
   "saintsdragons.gender.male": "Male",
   "saintsdragons.gender.female": "Female",
-
   "saintsdragons.variant.default": "Default",
   "saintsdragons.variant.crimson": "Crimson",
-
   "advancement.saintsdragons.tame_raevyx.title": "Bleeding Bolt",
   "advancement.saintsdragons.tame_raevyx.description": "Tame a Raevyx. Zeus who?",
-
   "advancement.saintsdragons.tame_cindervane.title": "Scorched Earth Protocol",
   "advancement.saintsdragons.tame_cindervane.description": "Tame a Cindervane, now you own a tactical nuke with wings. Great insurance.",
-
   "advancement.saintsdragons.tame_nulljaw.title": "Depths of Dread",
   "advancement.saintsdragons.tame_nulljaw.description": "Tame a Nulljaw, the abyss that bites back. Good job!",
-
   "advancement.saintsdragons.tame_stegonaut.title": "My Sturdy Friend",
   "advancement.saintsdragons.tame_stegonaut.description": "Win over a Stegonaut with a single fish.",
-
   "advancement.saintsdragons.tame_ignivorus.title": "Destruction Commence",
   "advancement.saintsdragons.tame_ignivorus.description": "Earn the trust of an Ignivorus, the living calamity",
-
   "entity.saintsdragons.ignivorus.baby_fed": "%s is growing stronger!",
   "entity.saintsdragons.ignivorus.baby_grown": "%s has grown into an adult!",
   "entity.saintsdragons.ignivorus.breeding_too_young": "%s is too young to breed",
@@ -146,7 +121,6 @@
   "entity.saintsdragons.ignivorus.breeding_ready": "%s is ready to breed!",
   "advancement.saintsdragons.why.title": "Why?",
   "advancement.saintsdragons.why.description": "Did you just hit a baby?",
-  
   "key.categories.saintsdragons": "Saint's Dragons",
   "key.saintsdragons.ascend": "Ascend",
   "key.saintsdragons.descend": "Descend",
@@ -157,7 +131,6 @@
   "key.saintsdragons.toggle_melee": "Toggle Melee Mode",
   "key.saintsdragons.toggle_pitch_mode": "Toggle Pitch Mode",
   "key.saintsdragons.toggle_dragon_ui": "Toggle Dragon UI",
-
   "saintsdragons.ui.control.title": "Dragon Controls",
   "saintsdragons.ui.control.attack": "Primary Attack",
   "saintsdragons.ui.control.ascend": "Ascend",
@@ -168,7 +141,6 @@
   "saintsdragons.ui.control.ability_tertiary": "Channel Ability",
   "saintsdragons.ui.control.toggle_melee": "Toggle Melee",
   "saintsdragons.ui.control.ability_with_name": "%s (%s)",
-
   "saintsdragons.ability.raevyx_bite": "Lightning Bite",
   "saintsdragons.ability.raevyx_horn_gore": "Horn Gore",
   "saintsdragons.ability.raevyx_lightning_beam": "Lightning Beam",
@@ -179,24 +151,20 @@
   "saintsdragons.ability.cindervane_fire_body": "Fire Body",
   "saintsdragons.ability.cindervane_fire_breath_volley": "Magma Volley",
   "entity.saintsdragons.cindervane_magma_block": "Magma Burst",
-
   "saintsdragons.ability.nulljaw_bite": "Bite",
   "saintsdragons.ability.nulljaw_bite2": "Bite (Phase 2)",
   "saintsdragons.ability.nulljaw_claw": "Claw",
   "saintsdragons.ability.nulljaw_horn_gore": "Horn Gore",
   "saintsdragons.ability.nulljaw_roar": "Roar",
   "saintsdragons.ability.nulljaw_phase_shift": "Phase Shift",
-
   "commands.dragonally.description": "Manage allies",
   "commands.dragonally.add.description": "Add a player as an ally to a dragon",
   "commands.dragonally.remove.description": "Remove a player as an ally from a dragon",
   "commands.dragonally.list.description": "List all allies of a dragon",
   "commands.dragonally.clear.description": "Clear all allies from a dragon",
-
   "entity.saintsdragons.all.command_0": "%s is now following you",
   "entity.saintsdragons.all.command_1": "%s is now sitting",
   "entity.saintsdragons.all.command_2": "%s is now wandering",
-
   "entity.saintsdragons.raevyx.fed": "%s is fully healed!",
   "entity.saintsdragons.raevyx.fed_partial": "%s is being healed...",
   "entity.saintsdragons.ignivorus.fed": "%s is fully healed!",
@@ -264,7 +232,6 @@
   "entity.saintsdragons.nulljaw.sitting_down": "%s is settling down...",
   "entity.saintsdragons.nulljaw.standing_up": "%s is standing up...",
   "entity.saintsdragons.nulljaw.transitioning": "%s is reshaping its stance...",
-
   "saintsdragons.message.ally.success": "Successfully managed ally %s",
   "saintsdragons.message.ally.invalid_username": "Invalid username! Must be 3-16 characters, letters/numbers/underscores only, and appropriate content",
   "saintsdragons.message.ally.player_not_found": "Who is %s? Are you sure you're playing with that person?",
@@ -279,7 +246,6 @@
   "saintsdragons.message.ignivorus_secondary_ground_only": "Ignivorus can only body slam while on the ground.",
   "saintsdragons.message.ignivorus.ultimate_requires_full_health": "Ignivorus must be at full health to unleash its cataclysm.",
   "saintsdragons.message.ignivorus.ultimate_penalty": "Ignivorus sacrifices its vitality to fuel the inferno!",
-
   "saintsdragons.message.easter_egg.notch": "Yes, he created this game. But he's not on this server!",
   "saintsdragons.message.easter_egg.jeb_": "The lead developer! But he's busy working on the next update.",
   "saintsdragons.message.easter_egg.dinnerbone": "The developer who makes everything upside down! But he's not here.",
@@ -290,31 +256,26 @@
   "entity.saintsdragons.cindervane.mount_occupied": "Uh... you shouldn't be here.",
   "ui.saintsdragons.melee_mode.primary": "Primary Melee",
   "ui.saintsdragons.melee_mode.secondary": "Secondary Melee",
-
   "text.autoconfig.saintsdragonsspawning.title": "Saint's Dragons Config",
   "text.autoconfig.saintsdragonsspawning.category.spawning": "Dragon Spawning",
-
   "text.autoconfig.saintsdragonsspawning.option.raevyxSpawnWeight": "Raevyx Spawn Weight",
   "text.autoconfig.saintsdragonsspawning.option.raevyxSpawnWeight.@Tooltip": "How often Raevyx spawns (0 = disabled, higher = more common)",
   "text.autoconfig.saintsdragonsspawning.option.raevyxMinGroupSize": "Raevyx Min Group Size",
   "text.autoconfig.saintsdragonsspawning.option.raevyxMinGroupSize.@Tooltip": "Minimum number of Raevyx that spawn together",
   "text.autoconfig.saintsdragonsspawning.option.raevyxMaxGroupSize": "Raevyx Max Group Size",
   "text.autoconfig.saintsdragonsspawning.option.raevyxMaxGroupSize.@Tooltip": "Maximum number of Raevyx that spawn together",
-
   "text.autoconfig.saintsdragonsspawning.option.stegonautSpawnWeight": "Stegonaut Spawn Weight",
   "text.autoconfig.saintsdragonsspawning.option.stegonautSpawnWeight.@Tooltip": "How often Stegonaut spawns (0 = disabled, higher = more common)",
   "text.autoconfig.saintsdragonsspawning.option.stegonautMinGroupSize": "Stegonaut Min Group Size",
   "text.autoconfig.saintsdragonsspawning.option.stegonautMinGroupSize.@Tooltip": "Minimum number of Stegonaut that spawn together",
   "text.autoconfig.saintsdragonsspawning.option.stegonautMaxGroupSize": "Stegonaut Max Group Size",
   "text.autoconfig.saintsdragonsspawning.option.stegonautMaxGroupSize.@Tooltip": "Maximum number of Stegonaut that spawn together",
-
   "text.autoconfig.saintsdragonsspawning.option.cindervaneSpawnWeight": "Cindervane Spawn Weight",
   "text.autoconfig.saintsdragonsspawning.option.cindervaneSpawnWeight.@Tooltip": "How often Cindervane spawns (0 = disabled, higher = more common)",
   "text.autoconfig.saintsdragonsspawning.option.cindervaneMinGroupSize": "Cindervane Min Group Size",
   "text.autoconfig.saintsdragonsspawning.option.cindervaneMinGroupSize.@Tooltip": "Minimum number of Cindervane that spawn together",
   "text.autoconfig.saintsdragonsspawning.option.cindervaneMaxGroupSize": "Cindervane Max Group Size",
   "text.autoconfig.saintsdragonsspawning.option.cindervaneMaxGroupSize.@Tooltip": "Maximum number of Cindervane that spawn together",
-
   "text.autoconfig.saintsdragonsspawning.option.nulljawSpawnWeight": "Nulljaw Spawn Weight",
   "text.autoconfig.saintsdragonsspawning.option.nulljawSpawnWeight.@Tooltip": "How often Nulljaw spawns (0 = disabled, higher = more common)",
   "text.autoconfig.saintsdragonsspawning.option.nulljawMinGroupSize": "Nulljaw Min Group Size",
@@ -323,7 +284,6 @@
   "text.autoconfig.saintsdragonsspawning.option.nulljawMaxGroupSize.@Tooltip": "Maximum number of Nulljaw that spawn together",
   "text.autoconfig.saintsdragonsspawning.option.nulljawAdditionalBiomes": "Nulljaw Additional Biomes",
   "text.autoconfig.saintsdragonsspawning.option.nulljawAdditionalBiomes.@Tooltip": "Extra biomes where Nulljaw can spawn (e.g., minecraft:desert, terralith:volcanic_crater)",
-
   "text.autoconfig.saintsdragonsspawning.option.ignivorusSpawnWeight": "Ignivorus Spawn Weight",
   "text.autoconfig.saintsdragonsspawning.option.ignivorusSpawnWeight.@Tooltip": "How often Ignivorus spawns (0 = disabled, higher = more common)",
   "text.autoconfig.saintsdragonsspawning.option.ignivorusMinGroupSize": "Ignivorus Min Group Size",
@@ -332,39 +292,29 @@
   "text.autoconfig.saintsdragonsspawning.option.ignivorusMaxGroupSize.@Tooltip": "Maximum number of Ignivorus that spawn together",
   "text.autoconfig.saintsdragonsspawning.option.ignivorusAdditionalBiomes": "Ignivorus Additional Biomes",
   "text.autoconfig.saintsdragonsspawning.option.ignivorusAdditionalBiomes.@Tooltip": "Extra biomes where Ignivorus can spawn (e.g., minecraft:desert, terralith:volcanic_crater)",
-
   "text.autoconfig.saintsdragonsspawning.option.raevyxAdditionalBiomes": "Raevyx Additional Biomes",
   "text.autoconfig.saintsdragonsspawning.option.raevyxAdditionalBiomes.@Tooltip": "Extra biomes where Raevyx can spawn (e.g., minecraft:desert, terralith:volcanic_crater)",
-
   "text.autoconfig.saintsdragonsspawning.option.stegonautAdditionalBiomes": "Stegonaut Additional Biomes",
   "text.autoconfig.saintsdragonsspawning.option.stegonautAdditionalBiomes.@Tooltip": "Extra biomes where Stegonaut can spawn (e.g., minecraft:desert, terralith:volcanic_crater)",
-
   "text.autoconfig.saintsdragonsspawning.option.cindervaneAdditionalBiomes": "Cindervane Additional Biomes",
   "text.autoconfig.saintsdragonsspawning.option.cindervaneAdditionalBiomes.@Tooltip": "Extra biomes where Cindervane can spawn (e.g., minecraft:desert, terralith:volcanic_crater)",
-
   "text.autoconfig.saintsdragonsspawning.category.taming": "Dragon Taming",
-
   "text.autoconfig.saintsdragonsspawning.option.raevyxBaseTamingChance": "Raevyx Base Taming Chance",
   "text.autoconfig.saintsdragonsspawning.option.raevyxBaseTamingChance.@Tooltip[0]": "Taming chance with regular food (1 in N chance)",
   "text.autoconfig.saintsdragonsspawning.option.raevyxBaseTamingChance.@Tooltip[1]": "Lower = easier taming. Example: 5 = 20% chance per feed",
-
   "text.autoconfig.saintsdragonsspawning.option.raevyxHeartyTamingChance": "Raevyx Hearty Taming Chance",
   "text.autoconfig.saintsdragonsspawning.option.raevyxHeartyTamingChance.@Tooltip[0]": "Taming chance with Hearty Dragon Meal (1 in N chance)",
   "text.autoconfig.saintsdragonsspawning.option.raevyxHeartyTamingChance.@Tooltip[1]": "Lower = easier taming. Example: 3 = 33% chance per feed",
-
   "text.autoconfig.saintsdragonsspawning.option.ignivorusBaseTamingChance": "Ignivorus Base Taming Chance",
   "text.autoconfig.saintsdragonsspawning.option.ignivorusBaseTamingChance.@Tooltip[0]": "Taming chance with regular food (1 in N chance)",
   "text.autoconfig.saintsdragonsspawning.option.ignivorusBaseTamingChance.@Tooltip[1]": "Lower = easier taming. Example: 7 = 14% chance per feed",
-
   "text.autoconfig.saintsdragonsspawning.option.ignivorusHeartyTamingChance": "Ignivorus Hearty Taming Chance",
   "text.autoconfig.saintsdragonsspawning.option.ignivorusHeartyTamingChance.@Tooltip[0]": "Taming chance with Hearty Dragon Meal (1 in N chance)",
   "text.autoconfig.saintsdragonsspawning.option.ignivorusHeartyTamingChance.@Tooltip[1]": "Lower = easier taming. Example: 4 = 25% chance per feed",
-
-
   "config.saintsdragons.attributes.ignivorus.legacy_taming": "Legacy Taming",
-  "config.saintsdragons.attributes.nulljaw.legacy_taming" : "Legacy Taming",
+  "config.saintsdragons.attributes.nulljaw.legacy_taming": "Legacy Taming",
   "config.saintsdragons.attributes.raevyx.legacy_taming": "Legacy Taming",
-  "config.saintsdragons.attributes.legacy_taming.tooltip" : "Toggle vanilla taming method",
+  "config.saintsdragons.attributes.legacy_taming.tooltip": "Toggle vanilla taming method",
   "config.saintsdragons.title": "Saint's Dragons Settings",
   "config.saintsdragons.category.spawning": "Spawning",
   "config.saintsdragons.category.attributes": "Dragon Attributes",
@@ -440,7 +390,6 @@
   "config.saintsdragons.attributes.ignivorus.ultimate_penalty": "Ultimate Health Penalty",
   "config.saintsdragons.attributes.ignivorus.taming_base": "Taming Chance (Base Food)",
   "config.saintsdragons.attributes.ignivorus.taming_hearty": "Taming Chance (Hearty Meal)",
-
   "saintsdragons.configuration.title": "Saint's Dragons Configuration",
   "saintsdragons.configuration.raevyx_attributes": "Raevyx Attributes",
   "saintsdragons.configuration.raevyx_attributes.maxHealth": "Max Health",
@@ -449,26 +398,22 @@
   "saintsdragons.configuration.raevyx_attributes.tamingChanceBase": "Taming Chance (Base Food)",
   "saintsdragons.configuration.raevyx_attributes.tamingChanceHearty": "Taming Chance (Hearty Meal)",
   "saintsdragons.configuration.raevyx_attributes.legacyTaming": "Legacy Taming",
-
   "saintsdragons.configuration.stegonaut_attributes": "Stegonaut Attributes",
   "saintsdragons.configuration.stegonaut_attributes.maxHealth": "Max Health",
   "saintsdragons.configuration.stegonaut_attributes.attackDamage": "Attack Damage",
   "saintsdragons.configuration.stegonaut_attributes.armor": "Armor",
-
   "saintsdragons.configuration.cindervane_attributes": "Cindervane Attributes",
   "saintsdragons.configuration.cindervane_attributes.maxHealth": "Max Health",
   "saintsdragons.configuration.cindervane_attributes.attackDamage": "Attack Damage",
   "saintsdragons.configuration.cindervane_attributes.flyingSpeed": "Flying Speed",
   "saintsdragons.configuration.cindervane_attributes.tamingChanceBase": "Taming Chance (Base Food)",
   "saintsdragons.configuration.cindervane_attributes.tamingChanceHearty": "Taming Chance (Hearty Meal)",
-
   "saintsdragons.configuration.nulljaw_attributes": "Nulljaw Attributes",
   "saintsdragons.configuration.nulljaw_attributes.maxHealth": "Max Health",
   "saintsdragons.configuration.nulljaw_attributes.attackDamage": "Attack Damage",
   "saintsdragons.configuration.nulljaw_attributes.swimSpeed": "Swimming Speed",
   "saintsdragons.configuration.nulljaw_attributes.tamingChance": "Taming Chance (Rodeo)",
   "saintsdragons.configuration.nulljaw_attributes.legacyTaming": "Legacy Taming",
-
   "saintsdragons.configuration.ignivorus_attributes": "Ignivorus Attributes",
   "saintsdragons.configuration.ignivorus_attributes.maxHealth": "Max Health",
   "saintsdragons.configuration.ignivorus_attributes.attackDamage": "Attack Damage",
@@ -476,7 +421,6 @@
   "saintsdragons.configuration.ignivorus_attributes.tamingChanceBase": "Taming Chance (Base Food)",
   "saintsdragons.configuration.ignivorus_attributes.tamingChanceHearty": "Taming Chance (Hearty Meal)",
   "saintsdragons.configuration.ignivorus_attributes.legacyTaming": "Legacy Taming",
-
   "saintsdragons.configuration.max_health": "Max Health",
   "saintsdragons.configuration.armor": "Armor",
   "saintsdragons.configuration.flying_speed": "Flying Speed",
@@ -508,7 +452,6 @@
   "saintsdragons.configuration.taming_chance_hearty": "Taming Chance (Hearty Meal)",
   "saintsdragons.configuration.taming_chance": "Taming Chance",
   "saintsdragons.configuration.legacy_taming": "Legacy Taming",
-
   "saintsdragons.configuration.max_health.tooltip": "Maximum health (in half-hearts).",
   "saintsdragons.configuration.armor.tooltip": "Flat damage reduction from armor.",
   "saintsdragons.configuration.flying_speed.tooltip": "Base flying speed multiplier.",
@@ -542,7 +485,6 @@
   "saintsdragons.configuration.legacy_taming.tooltip": "Use the legacy food-based taming rules.",
   "saintsdragons.configuration.ivy_restock_interval": "Ivy Restock Interval",
   "saintsdragons.configuration.ivy_restock_interval.tooltip": "Time in ticks between Ivy's trade restocks (20 ticks = 1 second, 24000 = 20 minutes).",
-
   "saintsdragons.configuration.spawning": "Spawning",
   "saintsdragons.configuration.cindervane": "Cindervane",
   "saintsdragons.configuration.raevyx": "Raevyx",
@@ -550,12 +492,10 @@
   "saintsdragons.configuration.ignivorus": "Ignivorus",
   "saintsdragons.configuration.stegonaut": "Stegonaut",
   "saintsdragons.configuration.others": "Others",
-
   "saintsdragons.configuration.section.saintsdragonsspawning.toml": "Dragon Spawning",
   "saintsdragons.configuration.section.saintsdragonsspawning.toml.title": "Dragon Spawning",
   "saintsdragons.configuration.section.saintsdragons.attributes.toml": "Dragon Attributes",
   "saintsdragons.configuration.section.saintsdragons.attributes.toml.title": "Dragon Attributes",
-
   "saintsdragons.configuration.spawning.button": "Configure",
   "saintsdragons.configuration.cindervane.button": "Configure",
   "saintsdragons.configuration.raevyx.button": "Configure",
@@ -563,7 +503,6 @@
   "saintsdragons.configuration.ignivorus.button": "Configure",
   "saintsdragons.configuration.stegonaut.button": "Configure",
   "saintsdragons.configuration.others.button": "Configure",
-
   "saintsdragons.configuration.spawning.tooltip": "Edit spawn weights, group sizes, and biome lists.",
   "saintsdragons.configuration.cindervane.tooltip": "Edit Cindervane attributes and tuning.",
   "saintsdragons.configuration.raevyx.tooltip": "Edit Raevyx attributes and tuning.",
@@ -571,7 +510,6 @@
   "saintsdragons.configuration.ignivorus.tooltip": "Edit Ignivorus attributes and tuning.",
   "saintsdragons.configuration.stegonaut.tooltip": "Edit Stegonaut attributes and taming.",
   "saintsdragons.configuration.others.tooltip": "Edit miscellaneous settings like NPC behavior.",
-
   "saintsdragons.config.raevyxSpawnWeight": "Raevyx Spawn Weight",
   "saintsdragons.config.raevyxMinGroupSize": "Raevyx Min Group Size",
   "saintsdragons.config.raevyxMaxGroupSize": "Raevyx Max Group Size",
@@ -581,7 +519,6 @@
   "saintsdragons.config.raevyxMaxGroupSize.tooltip": "Maximum number of Raevyx that spawn together.",
   "saintsdragons.config.raevyxAdditionalBiomes.button": "Edit Biome List",
   "saintsdragons.config.raevyxAdditionalBiomes.tooltip": "Extra biomes where Raevyx can spawn (e.g., minecraft:desert).",
-
   "saintsdragons.config.stegonautSpawnWeight": "Stegonaut Spawn Weight",
   "saintsdragons.config.stegonautMinGroupSize": "Stegonaut Min Group Size",
   "saintsdragons.config.stegonautMaxGroupSize": "Stegonaut Max Group Size",
@@ -591,7 +528,6 @@
   "saintsdragons.config.stegonautMaxGroupSize.tooltip": "Maximum number of Stegonaut that spawn together.",
   "saintsdragons.config.stegonautAdditionalBiomes.button": "Edit Biome List",
   "saintsdragons.config.stegonautAdditionalBiomes.tooltip": "Extra biomes where Stegonaut can spawn (e.g., minecraft:plains).",
-
   "saintsdragons.config.cindervaneSpawnWeight": "Cindervane Spawn Weight",
   "saintsdragons.config.cindervaneMinGroupSize": "Cindervane Min Group Size",
   "saintsdragons.config.cindervaneMaxGroupSize": "Cindervane Max Group Size",
@@ -601,7 +537,6 @@
   "saintsdragons.config.cindervaneMaxGroupSize.tooltip": "Maximum number of Cindervane that spawn together.",
   "saintsdragons.config.cindervaneAdditionalBiomes.button": "Edit Biome List",
   "saintsdragons.config.cindervaneAdditionalBiomes.tooltip": "Extra biomes where Cindervane can spawn (e.g., minecraft:badlands).",
-
   "saintsdragons.config.nulljawSpawnWeight": "Nulljaw Spawn Weight",
   "saintsdragons.config.nulljawMinGroupSize": "Nulljaw Min Group Size",
   "saintsdragons.config.nulljawMaxGroupSize": "Nulljaw Max Group Size",
@@ -611,7 +546,6 @@
   "saintsdragons.config.nulljawMaxGroupSize.tooltip": "Maximum number of Nulljaw that spawn together.",
   "saintsdragons.config.nulljawAdditionalBiomes.button": "Edit Biome List",
   "saintsdragons.config.nulljawAdditionalBiomes.tooltip": "Extra biomes where Nulljaw can spawn (e.g., minecraft:desert).",
-
   "saintsdragons.config.ignivorusSpawnWeight": "Ignivorus Spawn Weight",
   "saintsdragons.config.ignivorusMinGroupSize": "Ignivorus Min Group Size",
   "saintsdragons.config.ignivorusMaxGroupSize": "Ignivorus Max Group Size",
@@ -621,16 +555,13 @@
   "saintsdragons.config.ignivorusMaxGroupSize.tooltip": "Maximum number of Ignivorus that spawn together.",
   "saintsdragons.config.ignivorusAdditionalBiomes.button": "Edit Biome List",
   "saintsdragons.config.ignivorusAdditionalBiomes.tooltip": "Extra biomes where Ignivorus can spawn (e.g., minecraft:desert).",
-
   "saintsdragons.tooltip.cindervane_binder.right_click_dragon_to_bind": "Right-click on a tamed Cindervane to bind it",
   "saintsdragons.tooltip.ignivorus_binder.right_click_dragon_to_bind": "Right-click on a tamed Ignivorus to bind it",
-
   "saintsdragons.tooltip.nulljaw_binder.description": "A shard of the abyss hums quietly inside.",
   "saintsdragons.tooltip.nulljaw_binder.empty": "Right-click on a tamed Nulljaw to bind it",
   "saintsdragons.tooltip.nulljaw_binder.right_click_dragon_to_bind": "Right-click on a tamed Nulljaw to bind it",
   "saintsdragons.tooltip.nulljaw_binder.bound": "Contains: %s",
   "saintsdragons.tooltip.nulljaw_binder.right_click_to_release": "Right-click on ground to release bound Nulljaw",
-
   "Cindervane shoots out magma": "Cindervane shoots out magma",
   "Cindervane lands heavily": "Cindervane lands heavily",
   "Cindervane eats": "Cindervane eats",
@@ -650,7 +581,6 @@
   "Stegonaut walks": "Stegonaut walks",
   "Stegonaut eats": "Stegonaut eats",
   "Storm ends": "Storm ends",
-
   "Cindervane beats its wings": "Cindervane beats its wings",
   "Cindervane bites": "Cindervane bites",
   "Cindervane dying": "Cindervane dying",
@@ -723,7 +653,6 @@
   "Storm ignition": "Storm ignition",
   "Storm roars aloft": "Storm roars aloft",
   "Wings flap": "Wings flap",
-
   "saintsdragons.config_screen.title": "Saints & Dragons Config",
   "saintsdragons.config_screen.attributes": "Dragon Attributes",
   "saintsdragons.config_screen.spawning": "Spawning",
@@ -735,6 +664,45 @@
   "saintsdragons.config_screen.page": "Page %d / %d",
   "saintsdragons.config_screen.others.ivy": "Ivy the Dragon Merchant",
   "saintsdragons.config_screen.others.ivy.restock_interval": "Restock Interval (ticks)",
-  "saintsdragons.config_screen.others.ivy.restock_interval.tooltip": "Time in ticks between trade restocks (20 ticks = 1 second, 24000 = 20 minutes)"
+  "saintsdragons.config_screen.others.ivy.restock_interval.tooltip": "Time in ticks between trade restocks (20 ticks = 1 second, 24000 = 20 minutes)",
+  "saintsdragons.gui.draconic_codex.title": "Draconic Codex",
+  "saintsdragons.gui.draconic_codex.tab.physiology": "Physiology",
+  "saintsdragons.gui.draconic_codex.tab.ecology": "Ecology",
+  "saintsdragons.gui.draconic_codex.tab.ally": "Ally",
+  "saintsdragons.gui.draconic_codex.placeholder.physiology": "Physiology details will appear here.",
+  "saintsdragons.gui.draconic_codex.placeholder.ecology": "Ecology details will appear here.",
+  "saintsdragons.gui.draconic_codex.placeholder.ally": "Ally management will appear here.",
+  "saintsdragons.gui.draconic_codex.select_prompt": "Select a dragon to begin.",
+  "saintsdragons.gui.draconic_codex.empty": "No tamed dragons found.",
+  "saintsdragons.gui.draconic_codex.physiology.health": "Health: %s/%s",
+  "saintsdragons.gui.draconic_codex.physiology.armor": "Armor: %s",
+  "saintsdragons.gui.draconic_codex.physiology.gender": "Gender: %s",
+  "saintsdragons.gui.draconic_codex.physiology.gender_unknown": "Unknown",
+  "saintsdragons.gui.draconic_codex.ally.count": "Allies: %d/%d",
+  "saintsdragons.gui.draconic_codex.ally.empty": "No allies added yet.",
+  "saintsdragons.gui.draconic_codex.ally.input": "Enter username...",
+  "saintsdragons.gui.draconic_codex.ally.add": "Add",
+  "saintsdragons.gui.draconic_codex.ally.remove": "Remove",
+  "entity.saintsdragons.dragon.feeding": "Feeding %s...",
+  "config.saintsdragons.attributes.cindervane.egg_hatch_chance_normal": "Egg Hatch Chance (Normal)",
+  "config.saintsdragons.attributes.cindervane.aggressive_wild": "Agressive wild dragon toggle:",
+  "config.saintsdragons.attributes.stegonaut.egg_hatch_chance_normal": "Egg Hatch Chance (Normal)",
+  "config.saintsdragons.attributes.raevyx.taming_stun_health": "Stun HP",
+  "config.saintsdragons.attributes.raevyx.egg_hatch_chance_normal": "Egg Hatch Chance (Normal)",
+  "config.saintsdragons.attributes.raevyx.egg_hatch_chance_thunder": "Egg Hatch Chance (Thunder)",
+  "config.saintsdragons.attributes.raevyx.egg_storm_instant_chance": "Storm Instant Hatch Chance (1 in N)",
+  "config.saintsdragons.attributes.raevyx.egg_loot_pillager_outpost": "Egg Loot Chance (Pillager Outpost)",
+  "config.saintsdragons.attributes.raevyx.egg_loot_shipwreck_treasure": "Egg Loot Chance (Shipwreck Treasure)",
+  "config.saintsdragons.attributes.raevyx.egg_loot_ancient_city": "Egg Loot Chance (Ancient City)",
+  "config.saintsdragons.attributes.raevyx.egg_drop_chance": "Egg Drop Chance (Female)",
+  "config.saintsdragons.attributes.raevyx.aggressive_wild": "Agressive wild dragon toggle:",
+  "config.saintsdragons.attributes.nulljaw.egg_hatch_chance_normal": "Egg Hatch Chance (Normal)",
+  "config.saintsdragons.attributes.nulljaw.aggressive_wild": "Agressive wild dragon toggle:",
+  "config.saintsdragons.attributes.ignivorus.taming_stun_health": "Stun HP",
+  "config.saintsdragons.attributes.ignivorus.egg_hatch_chance_normal": "Egg Hatch Chance (Normal)",
+  "config.saintsdragons.attributes.ignivorus.egg_loot_bastion_treasure": "Egg Loot Chance (Bastion Treasure)",
+  "config.saintsdragons.attributes.ignivorus.egg_loot_nether_bridge": "Egg Loot Chance (Nether Bridge)",
+  "config.saintsdragons.attributes.ignivorus.egg_loot_ancient_city": "Egg Loot Chance (Ancient City)",
+  "config.saintsdragons.attributes.ignivorus.egg_drop_chance": "Egg Drop Chance (Female)",
+  "config.saintsdragons.attributes.ignivorus.aggressive_wild": "Agressive wild dragon toggle:"
 }
-

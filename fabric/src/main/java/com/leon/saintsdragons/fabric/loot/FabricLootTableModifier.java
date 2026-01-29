@@ -1,5 +1,7 @@
 package com.leon.saintsdragons.fabric.loot;
 
+import com.leon.saintsdragons.common.config.dragon.DragonAttributeConfig;
+import com.leon.saintsdragons.common.config.dragon.DragonAttributeConfigLoader;
 import com.leon.saintsdragons.common.registry.ModItems;
 import net.fabricmc.fabric.api.loot.v3.LootTableEvents;
 import net.minecraft.resources.ResourceLocation;
@@ -23,71 +25,108 @@ public class FabricLootTableModifier {
 
     public static void register() {
         LootTableEvents.MODIFY.register((key, tableBuilder, source, registries) -> {
-            // Add Raevyx Egg to Pillager Outpost chests (20% chance)
-            if (PILLAGER_OUTPOST_CHEST.equals(key.location())) {
-                LootPool.Builder poolBuilder = LootPool.lootPool()
-                        .setRolls(ConstantValue.exactly(1))
-                        .when(LootItemRandomChanceCondition.randomChance(0.2f))
-                        .add(LootItem.lootTableItem(ModItems.RAEVYX_EGG.get())
-                                .apply(SetItemCountFunction.setCount(ConstantValue.exactly(1))));
+            DragonAttributeConfig raevyxConfig = DragonAttributeConfigLoader.getInstance()
+                    .getConfig(DragonAttributeConfigLoader.RAEVYX_ID);
+            DragonAttributeConfig ignivorusConfig = DragonAttributeConfigLoader.getInstance()
+                    .getConfig(DragonAttributeConfigLoader.IGNIVORUS_ID);
 
-                tableBuilder.pool(poolBuilder.build());
+            double raevyxOutpostChance = clampChance(raevyxConfig.extraDouble("egg_loot_pillager_outpost", 0.2D));
+            double raevyxShipwreckChance = clampChance(raevyxConfig.extraDouble("egg_loot_shipwreck_treasure", 0.15D));
+            double raevyxAncientChance = clampChance(raevyxConfig.extraDouble("egg_loot_ancient_city", 0.15D));
+
+            double ignivorusBastionChance = clampChance(ignivorusConfig.extraDouble("egg_loot_bastion_treasure", 0.15D));
+            double ignivorusBridgeChance = clampChance(ignivorusConfig.extraDouble("egg_loot_nether_bridge", 0.15D));
+            double ignivorusAncientChance = clampChance(ignivorusConfig.extraDouble("egg_loot_ancient_city", 0.10D));
+
+            ResourceLocation id = key.location();
+
+            // Add Raevyx Egg to Pillager Outpost chests
+            if (PILLAGER_OUTPOST_CHEST.equals(id)) {
+                if (raevyxOutpostChance > 0.0D) {
+                    LootPool.Builder poolBuilder = LootPool.lootPool()
+                            .setRolls(ConstantValue.exactly(1))
+                            .when(LootItemRandomChanceCondition.randomChance((float) raevyxOutpostChance))
+                            .add(LootItem.lootTableItem(ModItems.RAEVYX_EGG.get())
+                                    .apply(SetItemCountFunction.setCount(ConstantValue.exactly(1))));
+
+                    tableBuilder.pool(poolBuilder.build());
+                }
             }
 
-            // Add Raevyx Egg to Shipwreck Treasure chests (15% chance)
-            if (SHIPWRECK_TREASURE_CHEST.equals(key.location())) {
-                LootPool.Builder poolBuilder = LootPool.lootPool()
-                        .setRolls(ConstantValue.exactly(1))
-                        .when(LootItemRandomChanceCondition.randomChance(0.15f))
-                        .add(LootItem.lootTableItem(ModItems.RAEVYX_EGG.get())
-                                .apply(SetItemCountFunction.setCount(ConstantValue.exactly(1))));
+            // Add Raevyx Egg to Shipwreck Treasure chests
+            if (SHIPWRECK_TREASURE_CHEST.equals(id)) {
+                if (raevyxShipwreckChance > 0.0D) {
+                    LootPool.Builder poolBuilder = LootPool.lootPool()
+                            .setRolls(ConstantValue.exactly(1))
+                            .when(LootItemRandomChanceCondition.randomChance((float) raevyxShipwreckChance))
+                            .add(LootItem.lootTableItem(ModItems.RAEVYX_EGG.get())
+                                    .apply(SetItemCountFunction.setCount(ConstantValue.exactly(1))));
 
-                tableBuilder.pool(poolBuilder.build());
+                    tableBuilder.pool(poolBuilder.build());
+                }
             }
 
-            // Add Raevyx Egg to Ancient City chests (15% chance)
-            if (ANCIENT_CITY_CHEST.equals(key.location())) {
-                LootPool.Builder poolBuilder = LootPool.lootPool()
-                        .setRolls(ConstantValue.exactly(1))
-                        .when(LootItemRandomChanceCondition.randomChance(0.15f))
-                        .add(LootItem.lootTableItem(ModItems.RAEVYX_EGG.get())
-                                .apply(SetItemCountFunction.setCount(ConstantValue.exactly(1))));
+            // Add Raevyx Egg to Ancient City chests
+            if (ANCIENT_CITY_CHEST.equals(id)) {
+                if (raevyxAncientChance > 0.0D) {
+                    LootPool.Builder poolBuilder = LootPool.lootPool()
+                            .setRolls(ConstantValue.exactly(1))
+                            .when(LootItemRandomChanceCondition.randomChance((float) raevyxAncientChance))
+                            .add(LootItem.lootTableItem(ModItems.RAEVYX_EGG.get())
+                                    .apply(SetItemCountFunction.setCount(ConstantValue.exactly(1))));
 
-                tableBuilder.pool(poolBuilder.build());
+                    tableBuilder.pool(poolBuilder.build());
+                }
             }
 
-            // Add Ignivorus Egg to Bastion Treasure chests (15% chance)
-            if (BASTION_TREASURE_CHEST.equals(key.location())) {
-                LootPool.Builder poolBuilder = LootPool.lootPool()
-                        .setRolls(ConstantValue.exactly(1))
-                        .when(LootItemRandomChanceCondition.randomChance(0.15f))
-                        .add(LootItem.lootTableItem(ModItems.IGNIVORUS_EGG.get())
-                                .apply(SetItemCountFunction.setCount(ConstantValue.exactly(1))));
+            // Add Ignivorus Egg to Bastion Treasure chests
+            if (BASTION_TREASURE_CHEST.equals(id)) {
+                if (ignivorusBastionChance > 0.0D) {
+                    LootPool.Builder poolBuilder = LootPool.lootPool()
+                            .setRolls(ConstantValue.exactly(1))
+                            .when(LootItemRandomChanceCondition.randomChance((float) ignivorusBastionChance))
+                            .add(LootItem.lootTableItem(ModItems.IGNIVORUS_EGG.get())
+                                    .apply(SetItemCountFunction.setCount(ConstantValue.exactly(1))));
 
-                tableBuilder.pool(poolBuilder.build());
+                    tableBuilder.pool(poolBuilder.build());
+                }
             }
 
-            // Add Ignivorus Egg to Nether Fortress chests (15% chance)
-            if (NETHER_BRIDGE_CHEST.equals(key.location())) {
-                LootPool.Builder poolBuilder = LootPool.lootPool()
-                        .setRolls(ConstantValue.exactly(1))
-                        .when(LootItemRandomChanceCondition.randomChance(0.15f))
-                        .add(LootItem.lootTableItem(ModItems.IGNIVORUS_EGG.get())
-                                .apply(SetItemCountFunction.setCount(ConstantValue.exactly(1))));
+            // Add Ignivorus Egg to Nether Fortress chests
+            if (NETHER_BRIDGE_CHEST.equals(id)) {
+                if (ignivorusBridgeChance > 0.0D) {
+                    LootPool.Builder poolBuilder = LootPool.lootPool()
+                            .setRolls(ConstantValue.exactly(1))
+                            .when(LootItemRandomChanceCondition.randomChance((float) ignivorusBridgeChance))
+                            .add(LootItem.lootTableItem(ModItems.IGNIVORUS_EGG.get())
+                                    .apply(SetItemCountFunction.setCount(ConstantValue.exactly(1))));
 
-                tableBuilder.pool(poolBuilder.build());
+                    tableBuilder.pool(poolBuilder.build());
+                }
             }
 
-            // Add Ignivorus Egg to Ancient City chests (10% chance)
-            if (ANCIENT_CITY_CHEST.equals(key.location())) {
-                LootPool.Builder poolBuilder = LootPool.lootPool()
-                        .setRolls(ConstantValue.exactly(1))
-                        .when(LootItemRandomChanceCondition.randomChance(0.10f))
-                        .add(LootItem.lootTableItem(ModItems.IGNIVORUS_EGG.get())
-                                .apply(SetItemCountFunction.setCount(ConstantValue.exactly(1))));
+            // Add Ignivorus Egg to Ancient City chests
+            if (ANCIENT_CITY_CHEST.equals(id)) {
+                if (ignivorusAncientChance > 0.0D) {
+                    LootPool.Builder poolBuilder = LootPool.lootPool()
+                            .setRolls(ConstantValue.exactly(1))
+                            .when(LootItemRandomChanceCondition.randomChance((float) ignivorusAncientChance))
+                            .add(LootItem.lootTableItem(ModItems.IGNIVORUS_EGG.get())
+                                    .apply(SetItemCountFunction.setCount(ConstantValue.exactly(1))));
 
-                tableBuilder.pool(poolBuilder.build());
+                    tableBuilder.pool(poolBuilder.build());
+                }
             }
         });
+    }
+
+    private static double clampChance(double value) {
+        if (value < 0.0D) {
+            return 0.0D;
+        }
+        if (value > 1.0D) {
+            return 1.0D;
+        }
+        return value;
     }
 }

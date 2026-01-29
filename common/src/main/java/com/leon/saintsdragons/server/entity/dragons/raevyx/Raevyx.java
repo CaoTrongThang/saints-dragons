@@ -22,6 +22,8 @@ import com.leon.saintsdragons.server.entity.base.DragonEntity;
 import com.leon.saintsdragons.server.entity.base.DragonGender;
 import com.leon.saintsdragons.server.entity.base.RideableDragonBase;
 import com.leon.saintsdragons.common.block.RaevyxEggBlockEntity;
+import com.leon.saintsdragons.common.config.dragon.DragonAttributeConfig;
+import com.leon.saintsdragons.common.config.dragon.DragonAttributeConfigLoader;
 import com.leon.saintsdragons.server.entity.interfaces.*;
 import com.leon.saintsdragons.server.entity.interfaces.DragonSoundProfile;
 import com.leon.saintsdragons.server.entity.dragons.raevyx.handlers.RaevyxInteractionHandler;
@@ -64,6 +66,7 @@ import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.ai.goal.*;
 import net.minecraft.world.entity.ai.goal.target.HurtByTargetGoal;
+import net.minecraft.world.entity.ai.goal.target.NearestAttackableTargetGoal;
 import net.minecraft.world.entity.ai.navigation.FlyingPathNavigation;
 import net.minecraft.world.entity.ai.navigation.GroundPathNavigation;
 import net.minecraft.world.entity.ai.navigation.PathNavigation;
@@ -267,11 +270,6 @@ public class Raevyx extends RideableDragonBase implements FlyingAnimal, RangedAt
     public AnimatableInstanceCache dragonCache = GeckoLibUtil.createInstanceCache(this);
 
 
-    // Simple per-field caches - more maintainable than generic system
-    private double cachedOwnerDistance = Double.MAX_VALUE;
-    private int ownerDistanceCacheTime = -1;
-    private double cachedHorizontalSpeed = 0.0;
-    private int horizontalSpeedCacheTime = -1;
     private static final double RIDER_GLIDE_ALTITUDE_THRESHOLD = 40.0D;
     private static final double RIDER_GLIDE_ALTITUDE_EXIT = 30.0D; // Hysteresis: exit at lower altitude
     private static final double RIDER_LOW_ALTITUDE_GLIDE_THRESHOLD = 6.0D;
@@ -493,7 +491,12 @@ public class Raevyx extends RideableDragonBase implements FlyingAnimal, RangedAt
     }
 
     public float getTamingThreshold() {
-        return this.getMaxHealth() * TAMING_HEALTH_RATIO;
+        double fallback = this.getMaxHealth() * TAMING_HEALTH_RATIO;
+        double configured = com.leon.saintsdragons.common.config.dragon.DragonAttributeConfigLoader.getInstance()
+                .getConfig(com.leon.saintsdragons.common.config.dragon.DragonAttributeConfigLoader.RAEVYX_ID)
+                .extraDouble("taming_stun_health", fallback);
+        double clamped = Math.max(0.0D, Math.min(configured, this.getMaxHealth()));
+        return (float) clamped;
     }
 
     // Rider takeoff request timer: while > 0, flight controller treats state as takeoff
@@ -556,13 +559,6 @@ public class Raevyx extends RideableDragonBase implements FlyingAnimal, RangedAt
     public boolean isInSittingPose() {
         return super.isInSittingPose() && !(this.isVehicle() || this.isPassenger() || this.isFlying());
     }
-    // GeckoLib cache is now handled by base DragonEntity class
-
-    //FLIGHT
-    // (Flight mode logic is already inline in getFlightMode() - no physics controller needed)
-
-    // Animation controller is internal-only; external integration goes via GeckoLib controllers.
-
 
     public Raevyx(EntityType<? extends TamableAnimal> type, Level level) {
         super(type, level);
@@ -3587,6 +3583,8 @@ public class Raevyx extends RideableDragonBase implements FlyingAnimal, RangedAt
         this.targetSelector.addGoal(2, new com.leon.saintsdragons.server.ai.goals.base.DragonOwnerHurtTargetGoal(this));
         this.targetSelector.addGoal(3, new DragonProtectBabiesGoal<>(this, Raevyx.class));  // Protect nearby babies
         this.targetSelector.addGoal(4, new HurtByTargetGoal(this));
+        this.targetSelector.addGoal(5, new NearestAttackableTargetGoal<>(this, Player.class, 10, true, false,
+                target -> shouldAggroOnSight()));
         // Neutral behavior: do not proactively target players. Only retaliate when hurt or defend owner.
     }
 
@@ -4321,20 +4319,6 @@ public class Raevyx extends RideableDragonBase implements FlyingAnimal, RangedAt
         // Pass the raw event data to the sound handler
         this.getSoundHandler().handleAnimationSound(this, event.getKeyframeData(), event.getController());
     }
-    // Cache frequently used calculations
-    public double getCachedDistanceToOwner() {
-        // Lower cache window for snappier follow responsiveness
-        int currentTick = tickCount;
-        if (currentTick - ownerDistanceCacheTime >= 3) {
-            LivingEntity owner = getOwner();
-            cachedOwnerDistance = owner != null ? distanceToSqr(owner) : Double.MAX_VALUE;
-            ownerDistanceCacheTime = currentTick;
-        }
-        return cachedOwnerDistance;
-    }
-    // DYNAMIC EYE HEIGHT SYSTEM
-    // Will be calculated dynamically from renderer
-
     @Override
     public void lockRiderControls(int ticks) {
         super.lockRiderControls(ticks); // Base handles tick counting and entity data
@@ -4393,16 +4377,6 @@ public class Raevyx extends RideableDragonBase implements FlyingAnimal, RangedAt
         // Refresh hitbox dimensions when baby grows into adult
         applyConfiguredAttributes();
         this.refreshDimensions();
-    }
-
-    // Cache horizontal flight speed - used in physics calculations
-    public double getCachedHorizontalSpeed() {
-        if (tickCount != horizontalSpeedCacheTime) {
-            Vec3 velocity = getDeltaMovement();
-            cachedHorizontalSpeed = Math.sqrt(velocity.x * velocity.x + velocity.z * velocity.z);
-            horizontalSpeedCacheTime = tickCount;
-        }
-        return cachedHorizontalSpeed;
     }
     @Override
     public boolean canMate(@Nonnull Animal otherAnimal) {
@@ -4538,7 +4512,6 @@ public class Raevyx extends RideableDragonBase implements FlyingAnimal, RangedAt
         }
         return riderController.getRiddenSpeed(rider);
     }
-
     @Override
     public void removePassenger(@Nonnull Entity passenger) {
         // Call parent implementation to handle standard rideable dragon cleanup (including clearing rider control lock)
@@ -4546,7 +4519,6 @@ public class Raevyx extends RideableDragonBase implements FlyingAnimal, RangedAt
     }
     // Cooldown for aggro growl to prevent spam while ridden or under repeated retargeting
     private int aggroGrowlCooldown = 0;
-
     @Override
     public void setTarget(@Nullable LivingEntity target) {
         if ((isTamingStunned() || tamingAbortCalmTicks > 0) && target != null) {
@@ -4558,20 +4530,17 @@ public class Raevyx extends RideableDragonBase implements FlyingAnimal, RangedAt
         }
         LivingEntity previousTarget = this.getTarget();
         super.setTarget(target);
-
-        if (!this.level().isClientSide) {
-            // Decrement here too in case tick() hasn't yet
-            if (aggroGrowlCooldown > 0) aggroGrowlCooldown--;
-
-            // Play growl when entering combat from idle, but throttle and avoid while being ridden
-            if (target != null && previousTarget == null && aggroGrowlCooldown <= 0) {
-                // Suppress frequent growls when mounted; lengthen cooldown if mounted
-                // Intentionally no warning growl; maintain cooldown to prevent rapid retargeting
-                // Set cooldown (mounted has longer to avoid flicker from rider clearing target)
-                this.aggroGrowlCooldown = this.isVehicle() ? 120 : 80;
-            }
-        }
     }
+
+    private boolean shouldAggroOnSight() {
+        if (isTame() || isBaby()) {
+            return false;
+        }
+        DragonAttributeConfig config = DragonAttributeConfigLoader.getInstance()
+                .getConfig(DragonAttributeConfigLoader.RAEVYX_ID);
+        return config.extraBoolean("aggressive_wild", false);
+    }
+
     @Override
     public @Nullable LivingEntity getControllingPassenger() {
         return riderController.getControllingPassenger();
@@ -4684,8 +4653,11 @@ public class Raevyx extends RideableDragonBase implements FlyingAnimal, RangedAt
 
         super.dropAllDeathLoot(level, source);
 
-        // Female dragons have 12% chance to drop one egg on death
-        if (!level().isClientSide && getGender() == DragonGender.FEMALE && this.random.nextFloat() < 0.12f) {
+        DragonAttributeConfig config = DragonAttributeConfigLoader.getInstance()
+                .getConfig(DragonAttributeConfigLoader.RAEVYX_ID);
+        double eggDropChance = config.extraDouble("egg_drop_chance", 0.12D);
+        // Female dragons have a configurable chance to drop one egg on death
+        if (!level().isClientSide && getGender() == DragonGender.FEMALE && this.random.nextDouble() < eggDropChance) {
             this.spawnAtLocation(ModItems.RAEVYX_EGG.get());
         }
     }

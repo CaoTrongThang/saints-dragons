@@ -69,6 +69,7 @@ import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.ai.control.MoveControl;
 import net.minecraft.world.entity.ai.goal.SitWhenOrderedToGoal;
 import net.minecraft.world.entity.ai.goal.target.HurtByTargetGoal;
+import net.minecraft.world.entity.ai.goal.target.NearestAttackableTargetGoal;
 import net.minecraft.world.entity.ai.navigation.FlyingPathNavigation;
 import net.minecraft.world.entity.ai.navigation.PathNavigation;
 import net.minecraft.world.entity.player.Player;
@@ -541,6 +542,8 @@ public class Cindervane extends RideableDragonBase implements DragonFlightCapabl
         this.targetSelector.addGoal(2, new com.leon.saintsdragons.server.ai.goals.base.DragonOwnerHurtTargetGoal(this));
         this.targetSelector.addGoal(3, new com.leon.saintsdragons.server.ai.goals.base.DragonProtectBabiesGoal<>(this, Cindervane.class)); // Protect and stay with babies
         this.targetSelector.addGoal(4, new HurtByTargetGoal(this));
+        this.targetSelector.addGoal(5, new NearestAttackableTargetGoal<>(this, Player.class, 10, true, false,
+                target -> shouldAggroOnSight()));
         // Look goals that skip when being ridden (so rider has full control)
         this.goalSelector.addGoal(12, new RandomLookAroundGoal(this) {
             @Override
@@ -1662,6 +1665,15 @@ public class Cindervane extends RideableDragonBase implements DragonFlightCapabl
             return;
         }
         super.setTarget(target);
+    }
+
+    private boolean shouldAggroOnSight() {
+        if (isTame() || isBaby()) {
+            return false;
+        }
+        DragonAttributeConfig config = DragonAttributeConfigLoader.getInstance()
+                .getConfig(DragonAttributeConfigLoader.CINDERVANE_ID);
+        return config.extraBoolean("aggressive_wild", false);
     }
 
     @Override

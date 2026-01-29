@@ -61,6 +61,8 @@ public final class DragonAttributeConfigLoader extends SimpleJsonResourceReloadL
         double magmaVolleyDamage = 20.0D;
         double tamingChanceBase = 4.0D;
         double tamingChanceHearty = 2.0D;
+        double eggHatchChanceNormal = 2.0D;
+        boolean aggressiveWild = false;
 
         // NeoForge config override (if available)
         try {
@@ -72,6 +74,8 @@ public final class DragonAttributeConfigLoader extends SimpleJsonResourceReloadL
             magmaVolleyDamage = (double) configClass.getField("CINDERVANE_MAGMA_VOLLEY_DAMAGE").get(null).getClass().getMethod("get").invoke(configClass.getField("CINDERVANE_MAGMA_VOLLEY_DAMAGE").get(null));
             tamingChanceBase = (double) configClass.getField("CINDERVANE_TAMING_CHANCE_BASE").get(null).getClass().getMethod("get").invoke(configClass.getField("CINDERVANE_TAMING_CHANCE_BASE").get(null));
             tamingChanceHearty = (double) configClass.getField("CINDERVANE_TAMING_CHANCE_HEARTY").get(null).getClass().getMethod("get").invoke(configClass.getField("CINDERVANE_TAMING_CHANCE_HEARTY").get(null));
+            eggHatchChanceNormal = (double) configClass.getField("CINDERVANE_EGG_HATCH_CHANCE_NORMAL").get(null).getClass().getMethod("get").invoke(configClass.getField("CINDERVANE_EGG_HATCH_CHANCE_NORMAL").get(null));
+            aggressiveWild = (boolean) configClass.getField("CINDERVANE_AGGRESSIVE_WILD").get(null).getClass().getMethod("get").invoke(configClass.getField("CINDERVANE_AGGRESSIVE_WILD").get(null));
         } catch (Exception ignored) {
             // NeoForge config not available (Fabric or config not loaded yet)
         }
@@ -89,9 +93,12 @@ public final class DragonAttributeConfigLoader extends SimpleJsonResourceReloadL
                         "run_speed", 0.27D,  // Hardcoded for AI/rider compatibility
                         "walk_speed", 0.225D,  // Hardcoded for AI/rider compatibility
                         "taming_chance_base", tamingChanceBase,
-                        "taming_chance_hearty", tamingChanceHearty
+                        "taming_chance_hearty", tamingChanceHearty,
+                        "egg_hatch_chance_normal", eggHatchChanceNormal
                 ),
-                Map.of()
+                Map.of(
+                        "aggressive_wild", aggressiveWild
+                )
         );
     }
 
@@ -107,6 +114,15 @@ public final class DragonAttributeConfigLoader extends SimpleJsonResourceReloadL
         boolean legacyTaming = false;
         double beamDrainPerTick = 0.014D;
         double beamRegenPerTick = 0.0025D;
+        double eggHatchChanceNormal = 2.0D;
+        double eggHatchChanceThunder = 1.0D;
+        double eggStormInstantChance = 100.0D;
+        double eggLootPillagerOutpost = 0.20D;
+        double eggLootShipwreckTreasure = 0.15D;
+        double eggLootAncientCity = 0.15D;
+        double eggDropChance = 0.12D;
+        double tamingStunHealth = maxHealth / 3.0D;
+        boolean aggressiveWild = false;
 
         // NeoForge config override (if available)
         try {
@@ -122,6 +138,15 @@ public final class DragonAttributeConfigLoader extends SimpleJsonResourceReloadL
             tamingChanceBase = (double) configClass.getField("RAEVYX_TAMING_CHANCE_BASE").get(null).getClass().getMethod("get").invoke(configClass.getField("RAEVYX_TAMING_CHANCE_BASE").get(null));
             tamingChanceHearty = (double) configClass.getField("RAEVYX_TAMING_CHANCE_HEARTY").get(null).getClass().getMethod("get").invoke(configClass.getField("RAEVYX_TAMING_CHANCE_HEARTY").get(null));
             legacyTaming = (boolean) configClass.getField("RAEVYX_LEGACY_TAMING").get(null).getClass().getMethod("get").invoke(configClass.getField("RAEVYX_LEGACY_TAMING").get(null));
+            eggHatchChanceNormal = (double) configClass.getField("RAEVYX_EGG_HATCH_CHANCE_NORMAL").get(null).getClass().getMethod("get").invoke(configClass.getField("RAEVYX_EGG_HATCH_CHANCE_NORMAL").get(null));
+            eggHatchChanceThunder = (double) configClass.getField("RAEVYX_EGG_HATCH_CHANCE_THUNDER").get(null).getClass().getMethod("get").invoke(configClass.getField("RAEVYX_EGG_HATCH_CHANCE_THUNDER").get(null));
+            eggStormInstantChance = (double) configClass.getField("RAEVYX_EGG_STORM_INSTANT_CHANCE").get(null).getClass().getMethod("get").invoke(configClass.getField("RAEVYX_EGG_STORM_INSTANT_CHANCE").get(null));
+            eggLootPillagerOutpost = (double) configClass.getField("RAEVYX_EGG_LOOT_PILLAGER_OUTPOST").get(null).getClass().getMethod("get").invoke(configClass.getField("RAEVYX_EGG_LOOT_PILLAGER_OUTPOST").get(null));
+            eggLootShipwreckTreasure = (double) configClass.getField("RAEVYX_EGG_LOOT_SHIPWRECK_TREASURE").get(null).getClass().getMethod("get").invoke(configClass.getField("RAEVYX_EGG_LOOT_SHIPWRECK_TREASURE").get(null));
+            eggLootAncientCity = (double) configClass.getField("RAEVYX_EGG_LOOT_ANCIENT_CITY").get(null).getClass().getMethod("get").invoke(configClass.getField("RAEVYX_EGG_LOOT_ANCIENT_CITY").get(null));
+            eggDropChance = (double) configClass.getField("RAEVYX_EGG_DROP_CHANCE").get(null).getClass().getMethod("get").invoke(configClass.getField("RAEVYX_EGG_DROP_CHANCE").get(null));
+            tamingStunHealth = (double) configClass.getField("RAEVYX_TAMING_STUN_HEALTH").get(null).getClass().getMethod("get").invoke(configClass.getField("RAEVYX_TAMING_STUN_HEALTH").get(null));
+            aggressiveWild = (boolean) configClass.getField("RAEVYX_AGGRESSIVE_WILD").get(null).getClass().getMethod("get").invoke(configClass.getField("RAEVYX_AGGRESSIVE_WILD").get(null));
         } catch (Exception ignored) {
             // NeoForge config not available (Fabric or config not loaded yet)
         }
@@ -142,10 +167,19 @@ public final class DragonAttributeConfigLoader extends SimpleJsonResourceReloadL
                         "taming_chance_base", tamingChanceBase,
                         "taming_chance_hearty", tamingChanceHearty,
                         "beam_drain_per_tick", beamDrainPerTick,
-                        "beam_regen_per_tick", beamRegenPerTick
+                        "beam_regen_per_tick", beamRegenPerTick,
+                        "egg_hatch_chance_normal", eggHatchChanceNormal,
+                        "egg_hatch_chance_thunder", eggHatchChanceThunder,
+                        "egg_storm_instant_chance", eggStormInstantChance,
+                        "egg_loot_pillager_outpost", eggLootPillagerOutpost,
+                        "egg_loot_shipwreck_treasure", eggLootShipwreckTreasure,
+                        "egg_loot_ancient_city", eggLootAncientCity,
+                        "egg_drop_chance", eggDropChance,
+                        "taming_stun_health", tamingStunHealth
                 ),
                 Map.of(
-                        "legacy_taming", legacyTaming
+                        "legacy_taming", legacyTaming,
+                        "aggressive_wild", aggressiveWild
                 )
         );
     }
@@ -162,6 +196,8 @@ public final class DragonAttributeConfigLoader extends SimpleJsonResourceReloadL
         double tamingChanceBase = 6.0D;
         double tamingChanceHearty = 3.0D;
         boolean legacyTaming = false;
+        double eggHatchChanceNormal = 3.0D;
+        boolean aggressiveWild = false;
 
         // NeoForge config override (if available)
         try {
@@ -177,6 +213,8 @@ public final class DragonAttributeConfigLoader extends SimpleJsonResourceReloadL
             tamingChanceBase = (double) configClass.getField("NULLJAW_TAMING_CHANCE_BASE").get(null).getClass().getMethod("get").invoke(configClass.getField("NULLJAW_TAMING_CHANCE_BASE").get(null));
             tamingChanceHearty = (double) configClass.getField("NULLJAW_TAMING_CHANCE_HEARTY").get(null).getClass().getMethod("get").invoke(configClass.getField("NULLJAW_TAMING_CHANCE_HEARTY").get(null));
             legacyTaming = (boolean) configClass.getField("NULLJAW_LEGACY_TAMING").get(null).getClass().getMethod("get").invoke(configClass.getField("NULLJAW_LEGACY_TAMING").get(null));
+            eggHatchChanceNormal = (double) configClass.getField("NULLJAW_EGG_HATCH_CHANCE_NORMAL").get(null).getClass().getMethod("get").invoke(configClass.getField("NULLJAW_EGG_HATCH_CHANCE_NORMAL").get(null));
+            aggressiveWild = (boolean) configClass.getField("NULLJAW_AGGRESSIVE_WILD").get(null).getClass().getMethod("get").invoke(configClass.getField("NULLJAW_AGGRESSIVE_WILD").get(null));
         } catch (Exception ignored) {
             // NeoForge config not available (Fabric or config not loaded yet)
         }
@@ -198,10 +236,12 @@ public final class DragonAttributeConfigLoader extends SimpleJsonResourceReloadL
                         "swim_speed", swimSpeed,
                         "taming_chance", tamingChance,
                         "taming_chance_base", tamingChanceBase,
-                        "taming_chance_hearty", tamingChanceHearty
+                        "taming_chance_hearty", tamingChanceHearty,
+                        "egg_hatch_chance_normal", eggHatchChanceNormal
                 ),
                 Map.of(
-                        "legacy_taming", legacyTaming
+                        "legacy_taming", legacyTaming,
+                        "aggressive_wild", aggressiveWild
                 )
         );
     }
@@ -227,6 +267,13 @@ public final class DragonAttributeConfigLoader extends SimpleJsonResourceReloadL
         double fireBreathFlameSpeedMultiplier = 1.0D;
         double fireBreathFlameLifetimeMultiplier = 1.0D;
         double fireBreathIgniteBlockChance = 1.0D;
+        double eggHatchChanceNormal = 9.0D;
+        double eggLootBastionTreasure = 0.15D;
+        double eggLootNetherBridge = 0.15D;
+        double eggLootAncientCity = 0.10D;
+        double eggDropChance = 0.12D;
+        double tamingStunHealth = maxHealth / 3.0D;
+        boolean aggressiveWild = false;
 
         // NeoForge config override (if available)
         try {
@@ -251,6 +298,13 @@ public final class DragonAttributeConfigLoader extends SimpleJsonResourceReloadL
             tamingChanceBase = (double) configClass.getField("IGNIVORUS_TAMING_CHANCE_BASE").get(null).getClass().getMethod("get").invoke(configClass.getField("IGNIVORUS_TAMING_CHANCE_BASE").get(null));
             tamingChanceHearty = (double) configClass.getField("IGNIVORUS_TAMING_CHANCE_HEARTY").get(null).getClass().getMethod("get").invoke(configClass.getField("IGNIVORUS_TAMING_CHANCE_HEARTY").get(null));
             legacyTaming = (boolean) configClass.getField("IGNIVORUS_LEGACY_TAMING").get(null).getClass().getMethod("get").invoke(configClass.getField("IGNIVORUS_LEGACY_TAMING").get(null));
+            eggHatchChanceNormal = (double) configClass.getField("IGNIVORUS_EGG_HATCH_CHANCE_NORMAL").get(null).getClass().getMethod("get").invoke(configClass.getField("IGNIVORUS_EGG_HATCH_CHANCE_NORMAL").get(null));
+            eggLootBastionTreasure = (double) configClass.getField("IGNIVORUS_EGG_LOOT_BASTION_TREASURE").get(null).getClass().getMethod("get").invoke(configClass.getField("IGNIVORUS_EGG_LOOT_BASTION_TREASURE").get(null));
+            eggLootNetherBridge = (double) configClass.getField("IGNIVORUS_EGG_LOOT_NETHER_BRIDGE").get(null).getClass().getMethod("get").invoke(configClass.getField("IGNIVORUS_EGG_LOOT_NETHER_BRIDGE").get(null));
+            eggLootAncientCity = (double) configClass.getField("IGNIVORUS_EGG_LOOT_ANCIENT_CITY").get(null).getClass().getMethod("get").invoke(configClass.getField("IGNIVORUS_EGG_LOOT_ANCIENT_CITY").get(null));
+            eggDropChance = (double) configClass.getField("IGNIVORUS_EGG_DROP_CHANCE").get(null).getClass().getMethod("get").invoke(configClass.getField("IGNIVORUS_EGG_DROP_CHANCE").get(null));
+            tamingStunHealth = (double) configClass.getField("IGNIVORUS_TAMING_STUN_HEALTH").get(null).getClass().getMethod("get").invoke(configClass.getField("IGNIVORUS_TAMING_STUN_HEALTH").get(null));
+            aggressiveWild = (boolean) configClass.getField("IGNIVORUS_AGGRESSIVE_WILD").get(null).getClass().getMethod("get").invoke(configClass.getField("IGNIVORUS_AGGRESSIVE_WILD").get(null));
         } catch (Exception ignored) {
             // NeoForge config not available (Fabric or config not loaded yet)
         }
@@ -267,6 +321,12 @@ public final class DragonAttributeConfigLoader extends SimpleJsonResourceReloadL
         extra.put("fire_breath_flame_speed_multiplier", fireBreathFlameSpeedMultiplier);
         extra.put("fire_breath_flame_lifetime_multiplier", fireBreathFlameLifetimeMultiplier);
         extra.put("fire_breath_ignite_block_chance", fireBreathIgniteBlockChance);
+        extra.put("egg_hatch_chance_normal", eggHatchChanceNormal);
+        extra.put("egg_loot_bastion_treasure", eggLootBastionTreasure);
+        extra.put("egg_loot_nether_bridge", eggLootNetherBridge);
+        extra.put("egg_loot_ancient_city", eggLootAncientCity);
+        extra.put("egg_drop_chance", eggDropChance);
+        extra.put("taming_stun_health", tamingStunHealth);
 
         return new DragonAttributeConfig(
                 maxHealth,
@@ -284,7 +344,8 @@ public final class DragonAttributeConfigLoader extends SimpleJsonResourceReloadL
                 ),
                 extra,
                 Map.of(
-                        "legacy_taming", legacyTaming
+                        "legacy_taming", legacyTaming,
+                        "aggressive_wild", aggressiveWild
                 )
         );
     }
@@ -406,6 +467,7 @@ public final class DragonAttributeConfigLoader extends SimpleJsonResourceReloadL
                 backfillLegacyTaming(path, entry.getKey());
                 backfillExtraBooleans(path, entry.getKey());
                 backfillBeamEnergyTuning(path, entry.getKey(), entry.getValue());
+                backfillTamingStunHealth(path, entry.getKey(), entry.getValue());
                 continue;
             }
             if (!source.has("hints")) {
@@ -686,6 +748,27 @@ public final class DragonAttributeConfigLoader extends SimpleJsonResourceReloadL
         }
     }
 
+    private void backfillTamingStunHealth(Path path, ResourceLocation id, DragonAttributeConfig mergedConfig) {
+        boolean isRaevyx = id.equals(RAEVYX_ID);
+        boolean isIgnivorus = id.equals(IGNIVORUS_ID);
+        if (!isRaevyx && !isIgnivorus) {
+            return;
+        }
+        try (Reader reader = Files.newBufferedReader(path)) {
+            JsonElement element = JsonParser.parseReader(reader);
+            JsonObject json = GsonHelper.convertToJsonObject(element, id.toString());
+            JsonObject extra = json.has("extra") ? GsonHelper.getAsJsonObject(json, "extra") : new JsonObject();
+            if (!extra.has("taming_stun_health")) {
+                extra.addProperty("taming_stun_health",
+                        mergedConfig.extraDouble("taming_stun_health", mergedConfig.maxHealth() / 3.0D));
+                json.add("extra", extra);
+                writeConfigFile(path, json);
+            }
+        } catch (Exception e) {
+            SaintsDragonsCommon.LOGGER.warn("Failed to backfill taming_stun_health at {}", path, e);
+        }
+    }
+
     private static boolean requiresLegacyTamingFlag(ResourceLocation id) {
         return id.equals(NULLJAW_ID) || id.equals(RAEVYX_ID) || id.equals(IGNIVORUS_ID);
     }
@@ -697,6 +780,17 @@ public final class DragonAttributeConfigLoader extends SimpleJsonResourceReloadL
         hints.addProperty("taming_chance_hearty", "Lower is easier: 1 = 100% per feed, 100 = 1% per feed");
         hints.addProperty("taming_chance", "Lower is easier: 1 = 100% per attempt, 100 = 1% per attempt");
         hints.addProperty("legacy_taming", "true = simple food taming, false = special mechanics (rodeo/low-health)");
+        hints.addProperty("egg_hatch_chance_normal", "Lower = faster (1 = every random tick)");
+        hints.addProperty("egg_hatch_chance_thunder", "Lower = faster during thunderstorms");
+        hints.addProperty("egg_storm_instant_chance", "1 in N chance to instantly hatch when placed during a storm");
+        hints.addProperty("egg_drop_chance", "Chance (0-1) for females to drop an egg on death");
+        hints.addProperty("egg_loot_pillager_outpost", "Chance (0-1) for egg in pillager outpost chests");
+        hints.addProperty("egg_loot_shipwreck_treasure", "Chance (0-1) for egg in shipwreck treasure chests");
+        hints.addProperty("egg_loot_ancient_city", "Chance (0-1) for egg in ancient city chests");
+        hints.addProperty("egg_loot_bastion_treasure", "Chance (0-1) for egg in bastion treasure chests");
+        hints.addProperty("egg_loot_nether_bridge", "Chance (0-1) for egg in nether fortress chests");
+        hints.addProperty("aggressive_wild", "true = wild dragons aggro on sight, false = only retaliate");
+        hints.addProperty("taming_stun_health", "Health threshold for taming stun (0 = disable stun)");
 
         if (id.equals(CINDERVANE_ID)) {
             hints.addProperty("run_speed", "Min 0.01, Max 1.5");

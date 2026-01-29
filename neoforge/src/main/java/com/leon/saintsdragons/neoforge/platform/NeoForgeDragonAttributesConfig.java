@@ -20,6 +20,8 @@ public final class NeoForgeDragonAttributesConfig {
     public static ModConfigSpec.DoubleValue CINDERVANE_MAGMA_VOLLEY_DAMAGE;
     public static ModConfigSpec.DoubleValue CINDERVANE_TAMING_CHANCE_BASE;
     public static ModConfigSpec.DoubleValue CINDERVANE_TAMING_CHANCE_HEARTY;
+    public static ModConfigSpec.DoubleValue CINDERVANE_EGG_HATCH_CHANCE_NORMAL;
+    public static ModConfigSpec.BooleanValue CINDERVANE_AGGRESSIVE_WILD;
 
     // Raevyx
     public static ModConfigSpec.DoubleValue RAEVYX_MAX_HEALTH;
@@ -32,7 +34,16 @@ public final class NeoForgeDragonAttributesConfig {
     public static ModConfigSpec.DoubleValue RAEVYX_BEAM_REGEN_PER_TICK;
     public static ModConfigSpec.DoubleValue RAEVYX_TAMING_CHANCE_BASE;
     public static ModConfigSpec.DoubleValue RAEVYX_TAMING_CHANCE_HEARTY;
+    public static ModConfigSpec.DoubleValue RAEVYX_TAMING_STUN_HEALTH;
     public static ModConfigSpec.BooleanValue RAEVYX_LEGACY_TAMING;
+    public static ModConfigSpec.DoubleValue RAEVYX_EGG_HATCH_CHANCE_NORMAL;
+    public static ModConfigSpec.DoubleValue RAEVYX_EGG_HATCH_CHANCE_THUNDER;
+    public static ModConfigSpec.DoubleValue RAEVYX_EGG_STORM_INSTANT_CHANCE;
+    public static ModConfigSpec.DoubleValue RAEVYX_EGG_LOOT_PILLAGER_OUTPOST;
+    public static ModConfigSpec.DoubleValue RAEVYX_EGG_LOOT_SHIPWRECK_TREASURE;
+    public static ModConfigSpec.DoubleValue RAEVYX_EGG_LOOT_ANCIENT_CITY;
+    public static ModConfigSpec.DoubleValue RAEVYX_EGG_DROP_CHANCE;
+    public static ModConfigSpec.BooleanValue RAEVYX_AGGRESSIVE_WILD;
 
     // Nulljaw
     public static ModConfigSpec.DoubleValue NULLJAW_MAX_HEALTH;
@@ -46,6 +57,8 @@ public final class NeoForgeDragonAttributesConfig {
     public static ModConfigSpec.DoubleValue NULLJAW_TAMING_CHANCE_BASE;
     public static ModConfigSpec.DoubleValue NULLJAW_TAMING_CHANCE_HEARTY;
     public static ModConfigSpec.BooleanValue NULLJAW_LEGACY_TAMING;
+    public static ModConfigSpec.DoubleValue NULLJAW_EGG_HATCH_CHANCE_NORMAL;
+    public static ModConfigSpec.BooleanValue NULLJAW_AGGRESSIVE_WILD;
 
     // Ignivorus
     public static ModConfigSpec.DoubleValue IGNIVORUS_MAX_HEALTH;
@@ -67,13 +80,21 @@ public final class NeoForgeDragonAttributesConfig {
     public static ModConfigSpec.DoubleValue IGNIVORUS_FIRE_BREATH_IGNITE_BLOCK_CHANCE;
     public static ModConfigSpec.DoubleValue IGNIVORUS_TAMING_CHANCE_BASE;
     public static ModConfigSpec.DoubleValue IGNIVORUS_TAMING_CHANCE_HEARTY;
+    public static ModConfigSpec.DoubleValue IGNIVORUS_TAMING_STUN_HEALTH;
     public static ModConfigSpec.BooleanValue IGNIVORUS_LEGACY_TAMING;
+    public static ModConfigSpec.DoubleValue IGNIVORUS_EGG_HATCH_CHANCE_NORMAL;
+    public static ModConfigSpec.DoubleValue IGNIVORUS_EGG_LOOT_BASTION_TREASURE;
+    public static ModConfigSpec.DoubleValue IGNIVORUS_EGG_LOOT_NETHER_BRIDGE;
+    public static ModConfigSpec.DoubleValue IGNIVORUS_EGG_LOOT_ANCIENT_CITY;
+    public static ModConfigSpec.DoubleValue IGNIVORUS_EGG_DROP_CHANCE;
+    public static ModConfigSpec.BooleanValue IGNIVORUS_AGGRESSIVE_WILD;
 
     // Stegonaut
     public static ModConfigSpec.DoubleValue STEGONAUT_MAX_HEALTH;
     public static ModConfigSpec.DoubleValue STEGONAUT_ARMOR;
     public static ModConfigSpec.DoubleValue STEGONAUT_TAMING_CHANCE_BASE;
     public static ModConfigSpec.DoubleValue STEGONAUT_TAMING_CHANCE_HEARTY;
+    public static ModConfigSpec.DoubleValue STEGONAUT_EGG_HATCH_CHANCE_NORMAL;
 
     // Others (NPCs, misc)
     public static ModConfigSpec.IntValue IVY_RESTOCK_INTERVAL;
@@ -97,6 +118,10 @@ public final class NeoForgeDragonAttributesConfig {
         CINDERVANE_TAMING_CHANCE_BASE = builder.defineInRange("taming_chance_base", 4.0, 1.0, 20.0);
         CINDERVANE_TAMING_CHANCE_HEARTY = builder.defineInRange("taming_chance_hearty", 2.0, 1.0, 20.0);
 
+        builder.comment("Eggs (1 in N chance per random tick)");
+        CINDERVANE_EGG_HATCH_CHANCE_NORMAL = builder.defineInRange("egg_hatch_chance_normal", 2.0, 1.0, 200.0);
+        builder.comment("Aggressive wild behavior");
+        CINDERVANE_AGGRESSIVE_WILD = builder.define("aggressive_wild", false);
         builder.pop();
 
         // Raevyx Configuration
@@ -119,10 +144,24 @@ public final class NeoForgeDragonAttributesConfig {
         builder.comment("Taming Chances (lower = easier)");
         RAEVYX_TAMING_CHANCE_BASE = builder.defineInRange("taming_chance_base", 5.0, 1.0, 20.0);
         RAEVYX_TAMING_CHANCE_HEARTY = builder.defineInRange("taming_chance_hearty", 3.0, 1.0, 20.0);
-
+        builder.comment("Taming stun health threshold (HP)");
+        RAEVYX_TAMING_STUN_HEALTH = builder.defineInRange("taming_stun_health", 60.0, 0.0, 1000.0);
         builder.comment("Legacy taming (true = simple food taming, false = special mechanics)");
         RAEVYX_LEGACY_TAMING = builder.define("legacy_taming", false);
 
+        builder.comment("Eggs (1 in N chance per random tick)");
+        RAEVYX_EGG_HATCH_CHANCE_NORMAL = builder.defineInRange("egg_hatch_chance_normal", 2.0, 1.0, 200.0);
+        RAEVYX_EGG_HATCH_CHANCE_THUNDER = builder.defineInRange("egg_hatch_chance_thunder", 1.0, 1.0, 200.0);
+        builder.comment("1 in N chance to instantly hatch when placed during a storm");
+        RAEVYX_EGG_STORM_INSTANT_CHANCE = builder.defineInRange("egg_storm_instant_chance", 100.0, 1.0, 10000.0);
+        builder.comment("Egg loot chances (0-1)");
+        RAEVYX_EGG_LOOT_PILLAGER_OUTPOST = builder.defineInRange("egg_loot_pillager_outpost", 0.20, 0.0, 1.0);
+        RAEVYX_EGG_LOOT_SHIPWRECK_TREASURE = builder.defineInRange("egg_loot_shipwreck_treasure", 0.15, 0.0, 1.0);
+        RAEVYX_EGG_LOOT_ANCIENT_CITY = builder.defineInRange("egg_loot_ancient_city", 0.15, 0.0, 1.0);
+        builder.comment("Egg drop chance (0-1)");
+        RAEVYX_EGG_DROP_CHANCE = builder.defineInRange("egg_drop_chance", 0.12, 0.0, 1.0);
+        builder.comment("Aggressive wild behavior");
+        RAEVYX_AGGRESSIVE_WILD = builder.define("aggressive_wild", false);
         builder.pop();
 
         // Nulljaw Configuration
@@ -146,7 +185,10 @@ public final class NeoForgeDragonAttributesConfig {
 
         builder.comment("Legacy taming (true = simple food taming, false = special mechanics)");
         NULLJAW_LEGACY_TAMING = builder.define("legacy_taming", false);
-
+        builder.comment("Eggs (1 in N chance per random tick)");
+        NULLJAW_EGG_HATCH_CHANCE_NORMAL = builder.defineInRange("egg_hatch_chance_normal", 3.0, 1.0, 200.0);
+        builder.comment("Aggressive wild behavior");
+        NULLJAW_AGGRESSIVE_WILD = builder.define("aggressive_wild", false);
         builder.pop();
 
         // Ignivorus Configuration
@@ -180,10 +222,21 @@ public final class NeoForgeDragonAttributesConfig {
         builder.comment("Taming Chances (lower = easier)");
         IGNIVORUS_TAMING_CHANCE_BASE = builder.defineInRange("taming_chance_base", 7.0, 1.0, 20.0);
         IGNIVORUS_TAMING_CHANCE_HEARTY = builder.defineInRange("taming_chance_hearty", 4.0, 1.0, 20.0);
-
+        builder.comment("Taming stun health threshold (HP)");
+        IGNIVORUS_TAMING_STUN_HEALTH = builder.defineInRange("taming_stun_health", 100.0, 0.0, 1000.0);
         builder.comment("Legacy taming (true = simple food taming, false = special mechanics)");
         IGNIVORUS_LEGACY_TAMING = builder.define("legacy_taming", false);
 
+        builder.comment("Eggs (1 in N chance per random tick)");
+        IGNIVORUS_EGG_HATCH_CHANCE_NORMAL = builder.defineInRange("egg_hatch_chance_normal", 9.0, 1.0, 300.0);
+        builder.comment("Egg loot chances (0-1)");
+        IGNIVORUS_EGG_LOOT_BASTION_TREASURE = builder.defineInRange("egg_loot_bastion_treasure", 0.15, 0.0, 1.0);
+        IGNIVORUS_EGG_LOOT_NETHER_BRIDGE = builder.defineInRange("egg_loot_nether_bridge", 0.15, 0.0, 1.0);
+        IGNIVORUS_EGG_LOOT_ANCIENT_CITY = builder.defineInRange("egg_loot_ancient_city", 0.10, 0.0, 1.0);
+        builder.comment("Egg drop chance (0-1)");
+        IGNIVORUS_EGG_DROP_CHANCE = builder.defineInRange("egg_drop_chance", 0.12, 0.0, 1.0);
+        builder.comment("Aggressive wild behavior");
+        IGNIVORUS_AGGRESSIVE_WILD = builder.define("aggressive_wild", false);
         builder.pop();
 
         // Stegonaut Configuration
@@ -194,6 +247,8 @@ public final class NeoForgeDragonAttributesConfig {
         builder.comment("Taming Chances (lower = easier)");
         STEGONAUT_TAMING_CHANCE_BASE = builder.defineInRange("taming_chance_base", 1.0, 1.0, 20.0);
         STEGONAUT_TAMING_CHANCE_HEARTY = builder.defineInRange("taming_chance_hearty", 1.0, 1.0, 20.0);
+        builder.comment("Eggs (1 in N chance per random tick)");
+        STEGONAUT_EGG_HATCH_CHANCE_NORMAL = builder.defineInRange("egg_hatch_chance_normal", 2.0, 1.0, 200.0);
         builder.pop();
 
         // Others (NPCs and Miscellaneous)
