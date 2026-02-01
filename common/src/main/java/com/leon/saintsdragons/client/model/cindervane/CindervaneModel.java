@@ -78,7 +78,7 @@ public class CindervaneModel extends DefaultedEntityGeoModel<Cindervane> {
 
         GeoBone root = rootOpt.get();
         var snap = root.getInitialSnapshot();
-        double deviation = entity.bodyRotDeviation.get(partialTick);
+        double deviation = entity.getBodyRotDeviation().get(partialTick);
         float deviationRad = (float)(deviation * Mth.DEG_TO_RAD);
 
         root.setRotY(snap.getRotY() - deviationRad);
@@ -134,7 +134,7 @@ public class CindervaneModel extends DefaultedEntityGeoModel<Cindervane> {
             return;
         }
 
-        double velocity = entity.yawVelocity.get(partialTick);
+        double velocity = entity.getYawVelocity().get(partialTick);
 
         velocity = Mth.clamp(velocity, -25.0, 25.0);
 
@@ -165,7 +165,7 @@ public class CindervaneModel extends DefaultedEntityGeoModel<Cindervane> {
             lookPitchRad *= 0.5f;
         }
 
-        double bodyDeviation = entity.bodyRotDeviation.get(partialTick);
+        double bodyDeviation = entity.getBodyRotDeviation().get(partialTick);
         float structuralYawRad = (float)(bodyDeviation * 2.0 * Mth.DEG_TO_RAD);
         float totalYawRad = lookYawRad + structuralYawRad;
 
@@ -190,7 +190,7 @@ public class CindervaneModel extends DefaultedEntityGeoModel<Cindervane> {
     }
 
     private void applyTailDrag(Cindervane entity, float partialTick) {
-        double velocity = entity.yawVelocity.get(partialTick);
+        double velocity = entity.getYawVelocity().get(partialTick);
         velocity = Mth.clamp(velocity, -30.0, 30.0);
         float targetVelocity = (float) velocity;
         float smoothedVelocity = entity.smoothTailDragVelocity(targetVelocity);

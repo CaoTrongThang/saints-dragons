@@ -102,7 +102,7 @@ public class RaevyxModel extends DefaultedEntityGeoModel<Raevyx> {
         var snap = root.getInitialSnapshot();
 
         // Get the smoothed head-body difference
-        double deviation = entity.bodyRotDeviation.get(partialTick);
+        double deviation = entity.getBodyRotDeviation().get(partialTick);
 
         // Convert to radians and apply
         // GeckoLib bones rotate left when positive, Minecraft rotates right when positive
@@ -187,7 +187,7 @@ public class RaevyxModel extends DefaultedEntityGeoModel<Raevyx> {
         }
 
         // Use yaw velocity to determine turn direction and magnitude
-        double velocity = entity.yawVelocity.get(partialTick);
+        double velocity = entity.getYawVelocity().get(partialTick);
 
         // Clamp to prevent excessive rotation
         velocity = Mth.clamp(velocity, -25.0, 25.0);
@@ -221,7 +221,7 @@ public class RaevyxModel extends DefaultedEntityGeoModel<Raevyx> {
     private void applyNeckFollow(Raevyx entity, EntityModelData modelData, float partialTick) {
 
         // Get body deviation (how much head leads body)
-        double bodyDeviation = entity.bodyRotDeviation.get(partialTick);
+        double bodyDeviation = entity.getBodyRotDeviation().get(partialTick);
 
         // Combine look rotation + structural bend (NO CLAMPING - let body control handle it)
         float lookYawRad = modelData.netHeadYaw() * Mth.DEG_TO_RAD;
@@ -261,7 +261,7 @@ public class RaevyxModel extends DefaultedEntityGeoModel<Raevyx> {
      */
     private void applyTailDrag(Raevyx entity, float partialTick) {
         // Use yawVelocity instead of bodyRotDeviation so it works when riding
-        double velocity = entity.yawVelocity.get(partialTick);
+        double velocity = entity.getYawVelocity().get(partialTick);
 
         // Clamp velocity to prevent tail from going crazy during rapid movements (takeoff, dodging, etc.)
         velocity = Mth.clamp(velocity, -30.0, 30.0); // Max ~30 degrees of tail swing
