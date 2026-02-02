@@ -12,6 +12,7 @@ import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
 import org.jetbrains.annotations.NotNull;
+import org.joml.Matrix3f;
 import org.joml.Matrix4f;
 
 /**
@@ -36,11 +37,8 @@ public class IgnivorusFlameRenderer extends EntityRenderer<IgnivorusFlameEntity>
     @Override
     public void render(@NotNull IgnivorusFlameEntity entity, float entityYaw, float partialTicks,
                        @NotNull PoseStack poseStack, @NotNull MultiBufferSource bufferSource, int packedLight) {
-
-        // Calculate animation frame based on age
-        // Moderate animation speed - 3 ticks per frame = ~7 FPS animation
         int age = entity.getAge();
-        int frame = (age / 3) % TOTAL_FRAMES;
+        int frame = (age / 2) % TOTAL_FRAMES;
 
         ResourceLocation texture = TEXTURES[frame];
 
@@ -50,15 +48,7 @@ public class IgnivorusFlameRenderer extends EntityRenderer<IgnivorusFlameEntity>
         float baseScale = entity.getScale();
         float growthMultiplier = 1.0F + ageRatio; // 1.0 at start, 2.0 at end
         float scale = baseScale * growthMultiplier;
-
-        // Fade in at start, fade out at end
         float alpha = 1.0F;
-        if (age < 3) {
-            alpha = age / 3.0F; // Fade in over first 3 ticks
-        } else if (lifetime - age < 5) {
-            alpha = (lifetime - age) / 5.0F; // Fade out over last 5 ticks
-        }
-        alpha = Mth.clamp(alpha, 0.0F, 1.0F);
 
         poseStack.pushPose();
 
@@ -71,36 +61,39 @@ public class IgnivorusFlameRenderer extends EntityRenderer<IgnivorusFlameEntity>
         // Get matrix for rendering
         PoseStack.Pose pose = poseStack.last();
         Matrix4f matrix4f = pose.pose();
+        Matrix3f matrix3f = pose.normal();
+
         // Get vertex consumer - use entityCutoutNoCull for better visibility during testing
         VertexConsumer vertexConsumer = bufferSource.getBuffer(RenderType.entityCutoutNoCull(texture));
 
         // Render quad (camera-facing billboard)
-        renderBillboard(vertexConsumer, pose, matrix4f, packedLight, alpha);
+        renderBillboard(vertexConsumer, matrix4f, matrix3f, packedLight, alpha);
 
         poseStack.popPose();
 
         super.render(entity, entityYaw, partialTicks, poseStack, bufferSource, packedLight);
     }
 
-    private void renderBillboard(VertexConsumer consumer, PoseStack.Pose pose, Matrix4f matrix4f, int packedLight, float alpha) {
-        float size = 1.0F; // Increased from 0.5F for bigger flames
+    private void renderBillboard(VertexConsumer consumer, Matrix4f matrix4f, Matrix3f matrix3f, int packedLight, float alpha) {
+        float size = 1.0F;
 
         // Render both front and back faces to ensure visibility
         // Front face (counter-clockwise when viewed from front)
-        addVertex(consumer, pose, matrix4f, -size, -size, 0.0F, 0.0F, 1.0F, alpha);
-        addVertex(consumer, pose, matrix4f, -size, size, 0.0F, 0.0F, 0.0F, alpha);
-        addVertex(consumer, pose, matrix4f, size, size, 0.0F, 1.0F, 0.0F, alpha);
-        addVertex(consumer, pose, matrix4f, size, -size, 0.0F, 1.0F, 1.0F, alpha);
+        addVertex(consumer, matrix4f, matrix3f, -size, -size, 0.0F, 0.0F, 1.0F, alpha);
+        addVertex(consumer, matrix4f, matrix3f, -size, size, 0.0F, 0.0F, 0.0F, alpha);
+        addVertex(consumer, matrix4f, matrix3f, size, size, 0.0F, 1.0F, 0.0F, alpha);
+        addVertex(consumer, matrix4f, matrix3f, size, -size, 0.0F, 1.0F, 1.0F, alpha);
     }
 
-    private void addVertex(VertexConsumer consumer, PoseStack.Pose pose, Matrix4f matrix4f,
+    private void addVertex(VertexConsumer consumer, Matrix4f matrix4f, Matrix3f matrix3f,
                           float x, float y, float z, float u, float v, float alpha) {
-        consumer.addVertex(matrix4f, x, y, z)
-                .setColor(1.0F, 1.0F, 1.0F, alpha)
-                .setUv(u, v)
-                .setOverlay(OverlayTexture.NO_OVERLAY)
-                .setLight(240)
-                .setNormal(pose, 0.0F, 0.0F, 1.0F);
+        consumer.vertex(matrix4f, x, y, z)
+                .color(1.0F, 1.0F, 1.0F, alpha)
+                .uv(u, v)
+                .overlayCoords(OverlayTexture.NO_OVERLAY)
+                .uv2(240) // Full brightness
+                .normal(matrix3f, 0.0F, 0.0F, 1.0F) // Normal pointing forward
+                .endVertex();
     }
 
     @Override

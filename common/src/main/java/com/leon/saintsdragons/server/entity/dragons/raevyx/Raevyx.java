@@ -77,7 +77,6 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.Level;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.levelgen.Heightmap;
 import net.minecraft.world.level.pathfinder.PathType;
 import net.minecraft.world.phys.Vec3;
@@ -1193,10 +1192,7 @@ public class Raevyx extends RideableDragonBase implements FlyingAnimal, RangedAt
         if (takeoff && this.isBaby()) takeoff = false;
         boolean wasTakeoff = isTakeoff();
         this.entityData.set(DATA_TAKEOFF, takeoff);
-        if (takeoff && !wasTakeoff && !level().isClientSide) {
-            float pitch = 0.94f + this.getRandom().nextFloat() * 0.12f;
-            this.playSound(ModSounds.RAEVYX_TAKEOFF.get(), 1.2f, pitch);
-        }
+        // Takeoff sound is now handled by animation keyframe in RaevyxSoundProfile
     }
 
     /**
@@ -1217,6 +1213,7 @@ public class Raevyx extends RideableDragonBase implements FlyingAnimal, RangedAt
         BlockPos maxPos = BlockPos.containing(bb.maxX, bb.maxY, bb.maxZ);
 
         for (BlockPos pos : BlockPos.betweenClosed(minPos, maxPos)) {
+            if (!level().hasChunkAt(pos)) continue;
             var state = level().getBlockState(pos);
 
             // Skip air
@@ -1730,9 +1727,9 @@ public class Raevyx extends RideableDragonBase implements FlyingAnimal, RangedAt
             }
         }
 
-        final int DASH_DURATION = 20;
-        final int DASH_COOLDOWN = 40; // 2 seconds
-        final double DASH_DISTANCE = 25; // blocks
+        final int DASH_DURATION = 27;
+        final int DASH_COOLDOWN = 50;
+        final double DASH_DISTANCE = 30; // blocks
 
         float yawRad = (float) Math.toRadians(this.getYRot());
         double forwardX = -Math.sin(yawRad);
@@ -1836,8 +1833,8 @@ public class Raevyx extends RideableDragonBase implements FlyingAnimal, RangedAt
         }
 
         // Dash constants
-        final int DASH_DURATION = 20;
-        final int DASH_COOLDOWN = 40; // 2 seconds
+        final int DASH_DURATION = 27;
+        final int DASH_COOLDOWN = 30;
         final double DASH_DISTANCE = 30; // blocks
 
         // Get forward vector (direction dragon is facing)
@@ -2149,6 +2146,8 @@ public class Raevyx extends RideableDragonBase implements FlyingAnimal, RangedAt
                 (int) Math.floor(pos.y) - checkDown,
                 (int) Math.floor(pos.z)
             );
+
+            if (!level().hasChunkAt(checkPos)) continue;
 
             BlockState state = level().getBlockState(checkPos);
 
@@ -4253,8 +4252,7 @@ public class Raevyx extends RideableDragonBase implements FlyingAnimal, RangedAt
         // Use entity-specific controller names to prevent animation bleeding between dragons
         // Update frequency: run every tick to maintain accurate keyframe timing
         AnimationController<Raevyx> movementController =
-                new AnimationController<>(this, "movement", 8, animationHandler::handleMovementAnimation);
-
+                new AnimationController<>(this, "movement", 5, animationHandler::handleMovementAnimation);
         // Action controller uses ONLY triggers (no predicate logic)
         // All animations (combat, abilities, sleep, death) are triggered via triggerAnim()
         // Lightning wyvern = fast, aggressive combat - instant transitions

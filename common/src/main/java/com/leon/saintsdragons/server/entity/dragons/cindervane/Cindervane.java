@@ -615,13 +615,10 @@ public class Cindervane extends RideableDragonBase implements DragonFlightCapabl
     public void tick() {
         // === CORE TICK (every tick) ===
         super.tick();
-        super.tickRiderControlLock(); // Tick rider control lock system
-
-        // === ANIMATION LOGIC (every tick for smooth visuals) ===
+        tickRiderControlLock();
         tickBankingLogic();
         tickPitchingLogic();
-        tickScreenShake(); // Both sides: client reads, server decays
-
+        tickScreenShake();
         // === CLIENT-SIDE ONLY ===
         if (level().isClientSide) {
             // Increment animation initialization counter (prevents T-pose on rejoin with shaders)
@@ -1212,10 +1209,12 @@ public class Cindervane extends RideableDragonBase implements DragonFlightCapabl
         // Check for water below (scan down from dragon position)
         for (int checkDown = 0; checkDown < WATER_EFFECT_MAX_HEIGHT; checkDown++) {
             BlockPos checkPos = new BlockPos(
-                (int) Math.floor(pos.x),
-                (int) Math.floor(pos.y) - checkDown,
-                (int) Math.floor(pos.z)
+                    Mth.floor(pos.x),
+                    Mth.floor(pos.y) - checkDown,
+                    Mth.floor(pos.z)
             );
+
+            if (!level().hasChunkAt(checkPos)) continue;
 
             BlockState state = level().getBlockState(checkPos);
 
@@ -2433,10 +2432,7 @@ public class Cindervane extends RideableDragonBase implements DragonFlightCapabl
     public void setTakeoff(boolean takeoff) {
         boolean wasTakeoff = isTakeoff();
         this.entityData.set(DATA_TAKEOFF, takeoff);
-        if (takeoff && !wasTakeoff && !level().isClientSide) {
-            float pitch = 0.95f + this.getRandom().nextFloat() * 0.1f;
-            this.playSound(ModSounds.CINDERVANE_TAKEOFF.get(), 1.2f, pitch);
-        }
+        // Takeoff sound is handled via animation keyframe for stereo/mono routing.
     }
 
     /**
@@ -2457,6 +2453,7 @@ public class Cindervane extends RideableDragonBase implements DragonFlightCapabl
         BlockPos maxPos = BlockPos.containing(bb.maxX, bb.maxY, bb.maxZ);
 
         for (BlockPos pos : BlockPos.betweenClosed(minPos, maxPos)) {
+            if (!level().hasChunkAt(pos)) continue;
             var state = level().getBlockState(pos);
 
             // Skip air
