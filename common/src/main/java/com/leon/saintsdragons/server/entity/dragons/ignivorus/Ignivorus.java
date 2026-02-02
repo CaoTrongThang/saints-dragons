@@ -234,10 +234,10 @@ public class Ignivorus extends RideableDragonBase implements DragonFlightCapable
                     .add("ignivorus_grumble3", "action", "animation.ignivorus.grumble3",
                             ModSounds.IGNIVORUS_GRUMBLE_3, 1.2f, 0.9f, 0.08f,
                             true, false, true)
-                    .add("ignivorus_hurt", "hurt", "animation.ignivorus.hurt",
+                    .add("ignivorus_hurt", "instant", "animation.ignivorus.hurt",
                             ModSounds.IGNIVORUS_HURT, 1.6f, 0.95f, 0.1f,
                             true, true, true)
-                    .add("ignivorus_die", "action", "animation.ignivorus.die",
+                    .add("ignivorus_die", "instant", "animation.ignivorus.die",
                             ModSounds.IGNIVORUS_DIE, 1.8f, 0.9f, 0.05f,
                             false, true, true)
                     .build();
@@ -2228,6 +2228,9 @@ public class Ignivorus extends RideableDragonBase implements DragonFlightCapable
     public void setTakeoff(boolean takeoff) {
         boolean wasTakeoff = isTakeoff();
         this.entityData.set(DATA_TAKEOFF, takeoff);
+        if (takeoff && !wasTakeoff && !level().isClientSide) {
+            triggerAnim("instant", "takeoff");
+        }
         // Takeoff sound is handled via animation keyframe for stereo/mono routing.
     }
 
@@ -3424,17 +3427,16 @@ public class Ignivorus extends RideableDragonBase implements DragonFlightCapable
                 return PlayState.STOP;
             });
 
-        AnimationController<Ignivorus> hurtController =
-            new AnimationController<>(this, "hurt", 5, state -> PlayState.STOP);
-        hurtController.triggerableAnim("ignivorus_hurt",
-            software.bernie.geckolib.animation.RawAnimation.begin().thenPlay("animation.ignivorus.hurt"));
-        hurtController.setSoundKeyframeHandler(this::onAnimationSound);
+        AnimationController<Ignivorus> instantController =
+            new AnimationController<>(this, "instant", 1, animationHandler::instantActionPredicate);
+        animationHandler.setupInstantActionController(instantController);
+        instantController.setSoundKeyframeHandler(this::onAnimationSound);
 
         // Register all action animations via handler
         animationHandler.setupActionController(actionController);
         actionController.setSoundKeyframeHandler(this::onAnimationSound);
 
-        controllers.add(movementController, hurtController, actionController);
+        controllers.add(movementController, instantController, actionController);
     }
 
     private void onAnimationSound(SoundKeyframeEvent<Ignivorus> event) {

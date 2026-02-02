@@ -120,16 +120,14 @@ public class Cindervane extends RideableDragonBase implements DragonFlightCapabl
     private int babiesToSpawn = 0;
 
     private static final Map<String, VocalEntry> VOCAL_ENTRIES =
-        new VocalEntryBuilder()
-            .add("grumble1", "actions", "animation.cindervane.grumble1", ModSounds.CINDERVANE_GRUMBLE_1, 1.1f, 0.98f, 0.06f, false, false, false)
-            .add("grumble2", "actions", "animation.cindervane.grumble2", ModSounds.CINDERVANE_GRUMBLE_2, 1.2f, 0.96f, 0.08f, false, false, false)
-            .add("grumble3", "actions", "animation.cindervane.grumble3", ModSounds.CINDERVANE_GRUMBLE_3, 1.0f, 1.0f, 0.05f, false, false, false)
-            .add("roar", "actions", "animation.cindervane.roar", ModSounds.CINDERVANE_ROAR, 1.5f, 0.95f, 0.1f, false, false, false)
-            .add("roar_ground", "actions", "animation.cindervane.roar_ground", ModSounds.CINDERVANE_ROAR, 1.5f, 0.9f, 0.05f, false, false, false)
-            .add("roar_air", "actions", "animation.cindervane.roar_air", ModSounds.CINDERVANE_ROAR, 1.5f, 1.05f, 0.05f, false, false, false)
-            .add("cindervane_hurt", "hurt", "animation.cindervane.hurt", ModSounds.CINDERVANE_HURT, 1.2f, 0.95f, 0.1f, false, false, false)
-            .add("cindervane_die", "actions", "animation.cindervane.die", ModSounds.CINDERVANE_DIE, 1.5f, 1.0f, 0.0f, false, false, false)
-            .build();
+            new VocalEntryBuilder()
+                    .add("grumble1", "actions", "animation.cindervane.grumble1", ModSounds.CINDERVANE_GRUMBLE_1, 1.1f, 0.98f, 0.06f, false, false, false)
+                    .add("grumble2", "actions", "animation.cindervane.grumble2", ModSounds.CINDERVANE_GRUMBLE_2, 1.2f, 0.96f, 0.08f, false, false, false)
+                    .add("grumble3", "actions", "animation.cindervane.grumble3", ModSounds.CINDERVANE_GRUMBLE_3, 1.0f, 1.0f, 0.05f, false, false, false)
+                    .add("roar", "actions", "animation.cindervane.roar", ModSounds.CINDERVANE_ROAR, 1.5f, 0.95f, 0.1f, false, false, false)
+                    .add("cindervane_hurt", "instant", "animation.cindervane.hurt", ModSounds.CINDERVANE_HURT, 1.2f, 0.95f, 0.1f, false, false, false)
+                    .add("cindervane_die", "instant", "animation.cindervane.die", ModSounds.CINDERVANE_DIE, 1.5f, 1.0f, 0.0f, false, false, false)
+                    .build();
 
     public AnimatableInstanceCache dragonCache = GeckoLibUtil.createInstanceCache(this);
     private final CindervaneAnimationHandler animationHandler = new CindervaneAnimationHandler(this);
@@ -2079,12 +2077,11 @@ public class Cindervane extends RideableDragonBase implements DragonFlightCapabl
         actions.setSoundKeyframeHandler(this::onAnimationSound);
         controllers.add(actions);
 
-        AnimationController<Cindervane> HurtController = new AnimationController<>(this, "hurt", 3,
-                state -> software.bernie.geckolib.animation.PlayState.STOP);
-        HurtController.triggerableAnim("cindervane_hurt",
-                RawAnimation.begin().thenPlay("animation.cindervane.hurt"));
-        HurtController.setSoundKeyframeHandler(this::onAnimationSound);
-        controllers.add(HurtController);
+        AnimationController<Cindervane> instantController = new AnimationController<>(this, "instant", 1,
+                animationHandler::instantActionPredicate);
+        animationHandler.setupInstantActionController(instantController);
+        instantController.setSoundKeyframeHandler(this::onAnimationSound);
+        controllers.add(instantController);
     }
 
     private void onAnimationSound(SoundKeyframeEvent<Cindervane> event) {
@@ -2427,6 +2424,9 @@ public class Cindervane extends RideableDragonBase implements DragonFlightCapabl
     public void setTakeoff(boolean takeoff) {
         boolean wasTakeoff = isTakeoff();
         this.entityData.set(DATA_TAKEOFF, takeoff);
+        if (takeoff && !wasTakeoff && !level().isClientSide) {
+            triggerAnim("instant", "takeoff");
+        }
         // Takeoff sound is handled via animation keyframe for stereo/mono routing.
     }
 
