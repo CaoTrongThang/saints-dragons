@@ -151,6 +151,22 @@ public final class DragonAttributeConfigLoader extends SimpleJsonResourceReloadL
             // NeoForge config not available (Fabric or config not loaded yet)
         }
 
+        Map<String, Double> raevyxExtras = new HashMap<>();
+        raevyxExtras.put("run_speed", 0.45D);  // Hardcoded for AI/rider compatibility
+        raevyxExtras.put("walk_speed", 0.25D);  // Hardcoded for AI/rider compatibility
+        raevyxExtras.put("taming_chance_base", tamingChanceBase);
+        raevyxExtras.put("taming_chance_hearty", tamingChanceHearty);
+        raevyxExtras.put("beam_drain_per_tick", beamDrainPerTick);
+        raevyxExtras.put("beam_regen_per_tick", beamRegenPerTick);
+        raevyxExtras.put("egg_hatch_chance_normal", eggHatchChanceNormal);
+        raevyxExtras.put("egg_hatch_chance_thunder", eggHatchChanceThunder);
+        raevyxExtras.put("egg_storm_instant_chance", eggStormInstantChance);
+        raevyxExtras.put("egg_loot_pillager_outpost", eggLootPillagerOutpost);
+        raevyxExtras.put("egg_loot_shipwreck_treasure", eggLootShipwreckTreasure);
+        raevyxExtras.put("egg_loot_ancient_city", eggLootAncientCity);
+        raevyxExtras.put("egg_drop_chance", eggDropChance);
+        raevyxExtras.put("taming_stun_health", tamingStunHealth);
+
         return new DragonAttributeConfig(
                 maxHealth,
                 armor,
@@ -161,22 +177,7 @@ public final class DragonAttributeConfigLoader extends SimpleJsonResourceReloadL
                         "lightning_beam", DragonAbilityOverride.ofDamage(lightningBeamDamage),
                         "horn_gore", DragonAbilityOverride.ofDamage(hornGoreDamage)
                 ),
-                Map.of(
-                        "run_speed", 0.45D,  // Hardcoded for AI/rider compatibility
-                        "walk_speed", 0.25D,  // Hardcoded for AI/rider compatibility
-                        "taming_chance_base", tamingChanceBase,
-                        "taming_chance_hearty", tamingChanceHearty,
-                        "beam_drain_per_tick", beamDrainPerTick,
-                        "beam_regen_per_tick", beamRegenPerTick,
-                        "egg_hatch_chance_normal", eggHatchChanceNormal,
-                        "egg_hatch_chance_thunder", eggHatchChanceThunder,
-                        "egg_storm_instant_chance", eggStormInstantChance,
-                        "egg_loot_pillager_outpost", eggLootPillagerOutpost,
-                        "egg_loot_shipwreck_treasure", eggLootShipwreckTreasure,
-                        "egg_loot_ancient_city", eggLootAncientCity,
-                        "egg_drop_chance", eggDropChance,
-                        "taming_stun_health", tamingStunHealth
-                ),
+                raevyxExtras,
                 Map.of(
                         "legacy_taming", legacyTaming,
                         "aggressive_wild", aggressiveWild

@@ -10,13 +10,17 @@ import com.leon.saintsdragons.common.item.StegonautBinderItem;
 import com.leon.saintsdragons.common.SaintsDragonsCommon;
 import com.leon.saintsdragons.platform.RegistryHelper;
 import com.leon.saintsdragons.platform.Services;
-import net.minecraft.world.food.FoodProperties;
 import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.registries.Registries;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.world.food.FoodProperties;
 import net.minecraft.world.item.BlockItem;
+import net.minecraft.world.item.EitherHolder;
 import net.minecraft.world.item.Item;
+import net.minecraft.world.item.JukeboxPlayable;
+import net.minecraft.world.item.JukeboxSong;
 import net.minecraft.world.item.Rarity;
-import net.minecraft.world.item.RecordItem;
 
 import java.util.function.Supplier;
 
@@ -24,6 +28,8 @@ public final class ModItems {
     private static final RegistryHelper.RegistryWrapper<Item> REGISTER =
             Services.PLATFORM.getRegistryHelper()
                     .create(Registries.ITEM, () -> BuiltInRegistries.ITEM, SaintsDragonsCommon.MOD_ID);
+    private static final ResourceKey<JukeboxSong> BLEEDING_BOLT_SONG_KEY =
+            ResourceKey.create(Registries.JUKEBOX_SONG, SaintsDragonsCommon.rl("bleeding_bolt"));
 
     public static final Supplier<Item> RAEVYX_SPAWN_EGG =
             REGISTER.register("raevyx_spawn_egg",
@@ -165,13 +171,12 @@ public final class ModItems {
 
     public static final Supplier<Item> BLEEDING_BOLT_MUSIC_DISC =
             REGISTER.register("bleeding_bolt_music_disc",
-                    () -> new RecordItem(
-                            1,
-                            ModSounds.BLEEDING_BOLT.get(),
+                    () -> new Item(
                             new Item.Properties()
                                     .stacksTo(1)
-                                    .rarity(Rarity.RARE),
-                            20 * 104
+                                    .rarity(Rarity.RARE)
+                                    .component(DataComponents.JUKEBOX_PLAYABLE,
+                                            new JukeboxPlayable(new EitherHolder<>(BLEEDING_BOLT_SONG_KEY), true))
                     ));
 
     private ModItems() {

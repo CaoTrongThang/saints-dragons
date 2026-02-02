@@ -27,23 +27,40 @@ public abstract class IgnivorusMultipartMixin implements IEntityExtension {
         this.saintsdragons$neoforgePartManager = new NeoForgeIgnivorusPartManager((Ignivorus) (Object) this);
     }
 
-    @Inject(method = "tick", at = @At("RETURN"))
+    @Inject(method = "tick", at = @At("HEAD"))
     private void onTick(CallbackInfo ci) {
-        if (this.saintsdragons$neoforgePartManager != null) {
-            this.saintsdragons$neoforgePartManager.updatePartPositions();
+        Ignivorus ignivorus = (Ignivorus) (Object) this;
+        if (ignivorus.isRemoved()) {
+            if (this.saintsdragons$neoforgePartManager != null) {
+                this.saintsdragons$neoforgePartManager.removeAllParts();
+                this.saintsdragons$neoforgePartManager = null;
+            }
+            return;
         }
+
+        if (ignivorus.isBaby()) {
+            if (this.saintsdragons$neoforgePartManager != null) {
+                this.saintsdragons$neoforgePartManager.removeAllParts();
+                this.saintsdragons$neoforgePartManager = null;
+            }
+            return;
+        }
+
+        if (this.saintsdragons$neoforgePartManager == null) {
+            this.saintsdragons$neoforgePartManager = new NeoForgeIgnivorusPartManager(ignivorus);
+        }
+        this.saintsdragons$neoforgePartManager.updatePartPositions();
     }
 
     @Override
     public boolean isMultipartEntity() {
-        boolean result = this.saintsdragons$neoforgePartManager != null;
-        return result;
+        return this.saintsdragons$neoforgePartManager != null;
     }
 
     @Override
     public PartEntity<?>[] getParts() {
         if (this.saintsdragons$neoforgePartManager == null) {
-            return null;
+            return new PartEntity[0];
         }
         return this.saintsdragons$neoforgePartManager.getParts();
     }

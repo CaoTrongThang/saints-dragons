@@ -43,7 +43,7 @@ public abstract class ServerGamePacketListenerMixin {
         // First check if vanilla can find it (regular entity)
         Entity vanillaEntity = level.getEntity(entityId);
 
-        if (vanillaEntity instanceof ForgeDragonPart directPart) {
+        if (vanillaEntity instanceof NeoForgeDragonPart directPart) {
             packet.dispatch(new ServerboundInteractPacket.Handler() {
                 @Override
                 public void onInteraction(InteractionHand hand) {

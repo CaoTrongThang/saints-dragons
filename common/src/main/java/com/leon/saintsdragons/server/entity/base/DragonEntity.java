@@ -873,6 +873,12 @@ public abstract class DragonEntity extends TamableAnimal implements GeoEntity {
         return sleepComponent.getAmbientCooldownTicks();
     }
 
+    protected void bumpSleepAmbientCooldown(int ticks) {
+        if (sleepComponent != null) {
+            sleepComponent.bumpAmbientCooldown(ticks);
+        }
+    }
+
     protected void clearSleepCooldowns() {
         if (sleepComponent != null) {
             sleepComponent.clearCooldowns();
@@ -1715,64 +1721,6 @@ public abstract class DragonEntity extends TamableAnimal implements GeoEntity {
             return false;
         }
         return state.isSolidRender(level, pos) || state.isFaceSturdy(level, pos, net.minecraft.core.Direction.UP);
-    }
-
-    // ===== SLEEP API (override per-dragon) =====
-
-    /**
-     * Check if the dragon is currently sleeping.
-     */
-    public boolean isSleeping() {
-        return false;
-    }
-
-    /**
-     * Check if the dragon is transitioning between sleep states.
-     */
-    public boolean isSleepTransitioning() {
-        return false;
-    }
-
-    /**
-     * Start the sleep enter sequence (sit down -> fall asleep -> sleep).
-     */
-    public void startSleepEnter() {
-        // Override in dragons that support sleeping
-    }
-
-    /**
-     * Start the sleep exit sequence (wake up -> sit up -> stand).
-     */
-    public void startSleepExit() {
-        // Override in dragons that support sleeping
-    }
-
-    /**
-     * Wake up immediately (e.g., on damage).
-     */
-    public void wakeUpImmediately() {
-        // Override in dragons that support sleeping
-    }
-
-    /**
-     * Check if sleep is temporarily suppressed (combat cooldown, etc.).
-     */
-    public boolean isSleepSuppressed() {
-        return false;
-    }
-
-    /**
-     * Get this dragon's sleep preferences (day/night, weather, etc.).
-     */
-    public DragonSleepBehavior.DragonSleepPreferences getSleepPreferences() {
-        return DragonSleepBehavior.DragonSleepPreferences.FLEXIBLE();
-    }
-
-    /**
-     * Check if dragon can sleep right now (custom per-dragon logic).
-     */
-    public boolean canSleepNow() {
-        return true;
     }
 
     // ===== ABSTRACT METHODS =====

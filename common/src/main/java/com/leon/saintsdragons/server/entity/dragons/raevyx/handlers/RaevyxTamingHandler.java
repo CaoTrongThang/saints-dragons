@@ -123,6 +123,13 @@ public class RaevyxTamingHandler {
             return;
         }
 
+        if (wyvern.isBaby()) {
+            if (wyvern.isTamingStunned()) {
+                clearRecovery();
+            }
+            return;
+        }
+
         if (!wyvern.isTame() && !wyvern.isTamingStunned() && wyvern.isBelowTamingThreshold()) {
             enterHoldState();
         }

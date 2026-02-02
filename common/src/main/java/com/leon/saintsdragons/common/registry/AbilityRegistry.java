@@ -56,6 +56,6 @@ public final class AbilityRegistry {
         if (name.indexOf(':') >= 0) {
             return ResourceLocation.tryParse(name);
         }
-        return new ResourceLocation(SaintsDragonsCommon.MOD_ID, name);
+        return ResourceLocation.fromNamespaceAndPath(SaintsDragonsCommon.MOD_ID, name);
     }
 }

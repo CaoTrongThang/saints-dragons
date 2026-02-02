@@ -468,6 +468,9 @@ public class Raevyx extends RideableDragonBase implements FlyingAnimal, RangedAt
     }
 
     public boolean isBelowTamingThreshold() {
+        if (isBaby()) {
+            return false;
+        }
         return this.getHealth() <= getTamingThreshold();
     }
 
@@ -3024,7 +3027,7 @@ public class Raevyx extends RideableDragonBase implements FlyingAnimal, RangedAt
     }
 
     private void suppressAmbientSounds(int ticks) {
-        this.sleepAmbientCooldownTicks = Math.max(this.sleepAmbientCooldownTicks, ticks);
+        bumpSleepAmbientCooldown(ticks);
         this.ambientSoundTimer = 0;
         this.nextAmbientSoundDelay = Math.max(this.nextAmbientSoundDelay, ticks);
     }
@@ -3683,6 +3686,11 @@ public class Raevyx extends RideableDragonBase implements FlyingAnimal, RangedAt
     public DragonSleepBehavior.DragonSleepPreferences getSleepPreferences() {
         // Raevyx are daylight sleepers (avoid thunderstorms)
         return DragonSleepBehavior.DragonSleepPreferences.DIURNAL();
+    }
+
+    @Override
+    public boolean canSleepNow() {
+        return !isBeaming() && !isVehicle();
     }
 
     @Override
@@ -4476,20 +4484,6 @@ public class Raevyx extends RideableDragonBase implements FlyingAnimal, RangedAt
         return !isInWaterOrBubble() && !isInLava() && onGround();
     }
     
-    // ===== DRAGON SLEEP CAPABLE INTERFACE =====
-    // Note: Most sleep methods already exist in LightningDragonEntity
-    
-    @Override
-    public DragonSleepBehavior.DragonSleepPreferences getSleepPreferences() {
-        // Raevyx are daylight sleepers (avoid thunderstorms)
-        return DragonSleepBehavior.DragonSleepPreferences.DIURNAL();
-    }
-    
-    @Override
-    public boolean canSleepNow() {
-        return !isBeaming() && !isVehicle();
-    }
-
     private boolean shouldStaySeatedCommand() {
         return this.isTame() && this.getCommand() == 1;
     }

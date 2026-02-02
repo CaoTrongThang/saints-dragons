@@ -4,6 +4,7 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.util.datafix.DataFixTypes;
 import net.minecraft.world.level.saveddata.SavedData;
 
 import java.util.HashMap;
@@ -20,8 +21,7 @@ public class GlobalDragonAllySavedData extends SavedData {
 
     public static GlobalDragonAllySavedData get(ServerLevel level) {
         return level.getDataStorage().computeIfAbsent(
-                GlobalDragonAllySavedData::load,
-                GlobalDragonAllySavedData::new,
+                new SavedData.Factory<>(GlobalDragonAllySavedData::new, GlobalDragonAllySavedData::load, DataFixTypes.LEVEL),
                 DATA_NAME
         );
     }
@@ -73,7 +73,7 @@ public class GlobalDragonAllySavedData extends SavedData {
     }
 
     @Override
-    public CompoundTag save(CompoundTag tag) {
+    public CompoundTag save(CompoundTag tag, net.minecraft.core.HolderLookup.Provider provider) {
         ListTag playerList = new ListTag();
         for (Map.Entry<UUID, Map<UUID, String>> entry : alliesByOwner.entrySet()) {
             CompoundTag playerTag = new CompoundTag();
@@ -92,7 +92,7 @@ public class GlobalDragonAllySavedData extends SavedData {
         return tag;
     }
 
-    public static GlobalDragonAllySavedData load(CompoundTag tag) {
+    public static GlobalDragonAllySavedData load(CompoundTag tag, net.minecraft.core.HolderLookup.Provider provider) {
         GlobalDragonAllySavedData data = new GlobalDragonAllySavedData();
         if (tag.contains("Players", Tag.TAG_LIST)) {
             ListTag playerList = tag.getList("Players", Tag.TAG_COMPOUND);

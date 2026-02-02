@@ -6,6 +6,7 @@ import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.util.datafix.DataFixTypes;
 import net.minecraft.world.level.saveddata.SavedData;
 
 import java.util.ArrayList;
@@ -25,8 +26,7 @@ public class DragonCodexSavedData extends SavedData {
 
     public static DragonCodexSavedData get(ServerLevel level) {
         return level.getDataStorage().computeIfAbsent(
-                DragonCodexSavedData::load,
-                DragonCodexSavedData::new,
+                new SavedData.Factory<>(DragonCodexSavedData::new, DragonCodexSavedData::load, DataFixTypes.LEVEL),
                 DATA_NAME
         );
     }
@@ -143,7 +143,7 @@ public class DragonCodexSavedData extends SavedData {
     }
 
     @Override
-    public CompoundTag save(CompoundTag tag) {
+    public CompoundTag save(CompoundTag tag, net.minecraft.core.HolderLookup.Provider provider) {
         ListTag playerList = new ListTag();
         for (Map.Entry<UUID, List<DragonCodexEntry>> entry : entriesByOwner.entrySet()) {
             CompoundTag playerTag = new CompoundTag();
@@ -172,7 +172,7 @@ public class DragonCodexSavedData extends SavedData {
         return tag;
     }
 
-    public static DragonCodexSavedData load(CompoundTag tag) {
+    public static DragonCodexSavedData load(CompoundTag tag, net.minecraft.core.HolderLookup.Provider provider) {
         DragonCodexSavedData data = new DragonCodexSavedData();
         if (tag.contains("Players", Tag.TAG_LIST)) {
             ListTag playerList = tag.getList("Players", Tag.TAG_COMPOUND);

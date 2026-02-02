@@ -7,11 +7,17 @@ import com.leon.saintsdragons.common.registry.ModEntities;
 import com.leon.saintsdragons.common.registry.ModSounds;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.components.AbstractButton;
 import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.client.renderer.entity.EntityRenderDispatcher;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.Mth;
 import org.jetbrains.annotations.NotNull;
+import org.joml.Quaternionf;
 
 import javax.annotation.Nullable;
 import java.util.ArrayList;
@@ -23,7 +29,6 @@ import java.util.Objects;
 public class DraconicCodexScreen extends Screen {
     // Flag to disable custom animations during GUI rendering
     public static final ThreadLocal<Boolean> RENDERING_IN_GUI = ThreadLocal.withInitial(() -> false);
-
     private static final int GUI_WIDTH = 393;
     private static final int GUI_HEIGHT = 214;
     private static final int TAB_HEIGHT = 22;
@@ -117,8 +122,8 @@ public class DraconicCodexScreen extends Screen {
     private int ecologyPage = 1;
 
     private CustomEditBox allyInput;
-    private net.minecraft.client.gui.components.ImageButton addAllyButton;
-    private net.minecraft.client.gui.components.ImageButton removeAllyButton;
+    private CodexIconButton addAllyButton;
+    private CodexIconButton removeAllyButton;
     private net.minecraft.client.gui.components.Button ecologyPrevPageButton;
     private net.minecraft.client.gui.components.Button ecologyNextPageButton;
 
@@ -149,8 +154,14 @@ public class DraconicCodexScreen extends Screen {
     }
 
     @Override
+    public void renderBackground(@NotNull GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
+        // Clear depth so 3D entity rendering isn't occluded by the world depth buffer.
+        com.mojang.blaze3d.systems.RenderSystem.clear(256, Minecraft.ON_OSX);
+    }
+
+    @Override
     public void render(@NotNull GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
-        this.renderBackground(guiGraphics);
+        this.renderBackground(guiGraphics, mouseX, mouseY, partialTick);
 
         guiGraphics.blit(BOOK_TEXTURE, leftPos, topPos, 0, 0, GUI_WIDTH, GUI_HEIGHT, GUI_WIDTH, GUI_HEIGHT);
 
@@ -165,7 +176,7 @@ public class DraconicCodexScreen extends Screen {
         super.render(guiGraphics, mouseX, mouseY, partialTick);
 
         // Render dragon last with scissor clipping
-        drawDragonPortrait(guiGraphics, mouseX, mouseY);
+        drawDragonPortrait(guiGraphics, mouseX, mouseY, partialTick);
     }
 
     private void drawTabs(GuiGraphics guiGraphics) {
@@ -458,20 +469,21 @@ public class DraconicCodexScreen extends Screen {
         guiGraphics.drawString(this.font, genderValue, iconX + STAT_ICON_WIDTH + 2, iconY + STAT_TEXT_OFFSET_Y, TEXT_COLOR, false);
     }
 
-    private void drawDragonPortrait(GuiGraphics guiGraphics, int mouseX, int mouseY) {
+    private void drawDragonPortrait(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
         DragonEntry selected = getSelectedEntry();
         if (selected == null || this.minecraft == null || this.minecraft.level == null) {
             return;
         }
 
-        // Try to find the real dragon first (if in render distance)
-        com.leon.saintsdragons.server.entity.base.DragonEntity dragon = findDragonEntity(selected.entityId);
-        // If not found, create a dummy dragon for rendering
+        com.leon.saintsdragons.server.entity.base.DragonEntity dragon = null;
+        if (selected.entityId != null) {
+            dragon = findDragonEntity(selected.entityId);
+        }
         if (dragon == null) {
             dragon = createDummyDragon(selected);
-            if (dragon == null) {
-                return;
-            }
+        }
+        if (dragon == null) {
+            return;
         }
 
         int boxX = leftPos + DRAGON_RENDER_BOX_X;
@@ -482,27 +494,21 @@ public class DraconicCodexScreen extends Screen {
         // Get scale based on dragon type
         int size = getDragonScale(dragon);
 
-        // Enable scissor to clip dragon rendering to the box
-        guiGraphics.enableScissor(boxX, boxY, boxX + DRAGON_RENDER_BOX_SIZE, boxY + DRAGON_RENDER_BOX_SIZE);
+        int renderX = centerX - DRAGON_RENDER_BOX_SIZE / 2;
+        int renderY = centerY - DRAGON_RENDER_BOX_SIZE / 2;
 
         // Set flag to disable custom animations during GUI rendering
         RENDERING_IN_GUI.set(true);
         try {
-            net.minecraft.client.gui.screens.inventory.InventoryScreen.renderEntityInInventoryFollowsMouse(
-                    guiGraphics,
-                    centerX,
-                    centerY,
-                    size,
-                    (float) (centerX - mouseX),
-                    (float) (centerY - DRAGON_RENDER_BOX_SIZE - mouseY),
-                    dragon
-            );
+            com.mojang.blaze3d.systems.RenderSystem.enableDepthTest();
+            guiGraphics.enableScissor(boxX, boxY, boxX + DRAGON_RENDER_BOX_SIZE, boxY + DRAGON_RENDER_BOX_SIZE);
+            renderDragonEntity(guiGraphics, renderX, renderY, DRAGON_RENDER_BOX_SIZE, DRAGON_RENDER_BOX_SIZE, size, mouseX, mouseY, partialTick, dragon);
+            guiGraphics.disableScissor();
+            com.mojang.blaze3d.systems.RenderSystem.disableDepthTest();
         } finally {
             // Always clear the flag, even if rendering fails
             RENDERING_IN_GUI.set(false);
         }
-
-        guiGraphics.disableScissor();
     }
 
     private int getDragonScale(com.leon.saintsdragons.server.entity.base.DragonEntity dragon) {
@@ -577,6 +583,8 @@ public class DraconicCodexScreen extends Screen {
         if (dragon == null) {
             return null;
         }
+        dragon.setNoAi(true);
+        dragon.setSilent(true);
 
         // Set baby status
         if (entry.isBaby()) {
@@ -592,6 +600,68 @@ public class DraconicCodexScreen extends Screen {
         dragon.setGender(com.leon.saintsdragons.server.entity.base.DragonGender.fromId(entry.genderId()));
 
         return dragon;
+    }
+
+    private void renderDragonEntity(GuiGraphics guiGraphics, int x, int y, int width, int height, int scale,
+                                    float mouseX, float mouseY, float partialTick, net.minecraft.world.entity.LivingEntity entity) {
+        float centerX = x + width / 2.0F;
+        float centerY = y + height / 2.0F;
+        float angleX = (float) Math.atan((centerX - mouseX) / 40.0F);
+        float angleY = (float) Math.atan((centerY - mouseY) / 40.0F);
+
+        var poseStack = guiGraphics.pose();
+        poseStack.pushPose();
+        poseStack.translate(centerX, centerY, 1050.0F);
+        poseStack.scale(scale, scale, -scale);
+
+        Quaternionf rotZ = new Quaternionf().rotateZ((float) Math.PI);
+        Quaternionf rotX = new Quaternionf().rotateX(angleY * 20.0F * Mth.DEG_TO_RAD);
+        rotZ.mul(rotX);
+        poseStack.mulPose(rotZ);
+
+        float bodyRot = entity.yBodyRot;
+        float bodyRotO = entity.yBodyRotO;
+        float yRot = entity.getYRot();
+        float yRotO = entity.yRotO;
+        float xRot = entity.getXRot();
+        float xRotO = entity.xRotO;
+        float yHeadRotO = entity.yHeadRotO;
+        float yHeadRot = entity.yHeadRot;
+
+        float targetBodyRot = 180.0F + angleX * 20.0F;
+        float targetYRot = 180.0F + angleX * 40.0F;
+        float targetXRot = -angleY * 20.0F;
+        entity.yBodyRot = targetBodyRot;
+        entity.yBodyRotO = targetBodyRot;
+        entity.setYRot(targetYRot);
+        entity.yRotO = targetYRot;
+        entity.setXRot(targetXRot);
+        entity.xRotO = targetXRot;
+        entity.yHeadRot = targetYRot;
+        entity.yHeadRotO = targetYRot;
+
+        com.mojang.blaze3d.platform.Lighting.setupForEntityInInventory();
+        EntityRenderDispatcher dispatcher = Minecraft.getInstance().getEntityRenderDispatcher();
+        Quaternionf camRot = new Quaternionf().rotateX(angleY * 20.0F * Mth.DEG_TO_RAD);
+        camRot.conjugate();
+        dispatcher.overrideCameraOrientation(camRot);
+        dispatcher.setRenderShadow(false);
+
+        MultiBufferSource.BufferSource buffer = guiGraphics.bufferSource();
+        dispatcher.render(entity, 0.0D, 0.0D, 0.0D, 0.0F, partialTick, poseStack, buffer, 15728880);
+        buffer.endBatch();
+
+        dispatcher.setRenderShadow(true);
+        entity.yBodyRot = bodyRot;
+        entity.yBodyRotO = bodyRotO;
+        entity.setYRot(yRot);
+        entity.yRotO = yRotO;
+        entity.setXRot(xRot);
+        entity.xRotO = xRotO;
+        entity.yHeadRotO = yHeadRotO;
+        entity.yHeadRot = yHeadRot;
+        poseStack.popPose();
+        com.mojang.blaze3d.platform.Lighting.setupFor3DItems();
     }
 
     private net.minecraft.world.entity.EntityType<? extends com.leon.saintsdragons.server.entity.base.DragonEntity> getDragonEntityType(String dragonType) {
@@ -669,7 +739,8 @@ public class DraconicCodexScreen extends Screen {
     }
 
     @Override
-    public boolean mouseScrolled(double mouseX, double mouseY, double delta) {
+    public boolean mouseScrolled(double mouseX, double mouseY, double scrollX, double scrollY) {
+        double delta = scrollY;
         if (activeTab == CodexTab.ALLY) {
             if (allyList.size() > MAX_VISIBLE_ALLIES) {
                 if (delta < 0 && allyScrollOffset < allyList.size() - MAX_VISIBLE_ALLIES) {
@@ -718,6 +789,32 @@ public class DraconicCodexScreen extends Screen {
         this.allyList = new ArrayList<>(newAllyList);
         this.allyList.sort(String.CASE_INSENSITIVE_ORDER);
         this.allyScrollOffset = Math.min(allyScrollOffset, Math.max(0, allyList.size() - MAX_VISIBLE_ALLIES));
+    }
+
+    private static final class CodexIconButton extends AbstractButton {
+        private final ResourceLocation texture;
+        private final Runnable onPress;
+
+        private CodexIconButton(int x, int y, int width, int height, ResourceLocation texture, Runnable onPress) {
+            super(x, y, width, height, Component.empty());
+            this.texture = texture;
+            this.onPress = onPress;
+        }
+
+        @Override
+        public void onPress() {
+            onPress.run();
+        }
+
+        @Override
+        protected void renderWidget(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
+            guiGraphics.blit(texture, getX(), getY(), 0, 0, width, height, width, height);
+        }
+
+        @Override
+        protected void updateWidgetNarration(net.minecraft.client.gui.narration.NarrationElementOutput narration) {
+            // No narration for icon-only buttons.
+        }
     }
 
     public void addAlly(String username) {
@@ -836,21 +933,17 @@ public class DraconicCodexScreen extends Screen {
 
         int iconButtonX = inputX + inputWidth + 8;
 
-        addAllyButton = new net.minecraft.client.gui.components.ImageButton(
+        addAllyButton = new CodexIconButton(
                 iconButtonX - 36, inputY + 18, 14, 14,
-                0, 0, 0,
                 ADD_ICON,
-                14, 14,
-                button -> addAllyFromInput()
+                this::addAllyFromInput
         );
         this.addRenderableWidget(addAllyButton);
 
-        removeAllyButton = new net.minecraft.client.gui.components.ImageButton(
+        removeAllyButton = new CodexIconButton(
                 iconButtonX - 19, inputY + 18, 14, 14,
-                0, 0, 0,
                 REMOVE_ICON,
-                14, 14,
-                button -> removeAllyFromInput()
+                this::removeAllyFromInput
         );
         this.addRenderableWidget(removeAllyButton);
 

@@ -1,6 +1,7 @@
 package com.leon.saintsdragons.neoforge.entity.part;
 
 import com.leon.saintsdragons.server.entity.dragons.ignivorus.Ignivorus;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.neoforge.entity.PartEntity;
 
@@ -148,5 +149,11 @@ public class NeoForgeIgnivorusPartManager {
 
     public PartEntity<?>[] getParts() {
         return partsArray;
+    }
+
+    public void removeAllParts() {
+        for (NeoForgeDragonPart part : parts.values()) {
+            part.remove(Entity.RemovalReason.DISCARDED);
+        }
     }
 }

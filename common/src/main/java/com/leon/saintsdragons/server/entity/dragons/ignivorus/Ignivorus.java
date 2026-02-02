@@ -795,6 +795,9 @@ public class Ignivorus extends RideableDragonBase implements DragonFlightCapable
     }
 
     public boolean isBelowTamingThreshold() {
+        if (isBaby()) {
+            return false;
+        }
         return this.getHealth() <= getTamingThreshold();
     }
 

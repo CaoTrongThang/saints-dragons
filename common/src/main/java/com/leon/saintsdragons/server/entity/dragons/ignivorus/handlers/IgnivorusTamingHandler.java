@@ -123,6 +123,13 @@ public class IgnivorusTamingHandler {
             return;
         }
 
+        if (dragon.isBaby()) {
+            if (dragon.isTamingStunned()) {
+                clearRecovery();
+            }
+            return;
+        }
+
         if (!dragon.isTame() && !dragon.isTamingStunned() && dragon.isBelowTamingThreshold()) {
             enterHoldState();
         }

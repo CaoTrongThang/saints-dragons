@@ -38,8 +38,8 @@ public final class SaintsDragonsCommon {
         ModEntities.register();
         ModBlocks.register();
         ModBlockEntities.register();
-        ModItems.register();
         ModSounds.register();
+        ModItems.register();
         ModParticles.register();
         SaintsCreativeTab.register();
 
