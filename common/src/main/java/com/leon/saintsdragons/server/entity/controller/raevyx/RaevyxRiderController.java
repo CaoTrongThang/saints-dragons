@@ -20,6 +20,7 @@ public record RaevyxRiderController(Raevyx wyvern) {
     // ===== SEAT TUNING CONSTANTS =====
     // Baseline vertical offset relative to wyvern height
     private static final double SEAT_BASE_FACTOR = 0.50D; // 0.0..1.0 of bbHeight
+    private static final double SEAT_HEIGHT_ADJUST = 0.00D;
 
     // No head-follow offsets; keep static body seat
 
@@ -305,13 +306,19 @@ public record RaevyxRiderController(Raevyx wyvern) {
     public double getPassengersRidingOffset() {
         return (double) wyvern.getBbHeight() * SEAT_BASE_FACTOR;
     }
+    
+    public void positionRider(@NotNull Entity passenger, Entity.@NotNull MoveFunction moveFunction) {
+        if (!wyvern.hasPassenger(passenger)) return;
 
-    public Vec3 getPassengerPosition(@NotNull Entity passenger) {
-        if (!wyvern.hasPassenger(passenger)) {
-            return passenger.position();
+        Vec3 passengerLoc = null;
+        if (wyvern.level().isClientSide) {
+            passengerLoc = wyvern.getClientLocatorPosition("passengerLocator");
+            if (passengerLoc == null) {
+                // Compatibility fallback for packs that rename locator keys.
+                passengerLoc = wyvern.getClientLocatorPosition("passengerSeat0");
+            }
         }
 
-        Vec3 passengerLoc = wyvern.getClientLocatorPosition("passengerLocator");
         if (passengerLoc != null) {
             Vec3 wyvernOldPos = new Vec3(wyvern.xo, wyvern.yo, wyvern.zo);
             float oldYaw = wyvern.yRotO;
@@ -332,61 +339,14 @@ public record RaevyxRiderController(Raevyx wyvern) {
             double currentWorldZ = -localX * sinCurrent + localZ * cosCurrent;
 
             Vec3 wyvernCurrentPos = wyvern.position();
-            return wyvernCurrentPos.add(currentWorldX, localY, currentWorldZ);
-        }
-
-        double x = wyvern.getX();
-        double y = wyvern.getY() + getPassengersRidingOffset() + passenger.getBbHeight() * 0.5D;
-        double z = wyvern.getZ();
-        return new Vec3(x, y, z);
-    }
-
-    public void positionRider(@NotNull Entity passenger, Entity.@NotNull MoveFunction moveFunction) {
-        if (!wyvern.hasPassenger(passenger)) return;
-
-        // Get the bone position from the renderer's cache (updated each render frame)
-        // Optimize: Only check cache on client side to avoid map lookup on server
-        Vec3 passengerLoc = wyvern.level().isClientSide ? wyvern.getClientLocatorPosition("passengerLocator") : null;
-
-        if (passengerLoc != null) {
-            // The cached position is in world-space but may be from the previous frame
-            // We need to convert to dragon-local space to handle both movement AND rotation
-
-            // Get dragon's old position and rotation (from when bone was sampled)
-            Vec3 dragonOldPos = new Vec3(wyvern.xo, wyvern.yo, wyvern.zo);
-            float oldYaw = wyvern.yRotO;
-
-            // Calculate offset in world space
-            Vec3 worldOffset = passengerLoc.subtract(dragonOldPos);
-
-            // Convert world offset to dragon-local space (relative to old rotation)
-            double oldYawRad = Math.toRadians(-oldYaw); // Negative because Minecraft yaw is inverted
-            double cosOld = Math.cos(oldYawRad);
-            double sinOld = Math.sin(oldYawRad);
-
-            // Rotate world offset back to local space
-            double localX = worldOffset.x * cosOld - worldOffset.z * sinOld;
-            double localY = worldOffset.y;
-            double localZ = worldOffset.x * sinOld + worldOffset.z * cosOld;
-
-            // Now rotate local offset to current rotation
-            float currentYaw = wyvern.getYRot();
-            double currentYawRad = Math.toRadians(-currentYaw);
-            double cosCurrent = Math.cos(currentYawRad);
-            double sinCurrent = Math.sin(currentYawRad);
-
-            double currentWorldX = localX * cosCurrent + localZ * sinCurrent;
-            double currentWorldZ = -localX * sinCurrent + localZ * cosCurrent;
-
-            // Apply to current dragon position
-            Vec3 dragonCurrentPos = wyvern.position();
-            Vec3 passengerCurrentPos = dragonCurrentPos.add(currentWorldX, localY, currentWorldZ);
+            Vec3 passengerCurrentPos = wyvernCurrentPos.add(currentWorldX, localY + SEAT_HEIGHT_ADJUST, currentWorldZ);
 
             moveFunction.accept(passenger, passengerCurrentPos.x, passengerCurrentPos.y, passengerCurrentPos.z);
         } else {
-            // Fallback to vanilla positioning if bone position not available yet
-            Vec3 pos = getPassengerPosition(passenger);
-            moveFunction.accept(passenger, pos.x, pos.y, pos.z);
+            double x = wyvern.getX();
+            double y = wyvern.getY() + getPassengersRidingOffset() + SEAT_HEIGHT_ADJUST + passenger.getMyRidingOffset();
+            double z = wyvern.getZ();
+            moveFunction.accept(passenger, x, y, z);
         }
     }
     
@@ -456,12 +416,12 @@ public record RaevyxRiderController(Raevyx wyvern) {
         wyvern.getNavigation().stop();
         wyvern.setGoingDown(false);
         wyvern.setGoingUp(true); // Latch ascend so we don't rely on a follow-up look/move packet
-        
+
         // Reset all flight states for a fresh takeoff
         wyvern.timeFlying = 0;
         wyvern.landingFlag = false;
         wyvern.landingTimer = 0;
-        
+
         // Initiate takeoff sequence
         wyvern.setFlying(true);
         wyvern.setTakeoff(true);
