@@ -10,6 +10,8 @@ import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.inventory.InventoryScreen;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
+import org.joml.Quaternionf;
+import org.joml.Vector3f;
 
 public class CodexDragonRenderer {
     private static final int IGNIVORUS_SCALE = 8;
@@ -19,15 +21,15 @@ public class CodexDragonRenderer {
     private static final int STEGONAUT_SCALE = 23;
 
     private static final int IGNIVORUS_OFFSET_X = 0;
-    private static final int IGNIVORUS_OFFSET_Y = 0;
+    private static final int IGNIVORUS_OFFSET_Y = -10;
     private static final int RAEVYX_OFFSET_X = 0;
-    private static final int RAEVYX_OFFSET_Y = -5;
+    private static final int RAEVYX_OFFSET_Y = -30;
     private static final int NULLJAW_OFFSET_X = 0;
-    private static final int NULLJAW_OFFSET_Y = -10;
+    private static final int NULLJAW_OFFSET_Y = -35;
     private static final int CINDERVANE_OFFSET_X = 0;
-    private static final int CINDERVANE_OFFSET_Y = -15;
+    private static final int CINDERVANE_OFFSET_Y = -30;
     private static final int STEGONAUT_OFFSET_X = 0;
-    private static final int STEGONAUT_OFFSET_Y = -15;
+    private static final int STEGONAUT_OFFSET_Y = -30;
 
     public void drawDragonPortrait(GuiGraphics guiGraphics, Minecraft minecraft, CodexDragonEntry selected,
                                    int leftPos, int topPos, int mouseX, int mouseY) {
@@ -45,10 +47,9 @@ public class CodexDragonRenderer {
 
         int boxX = leftPos + CodexLayout.DRAGON_RENDER_BOX_X;
         int boxY = topPos + CodexLayout.DRAGON_RENDER_BOX_Y;
-        int centerX = boxX + CodexLayout.DRAGON_RENDER_BOX_SIZE / 2 + getDragonOffsetX(dragon);
-        int centerY = boxY + CodexLayout.DRAGON_RENDER_BOX_SIZE + getDragonOffsetY(dragon);
-
         int size = getDragonScale(dragon);
+        int centerX = boxX + (CodexLayout.DRAGON_RENDER_BOX_SIZE / 2) + getDragonOffsetX(dragon);
+        int centerY = boxY + CodexLayout.DRAGON_RENDER_BOX_SIZE + getDragonOffsetY(dragon);
 
         guiGraphics.enableScissor(boxX, boxY,
                 boxX + CodexLayout.DRAGON_RENDER_BOX_SIZE,
@@ -56,15 +57,45 @@ public class CodexDragonRenderer {
 
         DraconicCodexScreen.RENDERING_IN_GUI.set(true);
         try {
-            InventoryScreen.renderEntityInInventoryFollowsMouse(
+            float yaw = (float) Math.atan((centerX - mouseX) / 40.0F);
+            float pitch = (float) Math.atan((centerY - mouseY) / 40.0F);
+
+            Quaternionf bodyRotation = new Quaternionf().rotateZ((float) Math.PI);
+            Quaternionf headRotation = new Quaternionf().rotateX(pitch * 20.0F * 0.017453292F);
+            bodyRotation.mul(headRotation);
+
+            float entityScale = dragon.getScale();
+            Vector3f translate = new Vector3f(0.0F, dragon.getBbHeight() / 2.0F + 0.0625F * entityScale, 0.0F);
+            float renderScale = size / entityScale;
+
+            float oldBodyRot = dragon.yBodyRot;
+            float oldYRot = dragon.getYRot();
+            float oldXRot = dragon.getXRot();
+            float oldHeadRotO = dragon.yHeadRotO;
+            float oldHeadRot = dragon.yHeadRot;
+
+            dragon.yBodyRot = 180.0F + yaw * 20.0F;
+            dragon.setYRot(180.0F + yaw * 40.0F);
+            dragon.setXRot(-pitch * 20.0F);
+            dragon.yHeadRot = dragon.getYRot();
+            dragon.yHeadRotO = dragon.getYRot();
+
+            InventoryScreen.renderEntityInInventory(
                     guiGraphics,
                     centerX,
                     centerY,
-                    size,
-                    (float) (centerX - mouseX),
-                    (float) (centerY - CodexLayout.DRAGON_RENDER_BOX_SIZE - mouseY),
+                    renderScale,
+                    translate,
+                    bodyRotation,
+                    headRotation,
                     dragon
             );
+
+            dragon.yBodyRot = oldBodyRot;
+            dragon.setYRot(oldYRot);
+            dragon.setXRot(oldXRot);
+            dragon.yHeadRotO = oldHeadRotO;
+            dragon.yHeadRot = oldHeadRot;
         } finally {
             DraconicCodexScreen.RENDERING_IN_GUI.set(false);
         }

@@ -1,106 +1,106 @@
-package com.leon.saintsdragons.forge.platform;
+package com.leon.saintsdragons.neoforge.platform;
 
-import net.minecraftforge.common.ForgeConfigSpec;
+import net.neoforged.neoforge.common.ModConfigSpec;
 
 /**
  * Forge dragon attributes configuration.
- * Builds a ForgeConfigSpec for all dragon attributes including health, armor, speeds, abilities, and taming.
+ * Builds a ModConfigSpec for all dragon attributes including health, armor, speeds, abilities, and taming.
  */
-public final class ForgeDragonAttributesConfig {
-    public static ForgeConfigSpec ATTRIBUTES_SPEC;
+public final class NeoForgeDragonAttributesConfig {
+    public static ModConfigSpec ATTRIBUTES_SPEC;
 
     // Cindervane
-    public static ForgeConfigSpec.DoubleValue CINDERVANE_MAX_HEALTH;
-    public static ForgeConfigSpec.DoubleValue CINDERVANE_ARMOR;
-    public static ForgeConfigSpec.DoubleValue CINDERVANE_FLYING_SPEED;
-    public static ForgeConfigSpec.DoubleValue CINDERVANE_BITE_DAMAGE;
-    public static ForgeConfigSpec.DoubleValue CINDERVANE_MAGMA_VOLLEY_DAMAGE;
-    public static ForgeConfigSpec.DoubleValue CINDERVANE_TAMING_CHANCE_BASE;
-    public static ForgeConfigSpec.DoubleValue CINDERVANE_TAMING_CHANCE_CHICKEN;
-    public static ForgeConfigSpec.DoubleValue CINDERVANE_TAMING_CHANCE_HEARTY;
-    public static ForgeConfigSpec.DoubleValue CINDERVANE_EGG_HATCH_CHANCE_NORMAL;
-    public static ForgeConfigSpec.DoubleValue CINDERVANE_EGG_DROP_CHANCE;
-    public static ForgeConfigSpec.BooleanValue CINDERVANE_AGGRESSIVE_WILD;
+    public static ModConfigSpec.DoubleValue CINDERVANE_MAX_HEALTH;
+    public static ModConfigSpec.DoubleValue CINDERVANE_ARMOR;
+    public static ModConfigSpec.DoubleValue CINDERVANE_FLYING_SPEED;
+    public static ModConfigSpec.DoubleValue CINDERVANE_BITE_DAMAGE;
+    public static ModConfigSpec.DoubleValue CINDERVANE_MAGMA_VOLLEY_DAMAGE;
+    public static ModConfigSpec.DoubleValue CINDERVANE_TAMING_CHANCE_BASE;
+    public static ModConfigSpec.DoubleValue CINDERVANE_TAMING_CHANCE_CHICKEN;
+    public static ModConfigSpec.DoubleValue CINDERVANE_TAMING_CHANCE_HEARTY;
+    public static ModConfigSpec.DoubleValue CINDERVANE_EGG_HATCH_CHANCE_NORMAL;
+    public static ModConfigSpec.DoubleValue CINDERVANE_EGG_DROP_CHANCE;
+    public static ModConfigSpec.BooleanValue CINDERVANE_AGGRESSIVE_WILD;
 
     // Raevyx
-    public static ForgeConfigSpec.DoubleValue RAEVYX_MAX_HEALTH;
-    public static ForgeConfigSpec.DoubleValue RAEVYX_ARMOR;
-    public static ForgeConfigSpec.DoubleValue RAEVYX_FLYING_SPEED;
-    public static ForgeConfigSpec.DoubleValue RAEVYX_BITE_DAMAGE;
-    public static ForgeConfigSpec.DoubleValue RAEVYX_LIGHTNING_BEAM_DAMAGE;
-    public static ForgeConfigSpec.DoubleValue RAEVYX_HORN_GORE_DAMAGE;
-    public static ForgeConfigSpec.DoubleValue RAEVYX_BEAM_DRAIN_PER_TICK;
-    public static ForgeConfigSpec.DoubleValue RAEVYX_BEAM_REGEN_PER_TICK;
-    public static ForgeConfigSpec.DoubleValue RAEVYX_TAMING_CHANCE_BASE;
-    public static ForgeConfigSpec.DoubleValue RAEVYX_TAMING_CHANCE_HEARTY;
-    public static ForgeConfigSpec.DoubleValue RAEVYX_TAMING_STUN_HEALTH;
-    public static ForgeConfigSpec.BooleanValue RAEVYX_LEGACY_TAMING;
-    public static ForgeConfigSpec.DoubleValue RAEVYX_EGG_HATCH_CHANCE_NORMAL;
-    public static ForgeConfigSpec.DoubleValue RAEVYX_EGG_HATCH_CHANCE_THUNDER;
-    public static ForgeConfigSpec.DoubleValue RAEVYX_EGG_STORM_INSTANT_CHANCE;
-    public static ForgeConfigSpec.DoubleValue RAEVYX_EGG_LOOT_PILLAGER_OUTPOST;
-    public static ForgeConfigSpec.DoubleValue RAEVYX_EGG_LOOT_SHIPWRECK_TREASURE;
-    public static ForgeConfigSpec.DoubleValue RAEVYX_EGG_LOOT_ANCIENT_CITY;
-    public static ForgeConfigSpec.DoubleValue RAEVYX_EGG_DROP_CHANCE;
-    public static ForgeConfigSpec.BooleanValue RAEVYX_AGGRESSIVE_WILD;
+    public static ModConfigSpec.DoubleValue RAEVYX_MAX_HEALTH;
+    public static ModConfigSpec.DoubleValue RAEVYX_ARMOR;
+    public static ModConfigSpec.DoubleValue RAEVYX_FLYING_SPEED;
+    public static ModConfigSpec.DoubleValue RAEVYX_BITE_DAMAGE;
+    public static ModConfigSpec.DoubleValue RAEVYX_LIGHTNING_BEAM_DAMAGE;
+    public static ModConfigSpec.DoubleValue RAEVYX_HORN_GORE_DAMAGE;
+    public static ModConfigSpec.DoubleValue RAEVYX_BEAM_DRAIN_PER_TICK;
+    public static ModConfigSpec.DoubleValue RAEVYX_BEAM_REGEN_PER_TICK;
+    public static ModConfigSpec.DoubleValue RAEVYX_TAMING_CHANCE_BASE;
+    public static ModConfigSpec.DoubleValue RAEVYX_TAMING_CHANCE_HEARTY;
+    public static ModConfigSpec.DoubleValue RAEVYX_TAMING_STUN_HEALTH;
+    public static ModConfigSpec.BooleanValue RAEVYX_LEGACY_TAMING;
+    public static ModConfigSpec.DoubleValue RAEVYX_EGG_HATCH_CHANCE_NORMAL;
+    public static ModConfigSpec.DoubleValue RAEVYX_EGG_HATCH_CHANCE_THUNDER;
+    public static ModConfigSpec.DoubleValue RAEVYX_EGG_STORM_INSTANT_CHANCE;
+    public static ModConfigSpec.DoubleValue RAEVYX_EGG_LOOT_PILLAGER_OUTPOST;
+    public static ModConfigSpec.DoubleValue RAEVYX_EGG_LOOT_SHIPWRECK_TREASURE;
+    public static ModConfigSpec.DoubleValue RAEVYX_EGG_LOOT_ANCIENT_CITY;
+    public static ModConfigSpec.DoubleValue RAEVYX_EGG_DROP_CHANCE;
+    public static ModConfigSpec.BooleanValue RAEVYX_AGGRESSIVE_WILD;
 
     // Nulljaw
-    public static ForgeConfigSpec.DoubleValue NULLJAW_MAX_HEALTH;
-    public static ForgeConfigSpec.DoubleValue NULLJAW_ARMOR;
-    public static ForgeConfigSpec.DoubleValue NULLJAW_BITE_PHASE1_DAMAGE;
-    public static ForgeConfigSpec.DoubleValue NULLJAW_BITE_PHASE2_DAMAGE;
-    public static ForgeConfigSpec.DoubleValue NULLJAW_HORN_GORE_PHASE1_DAMAGE;
-    public static ForgeConfigSpec.DoubleValue NULLJAW_HORN_GORE_PHASE2_DAMAGE;
-    public static ForgeConfigSpec.DoubleValue NULLJAW_SWIM_SPEED;
-    public static ForgeConfigSpec.DoubleValue NULLJAW_TAMING_CHANCE;
-    public static ForgeConfigSpec.DoubleValue NULLJAW_TAMING_CHANCE_TROPICAL;
-    public static ForgeConfigSpec.BooleanValue NULLJAW_LEGACY_TAMING;
-    public static ForgeConfigSpec.DoubleValue NULLJAW_EGG_HATCH_CHANCE_NORMAL;
-    public static ForgeConfigSpec.DoubleValue NULLJAW_EGG_DROP_CHANCE;
-    public static ForgeConfigSpec.BooleanValue NULLJAW_AGGRESSIVE_WILD;
+    public static ModConfigSpec.DoubleValue NULLJAW_MAX_HEALTH;
+    public static ModConfigSpec.DoubleValue NULLJAW_ARMOR;
+    public static ModConfigSpec.DoubleValue NULLJAW_BITE_PHASE1_DAMAGE;
+    public static ModConfigSpec.DoubleValue NULLJAW_BITE_PHASE2_DAMAGE;
+    public static ModConfigSpec.DoubleValue NULLJAW_HORN_GORE_PHASE1_DAMAGE;
+    public static ModConfigSpec.DoubleValue NULLJAW_HORN_GORE_PHASE2_DAMAGE;
+    public static ModConfigSpec.DoubleValue NULLJAW_SWIM_SPEED;
+    public static ModConfigSpec.DoubleValue NULLJAW_TAMING_CHANCE;
+    public static ModConfigSpec.DoubleValue NULLJAW_TAMING_CHANCE_TROPICAL;
+    public static ModConfigSpec.BooleanValue NULLJAW_LEGACY_TAMING;
+    public static ModConfigSpec.DoubleValue NULLJAW_EGG_HATCH_CHANCE_NORMAL;
+    public static ModConfigSpec.DoubleValue NULLJAW_EGG_DROP_CHANCE;
+    public static ModConfigSpec.BooleanValue NULLJAW_AGGRESSIVE_WILD;
 
     // Ignivorus
-    public static ForgeConfigSpec.DoubleValue IGNIVORUS_MAX_HEALTH;
-    public static ForgeConfigSpec.DoubleValue IGNIVORUS_ARMOR;
-    public static ForgeConfigSpec.DoubleValue IGNIVORUS_FLYING_SPEED;
-    public static ForgeConfigSpec.DoubleValue IGNIVORUS_BITE_DAMAGE;
-    public static ForgeConfigSpec.DoubleValue IGNIVORUS_BODY_SLAM_DAMAGE;
-    public static ForgeConfigSpec.DoubleValue IGNIVORUS_FIRE_BREATH_DAMAGE;
-    public static ForgeConfigSpec.DoubleValue IGNIVORUS_FIREBALL_DAMAGE;
-    public static ForgeConfigSpec.DoubleValue IGNIVORUS_WING_SWIPE_DAMAGE;
-    public static ForgeConfigSpec.DoubleValue IGNIVORUS_STOMP_DAMAGE;
-    public static ForgeConfigSpec.DoubleValue IGNIVORUS_ULTIMATE_DAMAGE;
-    public static ForgeConfigSpec.DoubleValue IGNIVORUS_ULTIMATE_PENALTY_HEALTH;
-    public static ForgeConfigSpec.DoubleValue IGNIVORUS_FIRE_BREATH_DRAIN_PER_TICK;
-    public static ForgeConfigSpec.DoubleValue IGNIVORUS_FIRE_BREATH_REGEN_PER_TICK;
-    public static ForgeConfigSpec.DoubleValue IGNIVORUS_FIRE_BREATH_FLAME_SPAWN_MULTIPLIER;
-    public static ForgeConfigSpec.DoubleValue IGNIVORUS_FIRE_BREATH_FLAME_SPEED_MULTIPLIER;
-    public static ForgeConfigSpec.DoubleValue IGNIVORUS_FIRE_BREATH_FLAME_LIFETIME_MULTIPLIER;
-    public static ForgeConfigSpec.DoubleValue IGNIVORUS_FIRE_BREATH_IGNITE_BLOCK_CHANCE;
-    public static ForgeConfigSpec.DoubleValue IGNIVORUS_TAMING_CHANCE_BASE;
-    public static ForgeConfigSpec.DoubleValue IGNIVORUS_TAMING_CHANCE_BEEF;
-    public static ForgeConfigSpec.DoubleValue IGNIVORUS_TAMING_CHANCE_HEARTY;
-    public static ForgeConfigSpec.DoubleValue IGNIVORUS_TAMING_STUN_HEALTH;
-    public static ForgeConfigSpec.BooleanValue IGNIVORUS_LEGACY_TAMING;
-    public static ForgeConfigSpec.DoubleValue IGNIVORUS_EGG_HATCH_CHANCE_NORMAL;
-    public static ForgeConfigSpec.DoubleValue IGNIVORUS_EGG_LOOT_BASTION_TREASURE;
-    public static ForgeConfigSpec.DoubleValue IGNIVORUS_EGG_LOOT_NETHER_BRIDGE;
-    public static ForgeConfigSpec.DoubleValue IGNIVORUS_EGG_LOOT_ANCIENT_CITY;
-    public static ForgeConfigSpec.DoubleValue IGNIVORUS_EGG_DROP_CHANCE;
-    public static ForgeConfigSpec.BooleanValue IGNIVORUS_AGGRESSIVE_WILD;
+    public static ModConfigSpec.DoubleValue IGNIVORUS_MAX_HEALTH;
+    public static ModConfigSpec.DoubleValue IGNIVORUS_ARMOR;
+    public static ModConfigSpec.DoubleValue IGNIVORUS_FLYING_SPEED;
+    public static ModConfigSpec.DoubleValue IGNIVORUS_BITE_DAMAGE;
+    public static ModConfigSpec.DoubleValue IGNIVORUS_BODY_SLAM_DAMAGE;
+    public static ModConfigSpec.DoubleValue IGNIVORUS_FIRE_BREATH_DAMAGE;
+    public static ModConfigSpec.DoubleValue IGNIVORUS_FIREBALL_DAMAGE;
+    public static ModConfigSpec.DoubleValue IGNIVORUS_WING_SWIPE_DAMAGE;
+    public static ModConfigSpec.DoubleValue IGNIVORUS_STOMP_DAMAGE;
+    public static ModConfigSpec.DoubleValue IGNIVORUS_ULTIMATE_DAMAGE;
+    public static ModConfigSpec.DoubleValue IGNIVORUS_ULTIMATE_PENALTY_HEALTH;
+    public static ModConfigSpec.DoubleValue IGNIVORUS_FIRE_BREATH_DRAIN_PER_TICK;
+    public static ModConfigSpec.DoubleValue IGNIVORUS_FIRE_BREATH_REGEN_PER_TICK;
+    public static ModConfigSpec.DoubleValue IGNIVORUS_FIRE_BREATH_FLAME_SPAWN_MULTIPLIER;
+    public static ModConfigSpec.DoubleValue IGNIVORUS_FIRE_BREATH_FLAME_SPEED_MULTIPLIER;
+    public static ModConfigSpec.DoubleValue IGNIVORUS_FIRE_BREATH_FLAME_LIFETIME_MULTIPLIER;
+    public static ModConfigSpec.DoubleValue IGNIVORUS_FIRE_BREATH_IGNITE_BLOCK_CHANCE;
+    public static ModConfigSpec.DoubleValue IGNIVORUS_TAMING_CHANCE_BASE;
+    public static ModConfigSpec.DoubleValue IGNIVORUS_TAMING_CHANCE_BEEF;
+    public static ModConfigSpec.DoubleValue IGNIVORUS_TAMING_CHANCE_HEARTY;
+    public static ModConfigSpec.DoubleValue IGNIVORUS_TAMING_STUN_HEALTH;
+    public static ModConfigSpec.BooleanValue IGNIVORUS_LEGACY_TAMING;
+    public static ModConfigSpec.DoubleValue IGNIVORUS_EGG_HATCH_CHANCE_NORMAL;
+    public static ModConfigSpec.DoubleValue IGNIVORUS_EGG_LOOT_BASTION_TREASURE;
+    public static ModConfigSpec.DoubleValue IGNIVORUS_EGG_LOOT_NETHER_BRIDGE;
+    public static ModConfigSpec.DoubleValue IGNIVORUS_EGG_LOOT_ANCIENT_CITY;
+    public static ModConfigSpec.DoubleValue IGNIVORUS_EGG_DROP_CHANCE;
+    public static ModConfigSpec.BooleanValue IGNIVORUS_AGGRESSIVE_WILD;
 
     // Stegonaut
-    public static ForgeConfigSpec.DoubleValue STEGONAUT_MAX_HEALTH;
-    public static ForgeConfigSpec.DoubleValue STEGONAUT_ARMOR;
-    public static ForgeConfigSpec.DoubleValue STEGONAUT_TAMING_CHANCE_BASE;
-    public static ForgeConfigSpec.DoubleValue STEGONAUT_TAMING_CHANCE_HEARTY;
-    public static ForgeConfigSpec.DoubleValue STEGONAUT_EGG_HATCH_CHANCE_NORMAL;
+    public static ModConfigSpec.DoubleValue STEGONAUT_MAX_HEALTH;
+    public static ModConfigSpec.DoubleValue STEGONAUT_ARMOR;
+    public static ModConfigSpec.DoubleValue STEGONAUT_TAMING_CHANCE_BASE;
+    public static ModConfigSpec.DoubleValue STEGONAUT_TAMING_CHANCE_HEARTY;
+    public static ModConfigSpec.DoubleValue STEGONAUT_EGG_HATCH_CHANCE_NORMAL;
 
     // Others (NPCs, misc)
-    public static ForgeConfigSpec.IntValue IVY_RESTOCK_INTERVAL;
+    public static ModConfigSpec.IntValue IVY_RESTOCK_INTERVAL;
 
     static {
-        ForgeConfigSpec.Builder builder = new ForgeConfigSpec.Builder();
+        ModConfigSpec.Builder builder = new ModConfigSpec.Builder();
 
         // Cindervane Configuration
         builder.comment("Cindervane Dragon Attributes").push("cindervane");
@@ -248,6 +248,7 @@ public final class ForgeDragonAttributesConfig {
         ATTRIBUTES_SPEC = builder.build();
     }
 
-    private ForgeDragonAttributesConfig() {
+    private NeoForgeDragonAttributesConfig() {
     }
 }
+

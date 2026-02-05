@@ -1475,7 +1475,7 @@ public class Raevyx extends RideableDragonBase implements FlyingAnimal, RangedAt
 
     @Override
     public @NotNull Vec3 getPassengerRidingPosition(@Nonnull Entity passenger) {
-        return riderController.getPassengerPosition(passenger);
+        return riderController.getPassengerRidingPosition(passenger);
     }
 
     @Override

@@ -2,7 +2,7 @@ package com.leon.saintsdragons.client.ui.codex;
 
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.client.gui.components.ImageButton;
+import net.minecraft.client.gui.components.Button;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 
@@ -14,8 +14,8 @@ public class CodexAllyPanel {
     private final ResourceLocation addIcon;
     private final ResourceLocation removeIcon;
     private CustomEditBox allyInput;
-    private ImageButton addAllyButton;
-    private ImageButton removeAllyButton;
+    private Button addAllyButton;
+    private Button removeAllyButton;
 
     public CodexAllyPanel(ResourceLocation editBoxTexture, ResourceLocation addIcon, ResourceLocation removeIcon) {
         this.editBoxTexture = editBoxTexture;
@@ -45,21 +45,16 @@ public class CodexAllyPanel {
         addWidget.accept(allyInput);
 
         int iconButtonX = inputX + inputWidth + 8;
-
-        addAllyButton = new ImageButton(
+        addAllyButton = new TextureIconButton(
                 iconButtonX - 36, inputY + 18, 14, 14,
-                0, 0, 0,
                 addIcon,
-                14, 14,
                 button -> addAllyFromInput(addCallback)
         );
         addWidget.accept(addAllyButton);
 
-        removeAllyButton = new ImageButton(
+        removeAllyButton = new TextureIconButton(
                 iconButtonX - 19, inputY + 18, 14, 14,
-                0, 0, 0,
                 removeIcon,
-                14, 14,
                 button -> removeAllyFromInput(removeCallback)
         );
         addWidget.accept(removeAllyButton);
@@ -146,5 +141,22 @@ public class CodexAllyPanel {
         }
         removeCallback.accept(username);
         allyInput.setValue("");
+    }
+
+    private static final class TextureIconButton extends Button {
+        private final ResourceLocation texture;
+
+        private TextureIconButton(int x, int y, int width, int height, ResourceLocation texture, OnPress onPress) {
+            super(x, y, width, height, Component.empty(), onPress, DEFAULT_NARRATION);
+            this.texture = texture;
+        }
+
+        @Override
+        protected void renderWidget(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
+            guiGraphics.blit(texture, this.getX(), this.getY(), 0, 0, this.getWidth(), this.getHeight(), this.getWidth(), this.getHeight());
+            if (this.isHovered() && this.active) {
+                guiGraphics.fill(this.getX(), this.getY(), this.getX() + this.getWidth(), this.getY() + this.getHeight(), 0x40FFFFFF);
+            }
+        }
     }
 }

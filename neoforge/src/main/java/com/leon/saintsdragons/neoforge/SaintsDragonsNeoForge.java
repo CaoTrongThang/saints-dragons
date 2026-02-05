@@ -80,7 +80,7 @@ public class SaintsDragonsNeoForge {
             return;
         }
 
-        DragonAttributeConfigLoader.getInstance().refreshFromNeoForgeConfig();
+        DragonAttributeConfigLoader.getInstance().refreshFromForgeConfig();
         applyAttributesToLoadedDragons();
     }
 

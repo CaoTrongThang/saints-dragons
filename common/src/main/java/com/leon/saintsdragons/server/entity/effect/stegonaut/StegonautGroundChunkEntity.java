@@ -63,9 +63,9 @@ public class StegonautGroundChunkEntity extends Entity {
     }
 
     @Override
-    protected void defineSynchedData() {
-        this.entityData.define(DATA_BLOCK_STATE, Blocks.DIRT.defaultBlockState());
-        this.entityData.define(DATA_SCALE, 1.0F);
+    protected void defineSynchedData(SynchedEntityData.Builder builder) {
+        builder.define(DATA_BLOCK_STATE, Blocks.DIRT.defaultBlockState());
+        builder.define(DATA_SCALE, 1.0F);
     }
 
     public void setBlockState(BlockState state) {
@@ -208,11 +208,6 @@ public class StegonautGroundChunkEntity extends Entity {
     }
 
     @Override
-    public Packet<ClientGamePacketListener> getAddEntityPacket() {
-        return new ClientboundAddEntityPacket(this);
-    }
-
-    @Override
     public void recreateFromPacket(ClientboundAddEntityPacket packet) {
         super.recreateFromPacket(packet);
         this.setDeltaMovement(packet.getXa(), packet.getYa(), packet.getZa());
@@ -226,11 +221,6 @@ public class StegonautGroundChunkEntity extends Entity {
     @Override
     public boolean displayFireAnimation() {
         return false;
-    }
-
-    @Override
-    public float getEyeHeight(@NotNull Pose pose) {
-        return 0.5F * getVisualScale();
     }
 
     @Override

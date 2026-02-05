@@ -1,4 +1,4 @@
-package com.leon.saintsdragons.forge.mixin;
+package com.leon.saintsdragons.neoforge.mixin;
 
 import net.minecraft.world.entity.ai.attributes.RangedAttribute;
 import org.spongepowered.asm.mixin.Mixin;

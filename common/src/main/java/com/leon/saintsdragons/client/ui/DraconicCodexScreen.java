@@ -126,7 +126,7 @@ public class DraconicCodexScreen extends Screen {
 
     @Override
     public void render(@NotNull GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
-        this.renderBackground(guiGraphics);
+        // Keep world fully visible behind the codex (no dark overlay).
 
         guiGraphics.blit(BOOK_TEXTURE, leftPos, topPos, 0, 0,
                 CodexLayout.GUI_WIDTH, CodexLayout.GUI_HEIGHT,
@@ -150,6 +150,16 @@ public class DraconicCodexScreen extends Screen {
 
         // Render dragon last with scissor clipping
         dragonRenderer.drawDragonPortrait(guiGraphics, this.minecraft, getSelectedEntry(), leftPos, topPos, mouseX, mouseY);
+    }
+
+    @Override
+    protected void renderBlurredBackground(float partialTick) {
+        // Disable vanilla screen blur for codex UI so the book texture stays crisp.
+    }
+
+    @Override
+    public void renderBackground(@NotNull GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
+        // Keep world brightness untouched behind the codex.
     }
 
     @Override
@@ -208,7 +218,8 @@ public class DraconicCodexScreen extends Screen {
     }
 
     @Override
-    public boolean mouseScrolled(double mouseX, double mouseY, double delta) {
+    public boolean mouseScrolled(double mouseX, double mouseY, double horizontalAmount, double verticalAmount) {
+        double delta = verticalAmount;
         if (activeTab == CodexTab.ECOLOGY) {
             if (ecologyPanel.handleLinkScroll(mouseX, mouseY, delta)) {
                 return true;

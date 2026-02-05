@@ -38,7 +38,8 @@ public final class DragonAttributeConfigLoader extends SimpleJsonResourceReloadL
     public static final ResourceLocation STEGONAUT_ID = SaintsDragonsCommon.rl("stegonaut");
 
     private static final DragonAttributeConfigLoader INSTANCE = new DragonAttributeConfigLoader();
-    private static final boolean IS_FORGE = Services.PLATFORM.isModLoaded("forge");
+    private static final boolean IS_FORGE = Services.PLATFORM.isModLoaded("forge")
+            || Services.PLATFORM.isModLoaded("neoforge");
 
     private final Map<ResourceLocation, DragonAttributeConfig> defaults;
     private final Path configDirectory;
@@ -87,6 +88,7 @@ public final class DragonAttributeConfigLoader extends SimpleJsonResourceReloadL
         return new DragonAttributeConfig(
                 maxHealth,
                 armor,
+                0.3D, // movementSpeed - using default
                 flyingSpeed,
                 Map.of(
                         "bite", DragonAbilityOverride.ofDamage(biteDamage),
@@ -171,6 +173,7 @@ public final class DragonAttributeConfigLoader extends SimpleJsonResourceReloadL
         return new DragonAttributeConfig(
                 maxHealth,
                 armor,
+                0.3D, // movementSpeed - using default
                 flyingSpeed,
                 Map.of(
                         "bite", DragonAbilityOverride.ofDamage(biteDamage),
@@ -223,6 +226,7 @@ public final class DragonAttributeConfigLoader extends SimpleJsonResourceReloadL
         return new DragonAttributeConfig(
                 maxHealth,
                 armor,
+                0.28D,
                 0.0D,
                 Map.of(
                         "bite_phase1", DragonAbilityOverride.ofDamage(bitePhase1Damage),
@@ -330,6 +334,7 @@ public final class DragonAttributeConfigLoader extends SimpleJsonResourceReloadL
         return new DragonAttributeConfig(
                 maxHealth,
                 armor,
+                0.3D, // movementSpeed - using default
                 flyingSpeed,
                 Map.of(
                         "bite", DragonAbilityOverride.ofDamage(biteDamage),
@@ -375,7 +380,8 @@ public final class DragonAttributeConfigLoader extends SimpleJsonResourceReloadL
         return new DragonAttributeConfig(
                 maxHealth,
                 armor,
-                0.0D,
+                0.3D, // movementSpeed - using default
+                0.0D, // flyingSpeed - Stegonaut doesn't fly
                 Map.of(),
                 Map.of(
                         "taming_chance_base", tamingChanceBase,

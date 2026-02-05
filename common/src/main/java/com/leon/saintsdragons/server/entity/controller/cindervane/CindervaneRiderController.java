@@ -353,7 +353,7 @@ public record CindervaneRiderController(Cindervane dragon) {
             moveFunction.accept(passenger, passengerCurrentPos.x, passengerCurrentPos.y, passengerCurrentPos.z);
         } else {
             double x = dragon.getX();
-            double y = dragon.getY() + getPassengersRidingOffset() + seatHeightAdjust + passenger.getMyRidingOffset();
+            double y = dragon.getY() + getPassengersRidingOffset() + seatHeightAdjust;
             double z = dragon.getZ();
             moveFunction.accept(passenger, x, y, z);
         }

@@ -23,6 +23,7 @@ import com.leon.saintsdragons.server.entity.handler.DragonSoundHandler;
 import com.leon.saintsdragons.server.entity.interfaces.*;
 import com.leon.saintsdragons.common.network.DragonRiderAction;
 import com.leon.saintsdragons.common.registry.ModSounds;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.util.RandomSource;
 import com.leon.saintsdragons.server.entity.controller.nulljaw.NulljawRiderController;
@@ -2478,13 +2479,13 @@ public class Nulljaw extends RideableDragonBase implements SemiAquaticDragon, Sh
     }
 
     @Override
-    protected void dropAllDeathLoot(@NotNull DamageSource source) {
+    protected void dropAllDeathLoot(@NotNull ServerLevel level, @NotNull DamageSource source) {
         // Don't drop loot until death animation completes
         if (deathTime < getDeathAnimationDurationTicks()) {
             return;
         }
 
-        super.dropAllDeathLoot(source);
+        super.dropAllDeathLoot(level, source);
 
         DragonAttributeConfig config = DragonAttributeConfigLoader.getInstance()
                 .getConfig(DragonAttributeConfigLoader.NULLJAW_ID);

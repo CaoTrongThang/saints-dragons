@@ -60,20 +60,23 @@ public class NulljawModel extends DefaultedEntityGeoModel<Nulljaw> {
         if (modelData == null) return;
 
         float partialTick = animationState.getPartialTick();
-        if (!entity.isAlive() || entity.isDeadOrDying()) {
-            return;
-        }
 
-        applyBodyRotationDeviation(entity, partialTick);
-        applyGroundNeckTurn(entity, partialTick);
-        applyTailDrag(entity, partialTick);
-        applySwimPitch(entity, partialTick);
-        applySwimRoll(entity, partialTick);
-        applyNeckFollow(entity, modelData, partialTick);
+
+        if (entity.isAlive()){
+            if (entity.isDeadOrDying()){
+                return;
+            }
+            applyBodyRotationDeviation(entity, partialTick);
+            applyGroundNeckTurn(entity, partialTick);
+            applyTailDrag(entity, partialTick);
+            applySwimPitch(entity, partialTick);
+            applySwimRoll(entity, partialTick);
+            applyNeckFollow(entity, modelData, partialTick);
+        }
     }
 
     private void applyBodyRotationDeviation(Nulljaw entity, float partialTick) {
-        var rootOpt = getBone("heightController");
+        var rootOpt = getBone("body");
         if (rootOpt.isEmpty()) {
             return;
         }

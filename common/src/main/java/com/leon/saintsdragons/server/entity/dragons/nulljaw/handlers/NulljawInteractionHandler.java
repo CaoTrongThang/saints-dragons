@@ -290,15 +290,10 @@ public record NulljawInteractionHandler(Nulljaw drake) {
             drake.applyFeedingHunger(heartyMeal);
 
             double tameChance = heartyMeal
-<<<<<<< HEAD
-                    ? getHeartyTamingChance(config, getBaseTamingChance(config))
-                    : getBaseTamingChance(config);
-=======
                     ? config.extraDoubles().getOrDefault("taming_chance", 6.0) / 2.0
                     : tropicalFish
                         ? config.extraDoubles().getOrDefault("taming_chance_tropical", 4.0)
                         : config.extraDoubles().getOrDefault("taming_chance", 6.0);
->>>>>>> 289c7c77 (Codex entry alongside other things. pt.1)
             int tameRoll = (int) Math.round(tameChance);
             boolean success = drake.getRandom().nextInt(Math.max(1, tameRoll)) == 0;
 

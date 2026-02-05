@@ -2288,13 +2288,13 @@ public class Cindervane extends RideableDragonBase implements DragonFlightCapabl
     }
 
     @Override
-    protected void dropAllDeathLoot(@NotNull DamageSource source) {
+    protected void dropAllDeathLoot(@NotNull ServerLevel level, @NotNull DamageSource source) {
         // Don't drop loot until death animation completes
         if (deathTime < getDeathAnimationDurationTicks()) {
             return;
         }
 
-        super.dropAllDeathLoot(source);
+        super.dropAllDeathLoot(level, source);
 
         DragonAttributeConfig config = DragonAttributeConfigLoader.getInstance()
                 .getConfig(DragonAttributeConfigLoader.CINDERVANE_ID);

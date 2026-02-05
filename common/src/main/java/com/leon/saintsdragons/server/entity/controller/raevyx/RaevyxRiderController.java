@@ -307,8 +307,10 @@ public record RaevyxRiderController(Raevyx wyvern) {
         return (double) wyvern.getBbHeight() * SEAT_BASE_FACTOR;
     }
     
-    public void positionRider(@NotNull Entity passenger, Entity.@NotNull MoveFunction moveFunction) {
-        if (!wyvern.hasPassenger(passenger)) return;
+    public @NotNull Vec3 getPassengerRidingPosition(@NotNull Entity passenger) {
+        if (!wyvern.hasPassenger(passenger)) {
+            return wyvern.position();
+        }
 
         Vec3 passengerLoc = null;
         if (wyvern.level().isClientSide) {
@@ -339,15 +341,19 @@ public record RaevyxRiderController(Raevyx wyvern) {
             double currentWorldZ = -localX * sinCurrent + localZ * cosCurrent;
 
             Vec3 wyvernCurrentPos = wyvern.position();
-            Vec3 passengerCurrentPos = wyvernCurrentPos.add(currentWorldX, localY + SEAT_HEIGHT_ADJUST, currentWorldZ);
-
-            moveFunction.accept(passenger, passengerCurrentPos.x, passengerCurrentPos.y, passengerCurrentPos.z);
+            return wyvernCurrentPos.add(currentWorldX, localY + SEAT_HEIGHT_ADJUST, currentWorldZ);
         } else {
             double x = wyvern.getX();
-            double y = wyvern.getY() + getPassengersRidingOffset() + SEAT_HEIGHT_ADJUST + passenger.getMyRidingOffset();
+            double y = wyvern.getY() + getPassengersRidingOffset() + SEAT_HEIGHT_ADJUST;
             double z = wyvern.getZ();
-            moveFunction.accept(passenger, x, y, z);
+            return new Vec3(x, y, z);
         }
+    }
+
+    public void positionRider(@NotNull Entity passenger, Entity.@NotNull MoveFunction moveFunction) {
+        if (!wyvern.hasPassenger(passenger)) return;
+        Vec3 pos = getPassengerRidingPosition(passenger);
+        moveFunction.accept(passenger, pos.x, pos.y, pos.z);
     }
     
     public @NotNull Vec3 getDismountLocationForPassenger(@NotNull LivingEntity passenger) {
