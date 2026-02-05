@@ -91,6 +91,7 @@ public class IgnivorusBinderItem extends Item {
         ItemStack newStack = stack.copy();
 
         net.minecraft.nbt.CompoundTag dragonData = new net.minecraft.nbt.CompoundTag();
+        dragon.setBoundInBinder(true);
         dragon.addAdditionalSaveData(dragonData);
 
         LivingEntity owner = dragon.getOwner();
@@ -138,7 +139,10 @@ public class IgnivorusBinderItem extends Item {
 
         Ignivorus newDragon = new Ignivorus(ModEntities.IGNIVORUS.get(), serverLevel);
 
-        data.dragonData().ifPresent(newDragon::readAdditionalSaveData);
+        data.dragonData().ifPresent(tag -> {
+            newDragon.readAdditionalSaveData(tag);
+            newDragon.setBoundInBinder(false);
+        });
 
         data.dragonUuid().ifPresent(newDragon::setUUID);
         newDragon.setPos(pos.getX() + 0.5, pos.getY() + 1, pos.getZ() + 0.5);

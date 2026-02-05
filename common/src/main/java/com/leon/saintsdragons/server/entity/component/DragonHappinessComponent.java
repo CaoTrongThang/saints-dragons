@@ -12,6 +12,7 @@ import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 
 public final class DragonHappinessComponent {
+    private static final double MODIFIER_EPSILON = 1.0E-6;
     public static final int HAPPINESS_MAX = 100;
     // 20 ticks = 1 second, so 9600 ticks = 8 minutes for one decay cycle.
     private static final int HAPPINESS_DECAY_INTERVAL_TICKS = 9600;
@@ -141,14 +142,17 @@ public final class DragonHappinessComponent {
                     move.removeModifier(HAPPINESS_SLOW_GROUND_ID);
                 }
             } else {
-                if (existing != null) {
-                    move.removeModifier(HAPPINESS_SLOW_GROUND_ID);
+                double amount = mult - 1.0;
+                if (existing == null || Math.abs(existing.getAmount() - amount) > MODIFIER_EPSILON) {
+                    if (existing != null) {
+                        move.removeModifier(HAPPINESS_SLOW_GROUND_ID);
+                    }
+                    move.addPermanentModifier(new AttributeModifier(
+                            HAPPINESS_SLOW_GROUND_ID,
+                            amount,
+                            AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL
+                    ));
                 }
-                move.addPermanentModifier(new AttributeModifier(
-                        HAPPINESS_SLOW_GROUND_ID,
-                        mult - 1.0,
-                        AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL
-                ));
             }
         }
 
@@ -160,14 +164,17 @@ public final class DragonHappinessComponent {
                     fly.removeModifier(HAPPINESS_SLOW_FLY_ID);
                 }
             } else {
-                if (existing != null) {
-                    fly.removeModifier(HAPPINESS_SLOW_FLY_ID);
+                double amount = mult - 1.0;
+                if (existing == null || Math.abs(existing.getAmount() - amount) > MODIFIER_EPSILON) {
+                    if (existing != null) {
+                        fly.removeModifier(HAPPINESS_SLOW_FLY_ID);
+                    }
+                    fly.addPermanentModifier(new AttributeModifier(
+                            HAPPINESS_SLOW_FLY_ID,
+                            amount,
+                            AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL
+                    ));
                 }
-                fly.addPermanentModifier(new AttributeModifier(
-                        HAPPINESS_SLOW_FLY_ID,
-                        mult - 1.0,
-                        AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL
-                ));
             }
         }
     }

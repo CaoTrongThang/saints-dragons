@@ -123,8 +123,9 @@ public class RaevyxTamingHandler {
             return;
         }
 
-        if (wyvern.isBaby()) {
-            if (wyvern.isTamingStunned()) {
+        // Wild babies are not part of combat-stun taming; keep them out of stun loop entirely.
+        if (wyvern.isBaby() && !wyvern.isTame()) {
+            if (wyvern.isTamingStunned() || aiLocked || awaitingFeed) {
                 clearRecovery();
             }
             return;

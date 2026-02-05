@@ -92,6 +92,7 @@ public class StegonautBinderItem extends Item {
         ItemStack newStack = stack.copy();
 
         net.minecraft.nbt.CompoundTag drakeData = new net.minecraft.nbt.CompoundTag();
+        drake.setBoundInBinder(true);
         drake.addAdditionalSaveData(drakeData);
 
         LivingEntity owner = drake.getOwner();
@@ -136,7 +137,10 @@ public class StegonautBinderItem extends Item {
         }
 
         Stegonaut newDrake = new Stegonaut(com.leon.saintsdragons.common.registry.ModEntities.STEGONAUT.get(), serverLevel);
-        data.dragonData().ifPresent(newDrake::readAdditionalSaveData);
+        data.dragonData().ifPresent(tag -> {
+            newDrake.readAdditionalSaveData(tag);
+            newDrake.setBoundInBinder(false);
+        });
         data.dragonUuid().ifPresent(newDrake::setUUID);
         newDrake.setPos(pos.getX() + 0.5, pos.getY() + 1, pos.getZ() + 0.5);
         if (ownerUUID != null) {

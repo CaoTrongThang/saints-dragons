@@ -93,6 +93,7 @@ public class NulljawBinderItem extends Item {
         ItemStack newStack = stack.copy();
 
         net.minecraft.nbt.CompoundTag dragonData = new net.minecraft.nbt.CompoundTag();
+        dragon.setBoundInBinder(true);
         dragon.addAdditionalSaveData(dragonData);
 
         LivingEntity owner = dragon.getOwner();
@@ -107,7 +108,6 @@ public class NulljawBinderItem extends Item {
                 dragonData
         );
         BinderComponentUtil.setData(newStack, data);
-
         dragon.remove(net.minecraft.world.entity.Entity.RemovalReason.DISCARDED);
 
         player.displayClientMessage(Component.translatable("saintsdragons.message.nulljaw_captured", dragon.getName().getString()), true);
@@ -140,7 +140,10 @@ public class NulljawBinderItem extends Item {
 
         Nulljaw newDragon = new Nulljaw(ModEntities.NULLJAW.get(), serverLevel);
 
-        data.dragonData().ifPresent(newDragon::readAdditionalSaveData);
+        data.dragonData().ifPresent(tag -> {
+            newDragon.readAdditionalSaveData(tag);
+            newDragon.setBoundInBinder(false);
+        });
 
         data.dragonUuid().ifPresent(newDragon::setUUID);
         newDragon.setPos(pos.getX() + 0.5, pos.getY() + 1, pos.getZ() + 0.5);
