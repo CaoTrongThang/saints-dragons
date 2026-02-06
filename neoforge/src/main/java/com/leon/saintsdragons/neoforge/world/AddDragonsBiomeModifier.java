@@ -75,7 +75,9 @@ public final class AddDragonsBiomeModifier implements BiomeModifier {
             boolean hasCindervaneBiome = biome.is(HAS_CINDERVANE)
                     || isInConfigBiomes(biome, SaintsDragonsConfig.CINDERVANE_ADDITIONAL_BIOMES);
             if (hasCindervaneBiome) {
-                addFeature(builder, CINDERVANE_EGG_PATCH);
+                if (SaintsDragonsConfig.CINDERVANE_EGG_BLOCK_WORLDGEN.get()) {
+                    addFeature(builder, CINDERVANE_EGG_PATCH);
+                }
                 addSpawn(builder,
                         MobCategory.CREATURE,
                         ModEntities.CINDERVANE.get(),
@@ -95,7 +97,7 @@ public final class AddDragonsBiomeModifier implements BiomeModifier {
                         SaintsDragonsConfig.NULLJAW_MAX_GROUP_SIZE.get());
             }
 
-            if (biome.is(HAS_NULLJAW_EGGS)) {
+            if (biome.is(HAS_NULLJAW_EGGS) && SaintsDragonsConfig.NULLJAW_EGG_BLOCK_WORLDGEN.get()) {
                 addFeature(builder, NULLJAW_EGG_PATCH);
             }
 
