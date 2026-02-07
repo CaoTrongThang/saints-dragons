@@ -50,8 +50,8 @@ public final class SaintsDragonsFabric implements ModInitializer {
     }
 
     private static void raiseVanillaAttributeCaps() {
-        raiseAttributeCap(Attributes.MAX_HEALTH, "MAX_HEALTH");
-        raiseAttributeCap(Attributes.ARMOR, "ARMOR");
+        raiseAttributeCap(Attributes.MAX_HEALTH.value(), "MAX_HEALTH");
+        raiseAttributeCap(Attributes.ARMOR.value(), "ARMOR");
     }
 
     private static void raiseAttributeCap(net.minecraft.world.entity.ai.attributes.Attribute attribute, String name) {

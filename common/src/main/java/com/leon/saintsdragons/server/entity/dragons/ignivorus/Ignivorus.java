@@ -85,7 +85,7 @@ import net.minecraft.world.level.GameRules;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.phys.AABB;
-import net.minecraft.world.level.pathfinder.BlockPathTypes;
+import net.minecraft.world.level.pathfinder.PathType;
 import software.bernie.geckolib.animatable.instance.AnimatableInstanceCache;
 import software.bernie.geckolib.animation.AnimatableManager;
 import software.bernie.geckolib.animation.AnimationController;
@@ -388,8 +388,8 @@ public class Ignivorus extends RideableDragonBase implements DragonFlightCapable
         this.usingAirNav = false;
         // Fire dragon: don't treat fire as a hazard for pathfinding.
         // This prevents repeated repath spikes when long fire lines are present.
-        this.setPathfindingMalus(BlockPathTypes.DANGER_FIRE, 0.0F);
-        this.setPathfindingMalus(BlockPathTypes.DAMAGE_FIRE, 0.0F);
+        this.setPathfindingMalus(PathType.DANGER_FIRE, 0.0F);
+        this.setPathfindingMalus(PathType.DANGER_OTHER, 0.0F);
 
         this.riderController = new IgnivorusRiderController(this);
         resetAmbientSoundTimer();

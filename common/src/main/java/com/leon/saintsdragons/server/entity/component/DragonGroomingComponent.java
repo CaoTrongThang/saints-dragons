@@ -56,7 +56,7 @@ public final class DragonGroomingComponent {
             dragon.spawnAtLocation(new ItemStack(profile.dropItem(), amount));
         }
 
-        brushStack.hurtAndBreak(1, player, ignored -> {});
+        brushStack.hurtAndBreak(1, player, net.minecraft.world.entity.EquipmentSlot.MAINHAND);
         return true;
     }
 
@@ -82,9 +82,9 @@ public final class DragonGroomingComponent {
             return new GroomingProfile(0.30F, Items.FIRE_CHARGE, 1, 1);
         }
         if (dragon instanceof Stegonaut) {
-            return new GroomingProfile(0.30F, Items.SCUTE, 1, 2);
+            return new GroomingProfile(0.30F, Items.TURTLE_SCUTE, 1, 2);
         }
-        return new GroomingProfile(0.25F, Items.SCUTE, 1, 1);
+        return new GroomingProfile(0.25F, Items.TURTLE_SCUTE, 1, 1);
     }
 
     private record GroomingProfile(float dropChance, Item dropItem, int minDrops, int maxDrops) {

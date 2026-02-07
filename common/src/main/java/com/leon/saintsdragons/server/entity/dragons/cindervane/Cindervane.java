@@ -2013,7 +2013,7 @@ public class Cindervane extends RideableDragonBase implements DragonFlightCapabl
 
         for (LivingEntity target : targets) {
             if (target.hurt(server.damageSources().explosion(this, this), blastDamage)) {
-                target.setSecondsOnFire(8);
+                target.igniteForSeconds(8);
             }
         }
     }

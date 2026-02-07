@@ -47,6 +47,12 @@ public final class NeoForgeConfigHelper implements ConfigHelper {
         }
 
         @Override
+        public BooleanValue defineBoolean(String key, boolean defaultValue) {
+            ModConfigSpec.BooleanValue value = builder.define(key, defaultValue);
+            return value::get;
+        }
+
+        @Override
         public ListValue defineList(String key, List<String> defaultValue) {
             ModConfigSpec.ConfigValue<List<? extends String>> value = builder.defineListAllowEmpty(
                     key,
