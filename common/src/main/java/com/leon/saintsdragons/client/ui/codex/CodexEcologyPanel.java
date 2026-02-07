@@ -33,6 +33,7 @@ public class CodexEcologyPanel {
             ResourceLocation.fromNamespaceAndPath("saintsdragons", "hearty_dragon_meal")
     );
     private static final List<ResourceLocation> RAEVYX_DROPS = List.of(
+            ResourceLocation.fromNamespaceAndPath("saintsdragons", "raevyx_scale"),
             ResourceLocation.fromNamespaceAndPath("saintsdragons", "raevyx_egg")
     );
     private static final List<ResourceLocation> NULLJAW_FAVORITE_FOODS = List.of(

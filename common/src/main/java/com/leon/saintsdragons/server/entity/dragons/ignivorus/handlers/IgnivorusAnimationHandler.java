@@ -144,8 +144,8 @@ public record IgnivorusAnimationHandler(Ignivorus dragon) {
             // 0 = glide, 1 = flap, 2 = hover, 3 = takeoff, 4 = sprint_flap, 5 = fly_idle, -1 = ground
             int syncedMode = dragon.getSyncedFlightMode();
 
-            // Check for takeoff animation (highest priority)
-            if (syncedMode == 3 || dragon.isTakeoff() || dragon.timeFlying < 30) {
+            // Mode 3: Takeoff (highest priority)
+            if (syncedMode == 3 || dragon.isTakeoff() || dragon.timeFlying < Ignivorus.TAKEOFF_ANIMATION_TICKS) {
                 state.getController().transitionLength(4);
                 // Use Phase 2 takeoff animation if dragon is in Phase 2 mode
                 if (dragon.getEntityData().get(Ignivorus.DATA_PHASE2)) {

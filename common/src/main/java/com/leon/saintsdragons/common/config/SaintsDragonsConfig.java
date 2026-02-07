@@ -32,28 +32,33 @@ public final class SaintsDragonsConfig {
     public static ConfigHelper.IntValue RAEVYX_MIN_GROUP_SIZE;
     public static ConfigHelper.IntValue RAEVYX_MAX_GROUP_SIZE;
     public static ConfigHelper.ListValue RAEVYX_ADDITIONAL_BIOMES;
+    public static ConfigHelper.ListValue RAEVYX_EXCLUDED_BIOMES;
 
     public static ConfigHelper.IntValue STEGONAUT_SPAWN_WEIGHT;
     public static ConfigHelper.IntValue STEGONAUT_MIN_GROUP_SIZE;
     public static ConfigHelper.IntValue STEGONAUT_MAX_GROUP_SIZE;
     public static ConfigHelper.ListValue STEGONAUT_ADDITIONAL_BIOMES;
+    public static ConfigHelper.ListValue STEGONAUT_EXCLUDED_BIOMES;
 
     public static ConfigHelper.IntValue CINDERVANE_SPAWN_WEIGHT;
     public static ConfigHelper.IntValue CINDERVANE_MIN_GROUP_SIZE;
     public static ConfigHelper.IntValue CINDERVANE_MAX_GROUP_SIZE;
     public static ConfigHelper.ListValue CINDERVANE_ADDITIONAL_BIOMES;
+    public static ConfigHelper.ListValue CINDERVANE_EXCLUDED_BIOMES;
     public static ConfigHelper.BooleanValue CINDERVANE_EGG_BLOCK_WORLDGEN;
 
     public static ConfigHelper.IntValue NULLJAW_SPAWN_WEIGHT;
     public static ConfigHelper.IntValue NULLJAW_MIN_GROUP_SIZE;
     public static ConfigHelper.IntValue NULLJAW_MAX_GROUP_SIZE;
     public static ConfigHelper.ListValue NULLJAW_ADDITIONAL_BIOMES;
+    public static ConfigHelper.ListValue NULLJAW_EXCLUDED_BIOMES;
     public static ConfigHelper.BooleanValue NULLJAW_EGG_BLOCK_WORLDGEN;
 
     public static ConfigHelper.IntValue IGNIVORUS_SPAWN_WEIGHT;
     public static ConfigHelper.IntValue IGNIVORUS_MIN_GROUP_SIZE;
     public static ConfigHelper.IntValue IGNIVORUS_MAX_GROUP_SIZE;
     public static ConfigHelper.ListValue IGNIVORUS_ADDITIONAL_BIOMES;
+    public static ConfigHelper.ListValue IGNIVORUS_EXCLUDED_BIOMES;
 
     private static volatile boolean initialized = false;
 
@@ -86,6 +91,8 @@ public final class SaintsDragonsConfig {
         builder.comment("Additional biomes where Raevyx can spawn (e.g., \"minecraft:desert\", \"terralith:volcanic_crater\")");
         builder.translation("saintsdragons.config.raevyxAdditionalBiomes");
         RAEVYX_ADDITIONAL_BIOMES = builder.defineList("raevyxAdditionalBiomes", Collections.emptyList());
+        builder.comment("Default tagged biomes where Raevyx should NOT spawn");
+        RAEVYX_EXCLUDED_BIOMES = builder.defineList("raevyxExcludedBiomes", Collections.emptyList());
 
         builder.comment("Stegonaut spawn settings");
         builder.translation("saintsdragons.config.stegonautSpawnWeight");
@@ -97,6 +104,8 @@ public final class SaintsDragonsConfig {
         builder.comment("Additional biomes where Stegonaut can spawn (e.g., \"minecraft:desert\", \"terralith:volcanic_crater\")");
         builder.translation("saintsdragons.config.stegonautAdditionalBiomes");
         STEGONAUT_ADDITIONAL_BIOMES = builder.defineList("stegonautAdditionalBiomes", Collections.emptyList());
+        builder.comment("Default tagged biomes where Stegonaut should NOT spawn");
+        STEGONAUT_EXCLUDED_BIOMES = builder.defineList("stegonautExcludedBiomes", Collections.emptyList());
 
         builder.comment("Cindervane spawn settings");
         builder.translation("saintsdragons.config.cindervaneSpawnWeight");
@@ -108,6 +117,8 @@ public final class SaintsDragonsConfig {
         builder.comment("Additional biomes where Cindervane can spawn (e.g., \"minecraft:desert\", \"terralith:volcanic_crater\")");
         builder.translation("saintsdragons.config.cindervaneAdditionalBiomes");
         CINDERVANE_ADDITIONAL_BIOMES = builder.defineList("cindervaneAdditionalBiomes", Collections.emptyList());
+        builder.comment("Default tagged biomes where Cindervane should NOT spawn");
+        CINDERVANE_EXCLUDED_BIOMES = builder.defineList("cindervaneExcludedBiomes", Collections.emptyList());
         builder.comment("Whether Cindervane egg blocks generate in worldgen feature patches");
         CINDERVANE_EGG_BLOCK_WORLDGEN = builder.defineBoolean("cindervaneEggBlockWorldgen", CINDERVANE_EGG_BLOCK_WORLDGEN_DEFAULT);
 
@@ -121,6 +132,8 @@ public final class SaintsDragonsConfig {
         builder.comment("Additional biomes where Nulljaw can spawn (e.g., \"minecraft:desert\", \"terralith:volcanic_crater\")");
         builder.translation("saintsdragons.config.nulljawAdditionalBiomes");
         NULLJAW_ADDITIONAL_BIOMES = builder.defineList("nulljawAdditionalBiomes", Collections.emptyList());
+        builder.comment("Default tagged biomes where Nulljaw should NOT spawn");
+        NULLJAW_EXCLUDED_BIOMES = builder.defineList("nulljawExcludedBiomes", Collections.emptyList());
         builder.comment("Whether Nulljaw egg blocks generate in worldgen feature patches");
         NULLJAW_EGG_BLOCK_WORLDGEN = builder.defineBoolean("nulljawEggBlockWorldgen", NULLJAW_EGG_BLOCK_WORLDGEN_DEFAULT);
 
@@ -134,6 +147,8 @@ public final class SaintsDragonsConfig {
         builder.comment("Additional biomes where Ignivorus can spawn (e.g., \"minecraft:desert\", \"terralith:volcanic_crater\")");
         builder.translation("saintsdragons.config.ignivorusAdditionalBiomes");
         IGNIVORUS_ADDITIONAL_BIOMES = builder.defineList("ignivorusAdditionalBiomes", Collections.emptyList());
+        builder.comment("Default tagged biomes where Ignivorus should NOT spawn");
+        IGNIVORUS_EXCLUDED_BIOMES = builder.defineList("ignivorusExcludedBiomes", Collections.emptyList());
 
         builder.pop();
         builder.build();
