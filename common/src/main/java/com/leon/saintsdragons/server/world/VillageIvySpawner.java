@@ -121,7 +121,7 @@ public class VillageIvySpawner {
         ivy.moveTo(spawnPos.getX() + 0.5, spawnPos.getY(), spawnPos.getZ() + 0.5,
                    level.random.nextFloat() * 360F, 0F);
         ivy.finalizeSpawn(level, level.getCurrentDifficultyAt(spawnPos),
-                         MobSpawnType.STRUCTURE, null, null);
+                         MobSpawnType.STRUCTURE, null);
         ivy.setPersistenceRequired();
 
         level.addFreshEntity(ivy);

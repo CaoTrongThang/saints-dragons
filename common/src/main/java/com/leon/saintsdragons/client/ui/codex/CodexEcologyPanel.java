@@ -20,46 +20,44 @@ public class CodexEcologyPanel {
     private final ResourceLocation ignivorusEggTexture;
     private final List<CodexPageLink> ecologyPageLinks = new ArrayList<>();
     private static final List<ResourceLocation> IGNIVORUS_FAVORITE_FOODS = List.of(
-            new ResourceLocation("minecraft", "salmon"),
-            new ResourceLocation("minecraft", "cod"),
-            new ResourceLocation("minecraft", "beef"),
-            new ResourceLocation("saintsdragons", "hearty_dragon_meal")
+            ResourceLocation.fromNamespaceAndPath("minecraft", "salmon"),
+            ResourceLocation.fromNamespaceAndPath("minecraft", "cod"),
+            ResourceLocation.fromNamespaceAndPath("minecraft", "beef"),
+            ResourceLocation.fromNamespaceAndPath("saintsdragons", "hearty_dragon_meal")
     );
     private static final List<ResourceLocation> IGNIVORUS_DROPS = List.of(
-            new ResourceLocation("saintsdragons", "ignivorus_scale"),
-            new ResourceLocation("saintsdragons", "ignivorus_egg")
+            ResourceLocation.fromNamespaceAndPath("saintsdragons", "ignivorus_egg")
     );
     private static final List<ResourceLocation> RAEVYX_FAVORITE_FOODS = List.of(
-            new ResourceLocation("minecraft", "salmon"),
-            new ResourceLocation("saintsdragons", "hearty_dragon_meal")
+            ResourceLocation.fromNamespaceAndPath("minecraft", "salmon"),
+            ResourceLocation.fromNamespaceAndPath("saintsdragons", "hearty_dragon_meal")
     );
     private static final List<ResourceLocation> RAEVYX_DROPS = List.of(
-            new ResourceLocation("saintsdragons", "raevyx_scale"),
-            new ResourceLocation("saintsdragons", "raevyx_egg")
+            ResourceLocation.fromNamespaceAndPath("saintsdragons", "raevyx_scale"),
+            ResourceLocation.fromNamespaceAndPath("saintsdragons", "raevyx_egg")
     );
     private static final List<ResourceLocation> NULLJAW_FAVORITE_FOODS = List.of(
-            new ResourceLocation("minecraft", "salmon"),
-            new ResourceLocation("minecraft", "tropical_fish"),
-            new ResourceLocation("minecraft", "cod"),
-            new ResourceLocation("saintsdragons", "hearty_dragon_meal")
+            ResourceLocation.fromNamespaceAndPath("minecraft", "salmon"),
+            ResourceLocation.fromNamespaceAndPath("minecraft", "tropical_fish"),
+            ResourceLocation.fromNamespaceAndPath("minecraft", "cod"),
+            ResourceLocation.fromNamespaceAndPath("saintsdragons", "hearty_dragon_meal")
     );
     private static final List<ResourceLocation> NULLJAW_DROPS = List.of(
-            new ResourceLocation("saintsdragons", "nulljaw_egg")
+            ResourceLocation.fromNamespaceAndPath("saintsdragons", "nulljaw_egg")
     );
     private static final List<ResourceLocation> CINDERVANE_FAVORITE_FOODS = List.of(
-            new ResourceLocation("saintsdragons", "hearty_dragon_meal"),
-            new ResourceLocation("minecraft", "chicken"),
-            new ResourceLocation("minecraft", "cod"),
-            new ResourceLocation("minecraft", "salmon")
+            ResourceLocation.fromNamespaceAndPath("saintsdragons", "hearty_dragon_meal"),
+            ResourceLocation.fromNamespaceAndPath("minecraft", "chicken"),
+            ResourceLocation.fromNamespaceAndPath("minecraft", "cod"),
+            ResourceLocation.fromNamespaceAndPath("minecraft", "salmon")
     );
     private static final List<ResourceLocation> CINDERVANE_DROPS = List.of(
-            new ResourceLocation("saintsdragons", "cindervane_scale"),
-            new ResourceLocation("saintsdragons", "cindervane_egg")
+            ResourceLocation.fromNamespaceAndPath("saintsdragons", "cindervane_egg")
     );
     private static final List<ResourceLocation> STEGONAUT_FAVORITE_FOODS = List.of(
-            new ResourceLocation("minecraft", "cod"),
-            new ResourceLocation("minecraft", "salmon"),
-            new ResourceLocation("saintsdragons", "hearty_dragon_meal")
+            ResourceLocation.fromNamespaceAndPath("minecraft", "cod"),
+            ResourceLocation.fromNamespaceAndPath("minecraft", "salmon"),
+            ResourceLocation.fromNamespaceAndPath("saintsdragons", "hearty_dragon_meal")
     );
     private static final List<ResourceLocation> STEGONAUT_DROPS = List.of();
     private Button ecologyPrevPageButton;

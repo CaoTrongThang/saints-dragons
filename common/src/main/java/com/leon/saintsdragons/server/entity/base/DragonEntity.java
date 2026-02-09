@@ -21,10 +21,12 @@ import com.leon.saintsdragons.server.entity.handler.DragonCombatHandler;
 import com.leon.saintsdragons.server.entity.interfaces.DragonSoundProfile;
 import com.leon.saintsdragons.server.entity.handler.DragonAllyManager;
 import com.leon.saintsdragons.common.network.DragonAnimTickets;
+import com.leon.saintsdragons.server.data.DragonCodexSavedData;
 import java.lang.reflect.Method;
 import java.util.Collections;
 import java.util.Map;
 import java.util.Optional;
+import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Supplier;
 import javax.annotation.Nullable;
@@ -45,6 +47,7 @@ import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.projectile.Projectile;
 import net.minecraft.world.entity.MobSpawnType;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.OwnableEntity;
 import net.minecraft.world.entity.SpawnGroupData;
 import net.minecraft.world.entity.TamableAnimal;
@@ -58,8 +61,7 @@ import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.NotNull;
 import software.bernie.geckolib.animatable.GeoEntity;
-import software.bernie.geckolib.core.animation.AnimatableManager;
-import com.leon.saintsdragons.server.data.DragonCodexSavedData;
+import software.bernie.geckolib.animation.AnimatableManager;
 
 /**
  * Base class for all wyvern entities in the mod.
@@ -93,12 +95,9 @@ public abstract class DragonEntity extends TamableAnimal implements GeoEntity {
             SynchedEntityData.defineId(DragonEntity.class, EntityDataSerializers.FLOAT);
     private static final EntityDataAccessor<Float> DATA_YAW_VELOCITY =
             SynchedEntityData.defineId(DragonEntity.class, EntityDataSerializers.FLOAT);
-    private static final EntityDataAccessor<Integer> DATA_TEXTURE_VARIANT =
-            SynchedEntityData.defineId(DragonEntity.class, EntityDataSerializers.INT);
 
     public static final int HUNGER_MAX = DragonHungerComponent.HUNGER_MAX;
     public static final int HAPPINESS_MAX = DragonHappinessComponent.HAPPINESS_MAX;
-
 
     // Dragon ability system (lightweight base – no global cooldown here)
     private DragonAbility<?> activeAbility = null;
@@ -237,19 +236,18 @@ public abstract class DragonEntity extends TamableAnimal implements GeoEntity {
     private boolean isRideable = false;
 
     @Override
-    protected void defineSynchedData() {
-        super.defineSynchedData();
-        this.entityData.define(DATA_COMMAND, 0); // 0=Follow, 1=Sit, 2=Wander (default Follow)
-        this.entityData.define(DATA_SIT_PROGRESS, 0.0f); // Sit progress for smooth animations
-        this.entityData.define(DATA_GENDER, DragonGender.MALE.getId());
-        this.entityData.define(DATA_HAPPINESS, HAPPINESS_MAX);
-        this.entityData.define(DATA_SLEEPING, false);
-        this.entityData.define(DATA_SLEEPING_ENTERING, false);
-        this.entityData.define(DATA_SLEEPING_EXITING, false);
-        this.entityData.define(DATA_BODY_DEVIATION, 0.0f);
-        this.entityData.define(DATA_PITCH_DEVIATION, 0.0f);
-        this.entityData.define(DATA_YAW_VELOCITY, 0.0f);
-        this.entityData.define(DATA_TEXTURE_VARIANT, 0);
+    protected void defineSynchedData(SynchedEntityData.Builder builder) {
+        super.defineSynchedData(builder);
+        builder.define(DATA_COMMAND, 0); // 0=Follow, 1=Sit, 2=Wander (default Follow)
+        builder.define(DATA_SIT_PROGRESS, 0.0f); // Sit progress for smooth animations
+        builder.define(DATA_GENDER, DragonGender.MALE.getId());
+        builder.define(DATA_HAPPINESS, HAPPINESS_MAX);
+        builder.define(DATA_SLEEPING, false);
+        builder.define(DATA_SLEEPING_ENTERING, false);
+        builder.define(DATA_SLEEPING_EXITING, false);
+        builder.define(DATA_BODY_DEVIATION, 0.0f);
+        builder.define(DATA_PITCH_DEVIATION, 0.0f);
+        builder.define(DATA_YAW_VELOCITY, 0.0f);
     }
 
     /**
@@ -392,80 +390,6 @@ public abstract class DragonEntity extends TamableAnimal implements GeoEntity {
         return genderComponent != null && genderComponent.hasGender();
     }
 
-    // ===== TEXTURE VARIANT SYSTEM =====
-
-    public int getTextureVariant() {
-        return this.entityData.get(DATA_TEXTURE_VARIANT);
-    }
-
-    public void setTextureVariant(int variant) {
-        int clamped = Math.max(0, Math.min(getMaxTextureVariant(), variant));
-        this.entityData.set(DATA_TEXTURE_VARIANT, clamped);
-    }
-
-    /**
-     * Maximum valid texture variant index for this dragon.
-     * Default is 0 (single texture/no variants).
-     */
-    protected int getMaxTextureVariant() {
-        return 0;
-    }
-
-    /**
-     * Exposes the maximum valid texture variant index for command/UI helpers.
-     */
-    public int getMaxTextureVariantIndex() {
-        return getMaxTextureVariant();
-    }
-
-    /**
-     * Human-readable variant names accepted by commands.
-     * Default dragons support only "default".
-     */
-    public Map<String, Integer> getTextureVariantNameMap() {
-        return Map.of("default", 0);
-    }
-
-    /**
-     * Resolves a variant id to its configured command/display name.
-     */
-    public String getTextureVariantName(int variantId) {
-        int clamped = Math.max(0, Math.min(getMaxTextureVariant(), variantId));
-        for (Map.Entry<String, Integer> entry : getTextureVariantNameMap().entrySet()) {
-            if (entry.getValue() == clamped) {
-                return entry.getKey();
-            }
-        }
-        return "default";
-    }
-
-    public String getTextureVariantTranslationKey(int variantId) {
-        return "saintsdragons.variant." + getTextureVariantName(variantId);
-    }
-
-    /**
-     * Rolls a random valid texture variant index using this dragon's configured range.
-     */
-    protected int rollRandomTextureVariant() {
-        int maxVariant = getMaxTextureVariant();
-        if (maxVariant <= 0) {
-            return 0;
-        }
-        return this.getRandom().nextInt(maxVariant + 1);
-    }
-
-    /**
-     * Hook for spawn-time variant selection.
-     * By default, picks a random variant from 0..maxVariant.
-     */
-    protected int chooseSpawnTextureVariant(@NotNull ServerLevelAccessor levelAccessor,
-                                            @NotNull DifficultyInstance difficulty,
-                                            @NotNull MobSpawnType reason,
-                                            @Nullable SpawnGroupData spawnData,
-                                            @Nullable CompoundTag spawnTag) {
-        return rollRandomTextureVariant();
-    }
-
     public boolean tryBrush(Player player, net.minecraft.world.item.ItemStack brushStack) {
         return groomingComponent != null && player != null && brushStack != null
                 && groomingComponent.tryBrush(player, brushStack);
@@ -485,7 +409,6 @@ public abstract class DragonEntity extends TamableAnimal implements GeoEntity {
         }
     }
 
-
     @Override
     public abstract void registerControllers(AnimatableManager.ControllerRegistrar controllers);
 
@@ -500,10 +423,9 @@ public abstract class DragonEntity extends TamableAnimal implements GeoEntity {
 
     @Override
     public @NotNull SpawnGroupData finalizeSpawn(@NotNull ServerLevelAccessor levelAccessor, @NotNull DifficultyInstance difficulty, MobSpawnType reason,
-                                                 @Nullable SpawnGroupData spawnData, @Nullable CompoundTag spawnTag) {
-        SpawnGroupData data = super.finalizeSpawn(levelAccessor, difficulty, reason, spawnData, spawnTag);
+                                                 @Nullable SpawnGroupData spawnData) {
+        SpawnGroupData data = super.finalizeSpawn(levelAccessor, difficulty, reason, spawnData);
         ensureGenderInitialized();
-        setTextureVariant(chooseSpawnTextureVariant(levelAccessor, difficulty, reason, spawnData, spawnTag));
 
         // If baby spawned from spawn egg, reposition on ground to prevent falling from sky
         if (this.isBaby() && reason == MobSpawnType.SPAWN_EGG) {
@@ -966,8 +888,8 @@ public abstract class DragonEntity extends TamableAnimal implements GeoEntity {
             this.lastHurtByPlayerTime = killDataRecentlyHit;
 
             // Drop loot with proper kill credit
-            if (killDataCause != null) {
-                this.dropAllDeathLoot(killDataCause);
+            if (killDataCause != null && this.level() instanceof ServerLevel serverLevel) {
+                this.dropAllDeathLoot(serverLevel, killDataCause);
             }
 
             // Broadcast death event and remove entity
@@ -981,12 +903,12 @@ public abstract class DragonEntity extends TamableAnimal implements GeoEntity {
      * This ensures loot drops only after the death animation completes.
      */
     @Override
-    protected void dropAllDeathLoot(@NotNull DamageSource source) {
+    protected void dropAllDeathLoot(@NotNull ServerLevel level, @NotNull DamageSource source) {
         if (deathTime < getDeathAnimationDurationTicks()) {
             // Still playing death animation - don't drop yet
             return;
         }
-        super.dropAllDeathLoot(source);
+        super.dropAllDeathLoot(level, source);
     }
 
     /**
@@ -1067,8 +989,8 @@ public abstract class DragonEntity extends TamableAnimal implements GeoEntity {
      *
      * @param controller The animation controller to register the sound key with
      */
-    protected final void registerBiteSoundKey(software.bernie.geckolib.core.animation.AnimationController<?> controller, String speciesId) {
-        controller.triggerableAnim("bite", software.bernie.geckolib.core.animation.RawAnimation.begin().thenPlay("animation." + speciesId + ".bite"));
+    protected final void registerBiteSoundKey(software.bernie.geckolib.animation.AnimationController<?> controller, String speciesId) {
+        controller.triggerableAnim("bite", software.bernie.geckolib.animation.RawAnimation.begin().thenPlay("animation." + speciesId + ".bite"));
     }
 
 
@@ -1157,6 +1079,12 @@ public abstract class DragonEntity extends TamableAnimal implements GeoEntity {
             return 0;
         }
         return sleepComponent.getAmbientCooldownTicks();
+    }
+
+    protected void bumpSleepAmbientCooldown(int ticks) {
+        if (sleepComponent != null) {
+            sleepComponent.bumpAmbientCooldown(ticks);
+        }
     }
 
     protected void clearSleepCooldowns() {
@@ -1834,7 +1762,6 @@ public abstract class DragonEntity extends TamableAnimal implements GeoEntity {
         if (genderComponent != null) {
             genderComponent.saveToNBT(tag);
         }
-        tag.putInt("TextureVariant", getTextureVariant());
         tag.putBoolean("BoundInBinder", this.boundInBinder);
 
         allyManager.saveToNBT(tag);
@@ -1851,7 +1778,6 @@ public abstract class DragonEntity extends TamableAnimal implements GeoEntity {
         }
 
         super.readAdditionalSaveData(tag);
-
         if (commandComponent != null) {
             commandComponent.loadFromNBT(tag);
         }
@@ -1870,9 +1796,6 @@ public abstract class DragonEntity extends TamableAnimal implements GeoEntity {
         if (sleepComponent != null) {
             sleepComponent.loadFromNBT(tag);
         }
-        if (tag.contains("TextureVariant")) {
-            setTextureVariant(tag.getInt("TextureVariant"));
-        }
         this.boundInBinder = tag.getBoolean("BoundInBinder");
         allyManager.loadFromNBT(tag);
     }
@@ -1888,7 +1811,9 @@ public abstract class DragonEntity extends TamableAnimal implements GeoEntity {
      */
     @Override
     public void travel(@NotNull Vec3 travelVector) {
-        if (this.isOrderedToSit() && !this.isVehicle() && !this.isPassenger()) {
+        // Freeze movement when sitting or sleeping
+        if ((this.isOrderedToSit() || this.isSleeping() || this.isSleepTransitioning())
+            && !this.isVehicle() && !this.isPassenger()) {
             this.setDeltaMovement(Vec3.ZERO);
             super.travel(Vec3.ZERO);
             return;

@@ -172,7 +172,9 @@ public class CodexDragonRenderer {
             dragon.setBaby(true);
         }
 
-        dragon.setTextureVariant(entry.variantId());
+        if (dragon instanceof Ignivorus ignivorus) {
+            ignivorus.setTextureVariant(entry.variantId());
+        }
 
         dragon.setGender(DragonGender.fromId(entry.genderId()));
         return dragon;
