@@ -75,12 +75,16 @@ public class VillageIvySpawner {
             BlockPos villageCenter = poi.getPos();
             long villageKey = villageCenter.asLong();
 
-            // Skip if we already spawned Ivy here this session
+            // If this village is tracked, confirm Ivy is still alive nearby.
+            // This allows auto-recovery if Ivy died/despawned/was removed.
             if (tracked.contains(villageKey)) {
-                return;
+                if (hasIvyNearby(level, villageCenter)) {
+                    return;
+                }
+                tracked.remove(villageKey);
             }
 
-            // Check if Ivy already exists nearby
+            // Skip if Ivy already exists nearby
             if (hasIvyNearby(level, villageCenter)) {
                 tracked.add(villageKey);
                 return;
@@ -117,7 +121,8 @@ public class VillageIvySpawner {
         ivy.moveTo(spawnPos.getX() + 0.5, spawnPos.getY(), spawnPos.getZ() + 0.5,
                    level.random.nextFloat() * 360F, 0F);
         ivy.finalizeSpawn(level, level.getCurrentDifficultyAt(spawnPos),
-                         MobSpawnType.STRUCTURE, null);
+                         MobSpawnType.STRUCTURE, null, null);
+        ivy.setPersistenceRequired();
 
         level.addFreshEntity(ivy);
     }

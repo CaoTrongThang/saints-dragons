@@ -39,7 +39,6 @@ import com.leon.saintsdragons.server.entity.interfaces.DragonSoundProfile;
 import com.leon.saintsdragons.server.entity.interfaces.ShakesScreen;
 import com.leon.saintsdragons.server.entity.interfaces.SoundHandledDragon;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.Holder;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
@@ -85,12 +84,11 @@ import net.minecraft.world.level.GameRules;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.phys.AABB;
-import net.minecraft.world.level.pathfinder.PathType;
-import software.bernie.geckolib.animatable.instance.AnimatableInstanceCache;
-import software.bernie.geckolib.animation.AnimatableManager;
-import software.bernie.geckolib.animation.AnimationController;
-import software.bernie.geckolib.animation.PlayState;
-import software.bernie.geckolib.animation.keyframe.event.SoundKeyframeEvent;
+import net.minecraft.world.level.pathfinder.BlockPathTypes;
+import software.bernie.geckolib.core.animatable.instance.AnimatableInstanceCache;
+import software.bernie.geckolib.core.animation.AnimatableManager;
+import software.bernie.geckolib.core.animation.AnimationController;
+import software.bernie.geckolib.core.keyframe.event.SoundKeyframeEvent;
 import software.bernie.geckolib.util.GeckoLibUtil;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -99,7 +97,7 @@ import java.util.List;
 import java.util.Map;
 
 public class Ignivorus extends RideableDragonBase implements DragonFlightCapable, SoundHandledDragon, ShakesScreen {
-    public static final int TAKEOFF_ANIMATION_TICKS = 31;
+    public static final int TAKEOFF_ANIMATION_TICKS = 30;
 
     // ===== ENTITY DATA ACCESSORS =====
 
@@ -166,10 +164,6 @@ public class Ignivorus extends RideableDragonBase implements DragonFlightCapable
     public static final EntityDataAccessor<Boolean> DATA_PITCH_KEY_MODE =
             SynchedEntityData.defineId(Ignivorus.class, EntityDataSerializers.BOOLEAN);
 
-    /** Tracks the texture variant (0 = default, 1 = second variant) */
-    public static final EntityDataAccessor<Integer> DATA_TEXTURE_VARIANT =
-            SynchedEntityData.defineId(Ignivorus.class, EntityDataSerializers.INT);
-
     /** Tracks the fireball charge level for UI display (0 = not charging, 1-3 = charge level) */
     public static final EntityDataAccessor<Integer> DATA_FIREBALL_CHARGE =
             SynchedEntityData.defineId(Ignivorus.class, EntityDataSerializers.INT);
@@ -216,7 +210,7 @@ public class Ignivorus extends RideableDragonBase implements DragonFlightCapable
     public static final int RIDER_WATER_SCAN_RADIUS = 2;
     public static final int RIDER_WATER_SCAN_DEPTH = 8;
     private static final double WATER_EFFECT_MAX_HEIGHT = 8.0D;
-    private static final double WATER_EFFECT_INTENSITY = 1.15D;
+    private static final double WATER_EFFECT_INTENSITY = 0.6D;
     public static final double LANDING_BLEND_ALTITUDE = 8.0D;
     private static final int RIDER_LANDING_BLEND_DURATION = 5;
     public static final double BREED_PARTNER_RANGE = 20.0D;
@@ -247,9 +241,10 @@ public class Ignivorus extends RideableDragonBase implements DragonFlightCapable
 
     public AnimatableInstanceCache dragonCache = GeckoLibUtil.createInstanceCache(this);
     private final IgnivorusAnimationHandler animationHandler = new IgnivorusAnimationHandler(this);
-    // Flight mode state (moved inline from physics controller for performance)
-    private boolean riderHighAltitudeGlide = false;
     private final DragonSoundHandler soundHandler = new DragonSoundHandler(this);
+
+    // Flight mode state (moved from physics controller for performance)
+    private boolean riderHighAltitudeGlide = false;
     private final IgnivorusRiderController riderController;
     private final IgnivorusInteractionHandler interactionHandler = new IgnivorusInteractionHandler(this);
     private final IgnivorusTamingHandler tamingController = new IgnivorusTamingHandler(this);
@@ -375,6 +370,7 @@ public class Ignivorus extends RideableDragonBase implements DragonFlightCapable
 
     public Ignivorus(EntityType<? extends Ignivorus> type, Level level) {
         super(type, level);
+        this.setMaxUpStep(1.1F);
 
         this.groundNav = new DragonPathNavigateGround(this, level);
         this.airNav = new FlyingPathNavigation(this, level) {
@@ -388,8 +384,8 @@ public class Ignivorus extends RideableDragonBase implements DragonFlightCapable
         this.usingAirNav = false;
         // Fire dragon: don't treat fire as a hazard for pathfinding.
         // This prevents repeated repath spikes when long fire lines are present.
-        this.setPathfindingMalus(PathType.DANGER_FIRE, 0.0F);
-        this.setPathfindingMalus(PathType.DANGER_OTHER, 0.0F);
+        this.setPathfindingMalus(BlockPathTypes.DANGER_FIRE, 0.0F);
+        this.setPathfindingMalus(BlockPathTypes.DAMAGE_FIRE, 0.0F);
 
         this.riderController = new IgnivorusRiderController(this);
         resetAmbientSoundTimer();
@@ -399,49 +395,49 @@ public class Ignivorus extends RideableDragonBase implements DragonFlightCapable
     }
 
     @Override
-    protected void defineSynchedData(SynchedEntityData.Builder builder) {
-        super.defineSynchedData(builder);
-        builder.define(DATA_FIRE_BREATHING, false);
-        builder.define(DATA_FIRE_BREATH_PROGRESS, 0);
-        builder.define(DATA_FIRE_BREATH_ENERGY, 1.0F);
-        builder.define(DATA_FIRE_BREATH_DEPLETED, false);
-        builder.define(DATA_FIRE_START_SET, false);
-        builder.define(DATA_FIRE_START_X, 0F);
-        builder.define(DATA_FIRE_START_Y, 0F);
-        builder.define(DATA_FIRE_START_Z, 0F);
-        builder.define(DATA_FIRE_END_SET, false);
-        builder.define(DATA_FIRE_END_X, 0F);
-        builder.define(DATA_FIRE_END_Y, 0F);
-        builder.define(DATA_FIRE_END_Z, 0F);
-        builder.define(DATA_SCREEN_SHAKE_AMOUNT, 0.0F);
-        builder.define(DATA_CINEMATIC_ZOOM_ACTIVE, false);
-        builder.define(DATA_FEEDING_COOLDOWN, 0);
-        builder.define(DATA_TAMING_STUNNED, false);
-        builder.define(DATA_FLIGHT_PITCH, 0f);
-        builder.define(DATA_PITCH_KEY_MODE, false);
-        builder.define(DATA_TEXTURE_VARIANT, 0);
-        builder.define(DATA_FIREBALL_CHARGE, 0);
+    protected void defineSynchedData() {
+        super.defineSynchedData();
+        this.entityData.define(DATA_FLYING, false);
+        this.entityData.define(DATA_TAKEOFF, false);
+        this.entityData.define(DATA_HOVERING, false);
+        this.entityData.define(DATA_LANDING, false);
+        this.entityData.define(DATA_RIDER_LANDING_BLEND, false);
+        this.entityData.define(DATA_RUNNING, false);
+        this.entityData.define(DATA_FLIGHT_MODE, -1);
+        this.entityData.define(DATA_RIDER_FORWARD, 0F);
+        this.entityData.define(DATA_RIDER_STRAFE, 0F);
+        this.entityData.define(DATA_GROUND_MOVE_STATE, 0);
+        this.entityData.define(DATA_GOING_UP, false);
+        this.entityData.define(DATA_GOING_DOWN, false);
+        this.entityData.define(DATA_ACCELERATING, false);
+        this.entityData.define(DATA_BULLDOZING, false);
+        this.entityData.define(DATA_PHASE2, false);
+        this.entityData.define(DATA_LEAPING, false);
+        this.entityData.define(DATA_LEAP_ANIM_STATE, 0);
+        this.entityData.define(DATA_FIRE_BREATHING, false);
+        this.entityData.define(DATA_FIRE_BREATH_PROGRESS, 0);
+        this.entityData.define(DATA_FIRE_BREATH_ENERGY, 1.0F);
+        this.entityData.define(DATA_FIRE_BREATH_DEPLETED, false);
+        this.entityData.define(DATA_FIRE_START_SET, false);
+        this.entityData.define(DATA_FIRE_START_X, 0F);
+        this.entityData.define(DATA_FIRE_START_Y, 0F);
+        this.entityData.define(DATA_FIRE_START_Z, 0F);
+        this.entityData.define(DATA_FIRE_END_SET, false);
+        this.entityData.define(DATA_FIRE_END_X, 0F);
+        this.entityData.define(DATA_FIRE_END_Y, 0F);
+        this.entityData.define(DATA_FIRE_END_Z, 0F);
+        this.entityData.define(DATA_SCREEN_SHAKE_AMOUNT, 0.0F);
+        this.entityData.define(DATA_CINEMATIC_ZOOM_ACTIVE, false);
+        this.entityData.define(DATA_FEEDING_COOLDOWN, 0);
+        this.entityData.define(DATA_TAMING_STUNNED, false);
+        this.entityData.define(DATA_FLIGHT_PITCH, 0f);
+        this.entityData.define(DATA_PITCH_KEY_MODE, false);
+        this.entityData.define(DATA_FIREBALL_CHARGE, 0);
     }
 
     @Override
-    protected void defineRideableDragonData(SynchedEntityData.Builder builder) {
-        builder.define(DATA_FLYING, false);
-        builder.define(DATA_TAKEOFF, false);
-        builder.define(DATA_HOVERING, false);
-        builder.define(DATA_LANDING, false);
-        builder.define(DATA_RIDER_LANDING_BLEND, false);
-        builder.define(DATA_RUNNING, false);
-        builder.define(DATA_FLIGHT_MODE, -1);
-        builder.define(DATA_RIDER_FORWARD, 0F);
-        builder.define(DATA_RIDER_STRAFE, 0F);
-        builder.define(DATA_GROUND_MOVE_STATE, 0);
-        builder.define(DATA_GOING_UP, false);
-        builder.define(DATA_GOING_DOWN, false);
-        builder.define(DATA_ACCELERATING, false);
-        builder.define(DATA_BULLDOZING, false);
-        builder.define(DATA_PHASE2, false);
-        builder.define(DATA_LEAPING, false);
-        builder.define(DATA_LEAP_ANIM_STATE, 0);
+    protected void defineRideableDragonData() {
+        // Additional rideable dragon data if needed
     }
 
     public static AttributeSupplier.Builder createAttributes() {
@@ -456,7 +452,6 @@ public class Ignivorus extends RideableDragonBase implements DragonFlightCapable
             .add(Attributes.ARMOR, config.armor())
             .add(Attributes.KNOCKBACK_RESISTANCE, 2.0D);
     }
-
 
     @Override
     protected void registerGoals() {
@@ -500,14 +495,11 @@ public class Ignivorus extends RideableDragonBase implements DragonFlightCapable
     public @NotNull SpawnGroupData finalizeSpawn(@NotNull ServerLevelAccessor level,
                                                  @NotNull DifficultyInstance difficulty,
                                                  @NotNull MobSpawnType spawnType,
-                                                 @Nullable SpawnGroupData spawnData) {
-        SpawnGroupData data = super.finalizeSpawn(level, difficulty, spawnType, spawnData);
+                                                 @Nullable SpawnGroupData spawnData,
+                                                 @Nullable CompoundTag dataTag) {
+        SpawnGroupData data = super.finalizeSpawn(level, difficulty, spawnType, spawnData, dataTag);
         applyConfiguredAttributes();
         this.setHealth(this.getMaxHealth());
-
-        // Randomly assign variant (50/50 chance between default and crimson)
-        int variant = this.getRandom().nextBoolean() ? 0 : 1;
-        this.setTextureVariant(variant);
 
         return data;
     }
@@ -516,7 +508,7 @@ public class Ignivorus extends RideableDragonBase implements DragonFlightCapable
     public void tick() {
         super.tick();
         soundHandler.tick();
-        super.tickRiderControlLock();
+        tickRiderControlLock();
         tickBulldozeState();
         tickPhase2State();
         tickLeapState();
@@ -572,8 +564,6 @@ public class Ignivorus extends RideableDragonBase implements DragonFlightCapable
         // Update banking and pitching for animations
         tickBankingLogic();
         tickPitchingLogic();
-        tickBulldozeState();
-        tickPhase2State();
 
         if (!level().isClientSide) {
             if (isBaby()) {
@@ -652,8 +642,8 @@ public class Ignivorus extends RideableDragonBase implements DragonFlightCapable
     }
 
     @Override
-    public @NotNull EntityDimensions getDefaultDimensions(@NotNull Pose pose) {
-        EntityDimensions baseDimensions = super.getDefaultDimensions(pose);
+    public @NotNull EntityDimensions getDimensions(@NotNull Pose pose) {
+        EntityDimensions baseDimensions = super.getDimensions(pose);
         if (isBaby()) {
             return baseDimensions.scale(BABY_HITBOX_SCALE);
         }
@@ -683,6 +673,7 @@ public class Ignivorus extends RideableDragonBase implements DragonFlightCapable
         }
         return super.getRiddenInput(player, input);
     }
+
 
     private void handleAmbientSounds() {
         if (isBaby() || isDying() || isSleeping() || isSleepTransitioning() || areRiderControlsLocked()) {
@@ -721,6 +712,7 @@ public class Ignivorus extends RideableDragonBase implements DragonFlightCapable
         nextAmbientSoundDelay = MIN_AMBIENT_DELAY + random.nextInt(range);
     }
 
+
     public boolean canFeed() {
         return this.entityData.get(DATA_FEEDING_COOLDOWN) <= 0;
     }
@@ -729,14 +721,18 @@ public class Ignivorus extends RideableDragonBase implements DragonFlightCapable
         this.entityData.set(DATA_FEEDING_COOLDOWN, Math.max(0, ticks));
     }
 
-    // ===== TEXTURE VARIANT SYSTEM =====
-
-    public int getTextureVariant() {
-        return this.entityData.get(DATA_TEXTURE_VARIANT);
+    @Override
+    protected int getMaxTextureVariant() {
+        // 0 = default, 1 = crimson
+        return 1;
     }
 
-    public void setTextureVariant(int variant) {
-        this.entityData.set(DATA_TEXTURE_VARIANT, variant);
+    @Override
+    public java.util.Map<String, Integer> getTextureVariantNameMap() {
+        return java.util.Map.of(
+                "default", 0,
+                "crimson", 1
+        );
     }
 
     // ===== FIREBALL CHARGE SYSTEM =====
@@ -808,9 +804,6 @@ public class Ignivorus extends RideableDragonBase implements DragonFlightCapable
     }
 
     public boolean isBelowTamingThreshold() {
-        if (isBaby()) {
-            return false;
-        }
         return this.getHealth() <= getTamingThreshold();
     }
 
@@ -825,8 +818,8 @@ public class Ignivorus extends RideableDragonBase implements DragonFlightCapable
 
     @Override
     public void lockRiderControls(int ticks) {
-        super.lockRiderControls(ticks); // Base handles tick counting and entity data
-        // Ignivorus-specific: reset movement states during lock
+        super.lockRiderControls(ticks);  // Base handles tick counting and entity data
+        // Ignivorus-specific: reset rider inputs and movement states during lock
         this.setAccelerating(false);
         this.setLastRiderForward(0.0F);
         this.setLastRiderStrafe(0.0F);
@@ -839,6 +832,7 @@ public class Ignivorus extends RideableDragonBase implements DragonFlightCapable
             this.setTarget(null);
         }
     }
+
 
     private void tickCinematicZoom() {
         prevCinematicZoomProgress = cinematicZoomProgress;
@@ -1500,6 +1494,12 @@ public class Ignivorus extends RideableDragonBase implements DragonFlightCapable
         } else {
             resetFireAimDirection();
         }
+    }
+
+    @Override
+    public void removePassenger(@NotNull Entity passenger) {
+        // Base implementation handles clearing control lock
+        super.removePassenger(passenger);
     }
 
     @Override
@@ -2279,13 +2279,13 @@ public class Ignivorus extends RideableDragonBase implements DragonFlightCapable
     }
 
     @Override
-    protected void positionRider(@NotNull Entity passenger, Entity.MoveFunction moveFunction) {
+    public void positionRider(@NotNull Entity passenger, @NotNull Entity.MoveFunction moveFunction) {
         riderController.positionRider(passenger, moveFunction);
     }
 
     @Override
-    public Vec3 getPassengerRidingPosition(@NotNull Entity passenger) {
-        return riderController.getPassengerPosition(passenger);
+    public double getPassengersRidingOffset() {
+        return riderController.getPassengersRidingOffset();
     }
 
     @Override
@@ -2376,7 +2376,7 @@ public class Ignivorus extends RideableDragonBase implements DragonFlightCapable
         }
     }
 
-    private void setAttributeBase(Holder<Attribute> attribute, double value) {
+    private void setAttributeBase(Attribute attribute, double value) {
         AttributeInstance instance = this.getAttribute(attribute);
         if (instance != null) {
             instance.setBaseValue(value);
@@ -2472,9 +2472,6 @@ public class Ignivorus extends RideableDragonBase implements DragonFlightCapable
     }
 
     public void setLanding(boolean landing) {
-        if (landing && isVehicle()) {
-            return;
-        }
         this.entityData.set(DATA_LANDING, landing);
     }
 
@@ -2512,35 +2509,7 @@ public class Ignivorus extends RideableDragonBase implements DragonFlightCapable
     @Override
     public int getFlightMode() {
         // Flight mode computation (consistent with Cindervane/Raevyx architecture)
-        // Calls the actual computation logic below
-        return computeFlightModeForSync();
-    }
-
-    public boolean isBreathingFire() {
-        return this.entityData.get(DATA_FIRE_BREATHING);
-    }
-
-    public void setBreathingFire(boolean breathing) {
-        boolean wasBreathing = this.entityData.get(DATA_FIRE_BREATHING);
-        this.entityData.set(DATA_FIRE_BREATHING, breathing);
-        if (!breathing) {
-            resetFireAimDirection();
-            setFireBreathProgress(0);
-            fireTime = 0;
-            fireServerTarget = null;
-        }
-        if (breathing && !wasBreathing) {
-            // Just started breathing - initialize targeting
-            fireTime = 0;
-            fireServerTarget = createInitialFireTarget();
-        }
-    }
-
-    /**
-     * Computes flight mode for network sync (moved inline from physics controller for performance)
-     * 0 = glide, 1 = flap, 2 = hover, 3 = takeoff, 4 = sprint_flap, 5 = fly_idle, -1 = ground
-     */
-    private int computeFlightModeForSync() {
+        // 0 = glide, 1 = flap, 2 = hover, 3 = takeoff, 4 = sprint_flap, 5 = fly_idle, -1 = ground
         if (!isFlying()) {
             riderHighAltitudeGlide = false;
             return -1;
@@ -2689,6 +2658,26 @@ public class Ignivorus extends RideableDragonBase implements DragonFlightCapable
             }
         }
         return false;
+    }
+
+    public boolean isBreathingFire() {
+        return this.entityData.get(DATA_FIRE_BREATHING);
+    }
+
+    public void setBreathingFire(boolean breathing) {
+        boolean wasBreathing = this.entityData.get(DATA_FIRE_BREATHING);
+        this.entityData.set(DATA_FIRE_BREATHING, breathing);
+        if (!breathing) {
+            resetFireAimDirection();
+            setFireBreathProgress(0);
+            fireTime = 0;
+            fireServerTarget = null;
+        }
+        if (breathing && !wasBreathing) {
+            // Just started breathing - initialize targeting
+            fireTime = 0;
+            fireServerTarget = createInitialFireTarget();
+        }
     }
 
     /**
@@ -3325,7 +3314,7 @@ public class Ignivorus extends RideableDragonBase implements DragonFlightCapable
                     // Use Phase 2 landed animation if in Phase 2 mode
                     String landedAnim = isPhase2Active() ? "phase2_landed" : "landed";
                     triggerAnim("action", landedAnim);  // Trigger as one-shot animation
-                    lockRiderControls(13);  // Lock controls for 1.25 seconds while animation plays
+                    lockRiderControls(13);  // Lock controls for 0.63 seconds while animation plays
                 }
             }
             return;
@@ -3352,6 +3341,7 @@ public class Ignivorus extends RideableDragonBase implements DragonFlightCapable
     private double getAltitudeAboveTerrain() {
         return getAltitudeAboveCollisionTerrain(24, true);
     }
+
     private void tickWaterDisturbance() {
         if (level().isClientSide || !isFlying()) {
             return;
@@ -3607,9 +3597,9 @@ public class Ignivorus extends RideableDragonBase implements DragonFlightCapable
             new AnimationController<>(this, "action", 3, state -> {
                 // CRITICAL: Stop action controller during taming stun to prevent animation bleeding
                 if (isTamingStunned()) {
-                    return PlayState.STOP;
+                    return software.bernie.geckolib.core.object.PlayState.STOP;
                 }
-                return PlayState.STOP;
+                return software.bernie.geckolib.core.object.PlayState.STOP;
             });
 
         AnimationController<Ignivorus> instantController =
@@ -3778,11 +3768,12 @@ public class Ignivorus extends RideableDragonBase implements DragonFlightCapable
             java.util.UUID ownerId = this.getOwnerUUID();
             if (ownerId != null) {
                 baby.setOwnerUUID(ownerId);
-                baby.setTame(true, true);
+                baby.setTame(true);
             }
             baby.skipRespawnTicks = 5;
             baby.setAge(-24000);
             baby.setBaby(true);
+            baby.setTextureVariant(baby.rollRandomTextureVariant());
             baby.applyConfiguredAttributes();
             baby.setHealth(baby.getMaxHealth());
 
@@ -3800,7 +3791,6 @@ public class Ignivorus extends RideableDragonBase implements DragonFlightCapable
         tag.putInt("TimeFlying", timeFlying);  // Save flying duration
         this.combatManager.saveToNBT(tag);
         tag.putInt("FeedingCooldownTicks", Math.max(0, this.entityData.get(DATA_FEEDING_COOLDOWN)));
-        tag.putInt("TextureVariant", this.entityData.get(DATA_TEXTURE_VARIANT));
         tag.putBoolean("RiderPitchKeyMode", isRiderPitchKeyMode());
         tag.putBoolean("Bulldozing", bulldozing);
         tag.putInt("BulldozeCooldownTicks", Math.max(0, bulldozeCooldownTicks));
@@ -3822,9 +3812,6 @@ public class Ignivorus extends RideableDragonBase implements DragonFlightCapable
         this.combatManager.loadFromNBT(tag);
         if (tag.contains("FeedingCooldownTicks")) {
             this.entityData.set(DATA_FEEDING_COOLDOWN, Math.max(0, tag.getInt("FeedingCooldownTicks")));
-        }
-        if (tag.contains("TextureVariant")) {
-            this.entityData.set(DATA_TEXTURE_VARIANT, tag.getInt("TextureVariant"));
         }
         if (tag.contains("RiderPitchKeyMode")) {
             setRiderPitchKeyMode(tag.getBoolean("RiderPitchKeyMode"));
@@ -4003,13 +3990,13 @@ public class Ignivorus extends RideableDragonBase implements DragonFlightCapable
     }
 
     @Override
-    protected void dropAllDeathLoot(@NotNull net.minecraft.server.level.ServerLevel level, @NotNull DamageSource source) {
+    protected void dropAllDeathLoot(@NotNull DamageSource source) {
         // Don't drop loot until death animation completes
         if (deathTime < getDeathAnimationDurationTicks()) {
             return;
         }
 
-        super.dropAllDeathLoot(level, source);
+        super.dropAllDeathLoot(source);
 
         DragonAttributeConfig config = DragonAttributeConfigLoader.getInstance()
                 .getConfig(DragonAttributeConfigLoader.IGNIVORUS_ID);

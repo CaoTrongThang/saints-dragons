@@ -38,7 +38,6 @@ import net.minecraft.util.RandomSource;
 import net.minecraft.world.phys.Vec3;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.AgeableMob;
-import net.minecraft.network.syncher.SynchedEntityData;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import com.leon.saintsdragons.server.entity.ability.DragonAbilityType;
@@ -58,10 +57,10 @@ import net.minecraft.network.chat.Component;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import javax.annotation.Nonnull;
-import software.bernie.geckolib.animatable.instance.AnimatableInstanceCache;
-import software.bernie.geckolib.animation.AnimatableManager;
-import software.bernie.geckolib.animation.AnimationController;
-import software.bernie.geckolib.animation.keyframe.event.SoundKeyframeEvent;
+import software.bernie.geckolib.core.animatable.instance.AnimatableInstanceCache;
+import software.bernie.geckolib.core.animation.AnimatableManager;
+import software.bernie.geckolib.core.animation.AnimationController;
+import software.bernie.geckolib.core.keyframe.event.SoundKeyframeEvent;
 import software.bernie.geckolib.util.GeckoLibUtil;
 
 public class Stegonaut extends RideableDragonBase implements SoundHandledDragon {
@@ -172,20 +171,20 @@ public class Stegonaut extends RideableDragonBase implements SoundHandledDragon 
     }
 
     @Override
-    protected void defineSynchedData(SynchedEntityData.Builder builder) {
-        super.defineSynchedData(builder);
+    protected void defineSynchedData() {
+        super.defineSynchedData();
     }
 
     @Override
-    protected void defineRideableDragonData(SynchedEntityData.Builder builder) {
-        builder.define(DATA_GROUND_MOVE_STATE, 0);
-        builder.define(DATA_RIDER_FORWARD, 0.0F);
-        builder.define(DATA_RIDER_STRAFE, 0.0F);
-        builder.define(DATA_ACCELERATING, false);
-        builder.define(DATA_FLIGHT_MODE, -1);
-        builder.define(DATA_GOING_UP, false);
-        builder.define(DATA_GOING_DOWN, false);
-        builder.define(DATA_RUNNING, false);
+    protected void defineRideableDragonData() {
+        this.entityData.define(DATA_GROUND_MOVE_STATE, 0);
+        this.entityData.define(DATA_RIDER_FORWARD, 0.0F);
+        this.entityData.define(DATA_RIDER_STRAFE, 0.0F);
+        this.entityData.define(DATA_ACCELERATING, false);
+        this.entityData.define(DATA_FLIGHT_MODE, -1);
+        this.entityData.define(DATA_GOING_UP, false);
+        this.entityData.define(DATA_GOING_DOWN, false);
+        this.entityData.define(DATA_RUNNING, false);
     }
 
     @Override
@@ -229,8 +228,8 @@ public class Stegonaut extends RideableDragonBase implements SoundHandledDragon 
     public static AttributeSupplier.Builder createAttributes() {
         return Mob.createMobAttributes()
                 .add(Attributes.MAX_HEALTH, 100.0D)
-                .add(Attributes.MOVEMENT_SPEED, 0.50D)// Increased for pack animal duties
                 .add(Attributes.KNOCKBACK_RESISTANCE, 1.0D)
+                .add(Attributes.MOVEMENT_SPEED, 0.50D) // Increased for pack animal duties
                 .add(Attributes.ATTACK_DAMAGE, 2.0D)
                 .add(Attributes.ARMOR, 15.0D)
                 .add(Attributes.FOLLOW_RANGE, 64.0D);
@@ -439,7 +438,7 @@ public class Stegonaut extends RideableDragonBase implements SoundHandledDragon 
             java.util.UUID ownerId = this.getOwnerUUID();
             if (ownerId != null) {
                 baby.setOwnerUUID(ownerId);
-                baby.setTame(true, true);
+                baby.setTame(true);
             }
 
             // Set baby attributes
@@ -473,7 +472,7 @@ public class Stegonaut extends RideableDragonBase implements SoundHandledDragon 
         }
     }
 
-    private void setAttributeBase(net.minecraft.core.Holder<net.minecraft.world.entity.ai.attributes.Attribute> attribute, double value) {
+    private void setAttributeBase(net.minecraft.world.entity.ai.attributes.Attribute attribute, double value) {
         net.minecraft.world.entity.ai.attributes.AttributeInstance instance = this.getAttribute(attribute);
         if (instance != null) {
             instance.setBaseValue(value);
@@ -488,8 +487,8 @@ public class Stegonaut extends RideableDragonBase implements SoundHandledDragon 
     }
 
     @Override
-    public @NotNull net.minecraft.world.entity.EntityDimensions getDefaultDimensions(@NotNull net.minecraft.world.entity.Pose pose) {
-        net.minecraft.world.entity.EntityDimensions baseDimensions = super.getDefaultDimensions(pose);
+    public @NotNull net.minecraft.world.entity.EntityDimensions getDimensions(@NotNull net.minecraft.world.entity.Pose pose) {
+        net.minecraft.world.entity.EntityDimensions baseDimensions = super.getDimensions(pose);
         if (isBaby()) {
             return baseDimensions.scale(BABY_HITBOX_SCALE);
         }
@@ -564,12 +563,13 @@ public class Stegonaut extends RideableDragonBase implements SoundHandledDragon 
     public @NotNull InteractionResult mobInteract(@NotNull Player player, @NotNull InteractionHand hand) {
         ItemStack itemstack = player.getItemInHand(hand);
         if (com.leon.saintsdragons.common.registry.ModItems.isDragonBrush(itemstack)) {
-            // Mirror shared dragon brush behavior: client always gets success for hand animation,
-            // while brush logic runs only on the server.
-            if (!this.level().isClientSide) {
-                this.tryBrush(player, itemstack);
+            // Match other dragons: acknowledge brush on client so hand swing plays,
+            // while the actual grooming logic executes on the server.
+            if (this.level().isClientSide) {
+                return InteractionResult.sidedSuccess(true);
             }
-            return InteractionResult.sidedSuccess(this.level().isClientSide);
+            boolean brushed = this.tryBrush(player, itemstack);
+            return brushed ? InteractionResult.sidedSuccess(false) : InteractionResult.CONSUME;
         }
         if (!this.isTame()) {
             return handleUntamedInteraction(player, hand);
@@ -621,7 +621,7 @@ public class Stegonaut extends RideableDragonBase implements SoundHandledDragon 
                 // Trigger advancement for taming Primitive Drake
                 if (player instanceof net.minecraft.server.level.ServerPlayer serverPlayer) {
                     var advancement = serverPlayer.server.getAdvancements()
-                            .get(com.leon.saintsdragons.common.SaintsDragonsCommon.rl("tame_stegonaut"));
+                            .getAdvancement(com.leon.saintsdragons.common.SaintsDragonsCommon.rl("tame_stegonaut"));
                     if (advancement != null) {
                         serverPlayer.getAdvancements().award(advancement, "tame_stegonaut");
                     }
@@ -1062,7 +1062,7 @@ public class Stegonaut extends RideableDragonBase implements SoundHandledDragon 
         // Stegonaut are nocturnal sleepers (sleep at night, active during day)
         return DragonSleepBehavior.DragonSleepPreferences.NOCTURNAL();
     }
-    
+
     @Override
     public boolean canSleepNow() {
         return !level().isDay();
@@ -1372,8 +1372,8 @@ public class Stegonaut extends RideableDragonBase implements SoundHandledDragon 
 
         // Don't force wake on chunk reload - let sleep behavior re-evaluate naturally (like Naturalist mod)
         // Sleep transition states are ephemeral and will be re-evaluated by DragonSleepBehavior
-
     }
+
     @Override
     public @NotNull Vec3 getRiddenInput(@NotNull Player player, @NotNull Vec3 deltaIn) {
         if (areRiderControlsLocked()) {
