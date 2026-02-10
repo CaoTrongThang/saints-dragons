@@ -45,6 +45,7 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.Optional;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Holder;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
@@ -83,15 +84,16 @@ import net.minecraft.world.level.ServerLevelAccessor;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.FluidState;
-import net.minecraft.world.level.pathfinder.BlockPathTypes;
+import net.minecraft.world.level.pathfinder.PathType;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import software.bernie.geckolib.core.animatable.instance.AnimatableInstanceCache;
-import software.bernie.geckolib.core.animation.AnimatableManager;
-import software.bernie.geckolib.core.animation.AnimationController;
-import software.bernie.geckolib.core.animation.RawAnimation;
+import software.bernie.geckolib.animatable.instance.AnimatableInstanceCache;
+import software.bernie.geckolib.animation.AnimatableManager;
+import software.bernie.geckolib.animation.AnimationController;
+import software.bernie.geckolib.animation.RawAnimation;
+import software.bernie.geckolib.animation.keyframe.event.SoundKeyframeEvent;
 import software.bernie.geckolib.util.GeckoLibUtil;
 import javax.annotation.Nonnull;
 
@@ -135,11 +137,14 @@ public class Cindervane extends RideableDragonBase implements DragonFlightCapabl
 
     public AnimatableInstanceCache dragonCache = GeckoLibUtil.createInstanceCache(this);
     private final CindervaneAnimationHandler animationHandler = new CindervaneAnimationHandler(this);
-    // Flight mode state (moved inline from physics controller for performance)
-    private boolean riderHighAltitudeGlide = false;
     private final DragonSoundHandler soundHandler = new DragonSoundHandler(this);
     private final CindervaneInteractionHandler interactionHandler = new CindervaneInteractionHandler(this);
     private final CindervaneRiderController riderController;
+    private boolean riderHighAltitudeGlide = false;
+    public double lastCheckedX = 0;
+    public double lastCheckedY = 0;
+    public double lastCheckedZ = 0;
+    public int ticksSinceLastMovement = 0;
 
     private final DragonPathNavigateGround groundNav;
     private final FlyingPathNavigation airNav;
@@ -175,13 +180,6 @@ public class Cindervane extends RideableDragonBase implements DragonFlightCapabl
     private int clientAnimInitTicks = 0;
     private static final int ANIM_INIT_GRACE_PERIOD = 5; // Wait 5 ticks for entity data sync
 
-    // Position tracking for FLY_IDLE detection (xo/yo/zo are synced too early in tick cycle)
-    // Public for physics controller access
-    public double lastCheckedX = 0;
-    public double lastCheckedY = 0;
-    public double lastCheckedZ = 0;
-    public int ticksSinceLastMovement = 0;
-
     private float prevScreenShakeAmount = 0f;
     private float screenShakeAmount = 0f;
 
@@ -214,12 +212,6 @@ public class Cindervane extends RideableDragonBase implements DragonFlightCapabl
             default -> super.supportsRiderAction(action);
         };
     }
-
-    @Override
-    public AnimatableInstanceCache getAnimatableInstanceCache() {
-        return dragonCache;
-    }
-
 
     @Override
     public float maxSitTicks() {
@@ -265,20 +257,6 @@ public class Cindervane extends RideableDragonBase implements DragonFlightCapabl
         this.entityData.set(DATA_FEEDING_COOLDOWN, ticks);
     }
 
-    @Override
-    protected int getMaxTextureVariant() {
-        // 0 = default, 1 = albino
-        return 1;
-    }
-
-    @Override
-    public java.util.Map<String, Integer> getTextureVariantNameMap() {
-        return java.util.Map.of(
-                "default", 0,
-                "albino", 1
-        );
-    }
-
     // ===== CLIENT LOCATOR CACHE (client-side only) =====
     private final Map<String, Vec3> clientLocatorCache = new java.util.concurrent.ConcurrentHashMap<>();
 
@@ -286,7 +264,6 @@ public class Cindervane extends RideableDragonBase implements DragonFlightCapabl
 
     public Cindervane(EntityType<? extends Cindervane> type, Level level) {
         super(type, level);
-        this.setMaxUpStep(1.1F);
 
         this.groundNav = new DragonPathNavigateGround(this, level);
         this.airNav = new FlyingPathNavigation(this, level) {
@@ -305,8 +282,8 @@ public class Cindervane extends RideableDragonBase implements DragonFlightCapabl
         this.usingAirNav = false;
         this.riderController = new CindervaneRiderController(this);
 
-        this.setPathfindingMalus(BlockPathTypes.LEAVES, -1.0F);
-        this.setPathfindingMalus(BlockPathTypes.DANGER_FIRE, -1.0F);
+        this.setPathfindingMalus(PathType.LEAVES, -1.0F);
+        this.setPathfindingMalus(PathType.DANGER_FIRE, -1.0F);
 
         RandomSource rng = this.getRandom();
         this.ambientSoundTimer = rng.nextInt(80);
@@ -319,8 +296,8 @@ public class Cindervane extends RideableDragonBase implements DragonFlightCapabl
 
     @Override
     public @NotNull SpawnGroupData finalizeSpawn(@NotNull ServerLevelAccessor level, @NotNull DifficultyInstance difficulty, @NotNull MobSpawnType spawnType,
-                                                 @Nullable SpawnGroupData spawnData, @Nullable CompoundTag dataTag) {
-        SpawnGroupData data = super.finalizeSpawn(level, difficulty, spawnType, spawnData, dataTag);
+                                                 @Nullable SpawnGroupData spawnData) {
+        SpawnGroupData data = super.finalizeSpawn(level, difficulty, spawnType, spawnData);
 
         if (spawnType == MobSpawnType.CHUNK_GENERATION || spawnType == MobSpawnType.NATURAL) {
             if (!(data instanceof CindervaneFamilyData)) {
@@ -364,7 +341,7 @@ public class Cindervane extends RideableDragonBase implements DragonFlightCapabl
         }
     }
 
-    private void setAttributeBase(net.minecraft.world.entity.ai.attributes.Attribute attribute, double value) {
+    private void setAttributeBase(Holder<net.minecraft.world.entity.ai.attributes.Attribute> attribute, double value) {
         AttributeInstance instance = this.getAttribute(attribute);
         if (instance != null) {
             instance.setBaseValue(value);
@@ -412,10 +389,15 @@ public class Cindervane extends RideableDragonBase implements DragonFlightCapabl
         return level.getBlockState(pos.below()).isFaceSturdy(level, pos.below(), Direction.UP);
     }
 
+    @Override
+    public float maxUpStep() {
+        return 1.1F;
+    }
+
     // Amphithere-specific entity data accessors
     private static final EntityDataAccessor<Boolean> DATA_FIRE_BREATHING =
             SynchedEntityData.defineId(Cindervane.class, EntityDataSerializers.BOOLEAN);
-
+    
     // Rideable dragon data accessors specific to Cindervane
     private static final EntityDataAccessor<Boolean> DATA_FLYING =
             SynchedEntityData.defineId(Cindervane.class, EntityDataSerializers.BOOLEAN);
@@ -452,39 +434,35 @@ public class Cindervane extends RideableDragonBase implements DragonFlightCapabl
 
     // Sleep system entity data accessors
 
-    /**
-     * Entity data accessor for feeding cooldown ticks
-     */
+    /** Entity data accessor for feeding cooldown ticks */
     private static final EntityDataAccessor<Integer> DATA_FEEDING_COOLDOWN =
             SynchedEntityData.defineId(Cindervane.class, EntityDataSerializers.INT);
 
     @Override
-    protected void defineSynchedData() {
-        super.defineSynchedData();
-        // Define Amphithere-specific data
-        this.entityData.define(DATA_FIRE_BREATHING, false);
-        this.entityData.define(DATA_SCREEN_SHAKE_AMOUNT, 0f);
-        this.entityData.define(DATA_RIDER_LANDING_BLEND, false);
-        this.entityData.define(DATA_FLIGHT_PITCH, 0f);
-        this.entityData.define(DATA_PITCH_KEY_MODE, false);
-        this.entityData.define(DATA_FEEDING_COOLDOWN, 0);
+    protected void defineSynchedData(SynchedEntityData.Builder builder) {
+        super.defineSynchedData(builder);
+        builder.define(DATA_FIRE_BREATHING, false);
+        builder.define(DATA_SCREEN_SHAKE_AMOUNT, 0f);
+        builder.define(DATA_RIDER_LANDING_BLEND, false);
+        builder.define(DATA_FLIGHT_PITCH, 0f);
+        builder.define(DATA_PITCH_KEY_MODE, false);
+        builder.define(DATA_FEEDING_COOLDOWN, 0);
     }
 
     @Override
-    protected void defineRideableDragonData() {
-        // Define all rideable dragon data keys for AmphithereEntity
-        this.entityData.define(DATA_FLYING, false);
-        this.entityData.define(DATA_TAKEOFF, false);
-        this.entityData.define(DATA_HOVERING, false);
-        this.entityData.define(DATA_LANDING, false);
-        this.entityData.define(DATA_RUNNING, false);
-        this.entityData.define(DATA_GROUND_MOVE_STATE, 0);
-        this.entityData.define(DATA_FLIGHT_MODE, -1);
-        this.entityData.define(DATA_RIDER_FORWARD, 0f);
-        this.entityData.define(DATA_RIDER_STRAFE, 0f);
-        this.entityData.define(DATA_GOING_UP, false);
-        this.entityData.define(DATA_GOING_DOWN, false);
-        this.entityData.define(DATA_ACCELERATING, false);
+    protected void defineRideableDragonData(SynchedEntityData.Builder builder) {
+        builder.define(DATA_FLYING, false);
+        builder.define(DATA_TAKEOFF, false);
+        builder.define(DATA_HOVERING, false);
+        builder.define(DATA_LANDING, false);
+        builder.define(DATA_RUNNING, false);
+        builder.define(DATA_GROUND_MOVE_STATE, 0);
+        builder.define(DATA_FLIGHT_MODE, -1);
+        builder.define(DATA_RIDER_FORWARD, 0f);
+        builder.define(DATA_RIDER_STRAFE, 0f);
+        builder.define(DATA_GOING_UP, false);
+        builder.define(DATA_GOING_DOWN, false);
+        builder.define(DATA_ACCELERATING, false);
     }
 
     // Implementation of abstract accessor methods
@@ -534,7 +512,7 @@ public class Cindervane extends RideableDragonBase implements DragonFlightCapabl
     @Override
     protected void registerGoals() {
         this.goalSelector.addGoal(0, new com.leon.saintsdragons.server.ai.goals.base.DragonFloatGoal(this));
-        this.goalSelector.addGoal(1, new com.leon.saintsdragons.server.ai.goals.base.DragonWaterEscapeGoal((com.leon.saintsdragons.server.entity.interfaces.DragonFlightCapable) this));
+        this.goalSelector.addGoal(1, new com.leon.saintsdragons.server.ai.goals.base.DragonWaterEscapeGoal((com.leon.saintsdragons.server.entity.interfaces.DragonFlightCapable)this));
         this.goalSelector.addGoal(2, new SitWhenOrderedToGoal(this));
 
         // Babies don't have flight or combat abilities
@@ -609,6 +587,7 @@ public class Cindervane extends RideableDragonBase implements DragonFlightCapabl
                     setTakeoff(false);
                 }
 
+                // Auto-land when touching ground (but not during takeoff)
                 if (onGroundNow && !isTakeoff()) {
                     if (isLanding()) {
                         handleAiLandingComplete();
@@ -620,20 +599,6 @@ public class Cindervane extends RideableDragonBase implements DragonFlightCapabl
             } else {
                 groundTicks++;
                 airTicks = 0;
-            }
-
-            if (isLanding()) {
-                // Hold landing state briefly so the landing animation can finish before ground loops resume
-                if (onGroundNow) {
-                    landingTicks++;
-                    if (landingTicks >= LANDING_SETTLE_TICKS) {
-                        markLandedNow();
-                    }
-                } else {
-                    landingTicks = 0;
-                }
-            } else {
-                landingTicks = 0;
             }
 
             // Update animation states
@@ -698,12 +663,12 @@ public class Cindervane extends RideableDragonBase implements DragonFlightCapabl
 
         // === SERVER-SIDE: EVERY TICK (precise timing needed) ===
         tickFeedingCooldown();
+        tickGroundStepAudio();
 
         // === SERVER-SIDE: EVERY 5 TICKS (timers/cooldowns/state machines - no precision needed) ===
         if (tickCount % 5 == 0) {
             handleAmbientSounds();
         }
-        tickGroundStepAudio();
 
         // === SERVER-SIDE: SLEEP WAKE-UP LOGIC ===
         // Wake up if sleeping and conditions changed
@@ -887,7 +852,8 @@ public class Cindervane extends RideableDragonBase implements DragonFlightCapabl
         }
 
         // Suppress ambient sounds during transitions to prevent animation snapping
-        if (isBaby() || isDying() || isSleeping() || isSleepTransitioning() || isInSitTransition() || getSleepAmbientCooldownTicks() > 0 || areRiderControlsLocked()) {
+        if (isBaby() || isDying() || isSleeping() || isSleepTransitioning() || isInSitTransition()
+                || getSleepAmbientCooldownTicks() > 0 || areRiderControlsLocked()) {
             return;
         }
 
@@ -931,40 +897,6 @@ public class Cindervane extends RideableDragonBase implements DragonFlightCapabl
         nextAmbientSoundDelay = MIN_AMBIENT_DELAY + random.nextInt(range);
     }
 
-    private void tickGroundStepAudio() {
-        if (groundStepSoundCooldownTicks > 0) {
-            groundStepSoundCooldownTicks--;
-        }
-        if (isFlying() || isTakeoff() || isLanding() || isHovering() || isInWaterOrBubble() || !onGround()) {
-            groundStepSoundCooldownTicks = 0;
-            return;
-        }
-        int moveState = this.entityData.get(DATA_GROUND_MOVE_STATE);
-        if (moveState != 2) {
-            double speedSqr = this.getDeltaMovement().horizontalDistanceSqr();
-            if (speedSqr > 0.02D) {
-                moveState = 2;
-            }
-        }
-        if (moveState != 2) {
-            groundStepSoundCooldownTicks = 0;
-            return;
-        }
-        if (groundStepSoundCooldownTicks > 0) {
-            return;
-        }
-        getSoundHandler().playMovingEntitySound(ModSounds.CINDERVANE_RUN.get(), 1.0f, 1.0f, 22);
-        groundStepSoundCooldownTicks = 30;
-    }
-
-    public void playEatMovingSound() {
-        if (level().isClientSide) {
-            return;
-        }
-        float pitch = isBaby() ? 1.6f : 1.0f;
-        getSoundHandler().playMovingEntitySound(ModSounds.CINDERVANE_EAT.get(), 1.0f, pitch, 33);
-    }
-
     private void clearStatesWhenMounted() {
         if (level().isClientSide || !this.isVehicle()) {
             return;
@@ -1001,7 +933,6 @@ public class Cindervane extends RideableDragonBase implements DragonFlightCapabl
         this.setOrderedToSit(false);
         this.setNoGravity(isFlying() || isHovering());
     }
-
     private void tickRiderTakeoff() {
         if (!level().isClientSide && riderTakeoffTicks > 0) {
             riderTakeoffTicks--;
@@ -1029,15 +960,6 @@ public class Cindervane extends RideableDragonBase implements DragonFlightCapabl
             bankSmoothedYaw = 0f;
             bankAngle = 0f;
             prevBankAngle = 0f;
-            return;
-        }
-
-        if (horizontalCollision || verticalCollision) {
-            bankSmoothedYaw *= 0.45f;
-            bankAngle = Mth.lerp(0.55f, bankAngle, 0f);
-            if (Math.abs(bankAngle) < 0.01f) {
-                bankAngle = 0f;
-            }
             return;
         }
 
@@ -1099,6 +1021,22 @@ public class Cindervane extends RideableDragonBase implements DragonFlightCapabl
         return this.entityData.get(DATA_RIDER_LANDING_BLEND);
     }
 
+    // ===== RIDER CONTROL LOCK SYSTEM =====
+
+    @Override
+    public void lockRiderControls(int ticks) {
+        super.lockRiderControls(ticks); // Base handles tick counting and entity data
+        // Cindervane-specific: reset movement states during lock
+        this.setAccelerating(false);
+        this.setGoingUp(false);
+        this.setGoingDown(false);
+        this.setDeltaMovement(Vec3.ZERO);
+        if (!this.level().isClientSide) {
+            this.getNavigation().stop();
+            this.setTarget(null);
+        }
+    }
+
     // Animation initialization system (fixes T-pose on world rejoin with shaders)
     public boolean isClientAnimationReady() {
         return clientAnimInitTicks >= ANIM_INIT_GRACE_PERIOD;
@@ -1125,7 +1063,6 @@ public class Cindervane extends RideableDragonBase implements DragonFlightCapabl
             this.entityData.set(DATA_FLIGHT_PITCH, flightPitchRad);
             return;
         }
-
         Vec3 velocity = getDeltaMovement();
         double horizontalSpeed = Math.sqrt(velocity.x * velocity.x + velocity.z * velocity.z);
         float targetPitchRad = 0f;
@@ -1224,7 +1161,7 @@ public class Cindervane extends RideableDragonBase implements DragonFlightCapabl
 
     // Tuneable constants
     private static final double WATER_EFFECT_MAX_HEIGHT = 10.0;  // Max height above water to trigger effect
-    private static final double WATER_EFFECT_INTENSITY = 0.6;    // Multiplier for particle count (bigger = more splash)
+    private static final double WATER_EFFECT_INTENSITY = 1.5;    // Multiplier for particle count (bigger = more splash)
 
     /**
      * Creates water disturbance effects when flying over water.
@@ -1279,21 +1216,21 @@ public class Cindervane extends RideableDragonBase implements DragonFlightCapabl
 
                     // Spawn splash particles
                     ((ServerLevel) level()).sendParticles(
-                            ParticleTypes.SPLASH,
-                            particleX, waterY, particleZ,
-                            1,
-                            offsetX * 0.2, 0.1, offsetZ * 0.2,  // Velocity based on offset (spreads outward)
-                            0.1
+                        ParticleTypes.SPLASH,
+                        particleX, waterY, particleZ,
+                        1,
+                        offsetX * 0.2, 0.1, offsetZ * 0.2,  // Velocity based on offset (spreads outward)
+                        0.1
                     );
 
                     // Bubbles (fewer than splashes)
                     if (random.nextFloat() < 0.3f) {
                         ((ServerLevel) level()).sendParticles(
-                                ParticleTypes.BUBBLE_POP,
-                                particleX, waterY, particleZ,
-                                1,
-                                0.0, 0.0, 0.0,
-                                0.0
+                            ParticleTypes.BUBBLE_POP,
+                            particleX, waterY, particleZ,
+                            1,
+                            0.0, 0.0, 0.0,
+                            0.0
                         );
                     }
                 }
@@ -1328,11 +1265,11 @@ public class Cindervane extends RideableDragonBase implements DragonFlightCapabl
     // ===== Rider Control Methods =====
     @Override
     public boolean isGoingUp() {
-        return this.entityData.get(DATA_GOING_UP);
+        return this.entityData.get(DATA_GOING_UP); 
     }
 
     // ===== Animation State Methods =====
-
+    
     @Override
     public boolean isRunning() {
         return this.entityData.get(DATA_RUNNING);
@@ -1343,7 +1280,7 @@ public class Cindervane extends RideableDragonBase implements DragonFlightCapabl
         this.entityData.set(DATA_RUNNING, running);
         // MOVEMENT_SPEED is fixed for AI - rider speed is handled by RiderController
     }
-
+    
     public boolean isWalking() {
         if (level().isClientSide) {
             int s = getEffectiveGroundState();
@@ -1352,7 +1289,7 @@ public class Cindervane extends RideableDragonBase implements DragonFlightCapabl
         int s = this.entityData.get(DATA_GROUND_MOVE_STATE);
         return s == 1; // walking state
     }
-
+    
 
     public void setGroundMoveStateFromAI(int state) {
         if (!this.level().isClientSide) {
@@ -1365,8 +1302,9 @@ public class Cindervane extends RideableDragonBase implements DragonFlightCapabl
     }
 
 
+    
     // Rider input snapshots for server-side animation sync
-
+    
     /**
      * Initialize animation state after entity loading to prevent thrashing.
      */
@@ -1380,15 +1318,14 @@ public class Cindervane extends RideableDragonBase implements DragonFlightCapabl
             landingTicks = 0;
         }
     }
-
+    
 
     // ===== Client animation overrides (for robust observer sync) =====
-
+    
+    
 
     @Override
     public int getFlightMode() {
-        // Flight mode computation (moved inline from physics controller for performance)
-        // 0 = glide, 1 = flap, 2 = hover, 3 = takeoff, 4 = sprint_flap, 5 = fly_idle, -1 = ground
         if (!isFlying()) {
             riderHighAltitudeGlide = false;
             return -1;
@@ -1682,22 +1619,22 @@ public class Cindervane extends RideableDragonBase implements DragonFlightCapabl
     public double getPassengersRidingOffset() {
         return riderController.getPassengersRidingOffset();
     }
-
+    
     @Override
     protected void positionRider(@Nonnull Entity passenger, @Nonnull Entity.MoveFunction moveFunction) {
         riderController.positionRider(passenger, moveFunction);
     }
-
+    
     @Override
     public @NotNull Vec3 getDismountLocationForPassenger(@Nonnull LivingEntity passenger) {
         return riderController.getDismountLocationForPassenger(passenger);
     }
-
+    
     @Override
     public @Nullable LivingEntity getControllingPassenger() {
         return riderController.getControllingPassenger();
     }
-
+    
     @Override
     public void setTarget(@Nullable LivingEntity target) {
         if (this.isBaby()) {
@@ -1727,6 +1664,16 @@ public class Cindervane extends RideableDragonBase implements DragonFlightCapabl
     }
 
     @Override
+    protected float getRiderLockPitchMin() {
+        return -45.0F;
+    }
+
+    @Override
+    protected float getRiderLockPitchMax() {
+        return 45.0F;
+    }
+
+    @Override
     protected void tickRidden(@Nonnull Player player, @Nonnull Vec3 travelVector) {
         super.tickRidden(player, travelVector);
 
@@ -1751,11 +1698,11 @@ public class Cindervane extends RideableDragonBase implements DragonFlightCapabl
             }
         }
     }
-
+    
     @Override
     public @NotNull Vec3 getRiddenInput(@Nonnull Player player, @Nonnull Vec3 deltaIn) {
         Vec3 input = riderController.getRiddenInput(player, deltaIn);
-
+        
         // Capture rider inputs for animation state (like Lightning Dragon)
         if (!level().isClientSide && !isFlying()) {
             float fwd = (float) Mth.clamp(input.z, -1.0, 1.0);
@@ -1764,7 +1711,7 @@ public class Cindervane extends RideableDragonBase implements DragonFlightCapabl
             this.entityData.set(DATA_RIDER_FORWARD, Math.abs(fwd) > 0.02f ? fwd : 0f);
             this.entityData.set(DATA_RIDER_STRAFE, Math.abs(str) > 0.02f ? str : 0f);
         }
-
+        
         return input;
     }
 
@@ -1784,7 +1731,7 @@ public class Cindervane extends RideableDragonBase implements DragonFlightCapabl
         }
         // Don't clear sitProgress when standing - let updateSittingProgress() handle the "up" animation transition
     }
-
+    
     @Override
     public void travel(@NotNull Vec3 motion) {
         // Block ALL movement when controls are locked (e.g., during landed animation)
@@ -1889,13 +1836,13 @@ public class Cindervane extends RideableDragonBase implements DragonFlightCapabl
     // Amphithere-specific flight parameters for glider behavior
     private DragonFlightMoveHelper.FlightParameters getGliderFlightParameters() {
         return new DragonFlightMoveHelper.FlightParameters(
-                3.0F,    // maxYawChange - smoother turns for gradual banking
-                5.0F,    // maxPitchChange - slower pitching for glider
-                0.3F,    // speedFactorMin - lower minimum speed
-                2.0F,    // speedFactorMax - lower maximum speed for glider
-                0.08F,   // speedTransitionRate - slower transitions for glider
-                0.15D,   // accelerationCap - lower acceleration cap for glider
-                0.10D    // velocityBlendRate - gentler blend for glider
+            3.0F,    // maxYawChange - smoother turns for gradual banking
+            5.0F,    // maxPitchChange - slower pitching for glider
+            0.3F,    // speedFactorMin - lower minimum speed
+            2.0F,    // speedFactorMax - lower maximum speed for glider
+            0.08F,   // speedTransitionRate - slower transitions for glider
+            0.15D,   // accelerationCap - lower acceleration cap for glider
+            0.10D    // velocityBlendRate - gentler blend for glider
         );
     }
 
@@ -1936,14 +1883,14 @@ public class Cindervane extends RideableDragonBase implements DragonFlightCapabl
         double y = this.getY();
         double z = this.getZ();
         List<Entity> immune = new ArrayList<>(this.getPassengers());
-
+        
         // Give passengers explosion resistance before the explosion
         for (Entity passenger : immune) {
             if (passenger instanceof LivingEntity livingPassenger) {
                 livingPassenger.addEffect(new MobEffectInstance(MobEffects.DAMAGE_RESISTANCE, 20, 4, true, false, false));
             }
         }
-
+        
         ExplosionDamageCalculator calculator = new ExplosionDamageCalculator() {
             @Override
             public @NotNull Optional<Float> getBlockExplosionResistance(@NotNull Explosion explosion, @NotNull BlockGetter level, @NotNull BlockPos pos, @NotNull BlockState state, @NotNull FluidState fluid) {
@@ -1958,9 +1905,6 @@ public class Cindervane extends RideableDragonBase implements DragonFlightCapabl
                 return !isFireBodyImmuneBlock(state);
             }
         };
-
-        Explosion explosion = new Explosion(server, this, server.damageSources().explosion(this, this), calculator,
-                x, y + 0.2D, z, FIRE_BODY_EXPLOSION_RADIUS, true, Explosion.BlockInteraction.DESTROY);
 
         List<LivingEntity> allies = grantAlliesExplosionImmunity(server, x, y, z);
         double protectionRadius = FIRE_BODY_EXPLOSION_RADIUS + 4.0D;
@@ -1984,8 +1928,8 @@ public class Cindervane extends RideableDragonBase implements DragonFlightCapabl
             entity.setInvulnerable(true);
         }
 
-        explosion.explode();
-        explosion.finalizeExplosion(true);
+        Explosion explosion = server.explode(this, server.damageSources().explosion(this, this), calculator,
+                x, y + 0.2D, z, FIRE_BODY_EXPLOSION_RADIUS, true, net.minecraft.world.level.Level.ExplosionInteraction.MOB);
 
         // Restore prior invulnerability state.
         for (LivingEntity entity : protectedEntities) {
@@ -2072,7 +2016,7 @@ public class Cindervane extends RideableDragonBase implements DragonFlightCapabl
 
         for (LivingEntity target : targets) {
             if (target.hurt(server.damageSources().explosion(this, this), blastDamage)) {
-                target.setSecondsOnFire(8);
+                target.igniteForSeconds(8);
             }
         }
     }
@@ -2120,7 +2064,6 @@ public class Cindervane extends RideableDragonBase implements DragonFlightCapabl
             }
         }
     }
-
     public void switchToGroundNavigation() {
         if (usingAirNav) {
             this.navigation = this.groundNav;
@@ -2148,25 +2091,33 @@ public class Cindervane extends RideableDragonBase implements DragonFlightCapabl
     @Override
     public void registerControllers(AnimatableManager.ControllerRegistrar controllers) {
         AnimationController<Cindervane> movement = new AnimationController<>(this, "movement", 5, animationHandler::handleMovementAnimation);
-        movement.setSoundKeyframeHandler(event -> {});
+        movement.setSoundKeyframeHandler(this::onAnimationSound);
         controllers.add(movement);
 
         AnimationController<Cindervane> actions = new AnimationController<>(this, "actions", 5, animationHandler::actionPredicate);
         animationHandler.setupActionController(actions);
-        actions.setSoundKeyframeHandler(event -> {});
+        actions.setSoundKeyframeHandler(this::onAnimationSound);
         controllers.add(actions);
 
         AnimationController<Cindervane> instantController = new AnimationController<>(this, "instant", 1,
                 animationHandler::instantActionPredicate);
         animationHandler.setupInstantActionController(instantController);
-        instantController.setSoundKeyframeHandler(event -> {});
+        instantController.setSoundKeyframeHandler(this::onAnimationSound);
         controllers.add(instantController);
+    }
+
+    private void onAnimationSound(SoundKeyframeEvent<Cindervane> event) {
+        
     }
 
     public DragonSoundHandler getSoundHandler() {
         return soundHandler;
     }
 
+    @Override
+    public AnimatableInstanceCache getAnimatableInstanceCache() {
+        return dragonCache;
+    }
 
     @Override
     public Map<String, VocalEntry> getVocalEntries() {
@@ -2340,9 +2291,9 @@ public class Cindervane extends RideableDragonBase implements DragonFlightCapabl
     @Override
     public boolean isFood(@Nonnull ItemStack stack) {
         return stack.is(Items.COD) ||
-                stack.is(Items.SALMON) ||
-                stack.is(Items.CHICKEN) ||
-                stack.is(com.leon.saintsdragons.common.registry.ModItems.HEARTY_DRAGON_MEAL.get());
+               stack.is(Items.SALMON) ||
+               stack.is(Items.CHICKEN) ||
+               stack.is(com.leon.saintsdragons.common.registry.ModItems.HEARTY_DRAGON_MEAL.get());
     }
 
     @Override
@@ -2358,13 +2309,13 @@ public class Cindervane extends RideableDragonBase implements DragonFlightCapabl
     }
 
     @Override
-    protected void dropAllDeathLoot(@NotNull DamageSource source) {
+    protected void dropAllDeathLoot(@NotNull ServerLevel level, @NotNull DamageSource source) {
         // Don't drop loot until death animation completes
         if (deathTime < getDeathAnimationDurationTicks()) {
             return;
         }
 
-        super.dropAllDeathLoot(source);
+        super.dropAllDeathLoot(level, source);
 
         DragonAttributeConfig config = DragonAttributeConfigLoader.getInstance()
                 .getConfig(DragonAttributeConfigLoader.CINDERVANE_ID);
@@ -2444,8 +2395,7 @@ public class Cindervane extends RideableDragonBase implements DragonFlightCapabl
             this.tickCount = 0; // Reset tick counter to ensure proper initialization
         }
 
-
-        // Apply config attributes when loading from NBT (Forge fix)
+        // Apply config attributes when loading from NBT (NeoForge fix)
         applyConfiguredAttributes();
     }
 
@@ -2628,19 +2578,12 @@ public class Cindervane extends RideableDragonBase implements DragonFlightCapabl
 
     @Override
     public void markLandedNow() {
-        setFlying(false);
         setLanding(false);
         setTakeoff(false);
         this.riderTakeoffTicks = 0;
-        this.timeFlying = 0;
     }
 
     public void handleAiLandingComplete() {
-        if (isInWaterOrBubble()) {
-            suppressSleep(60);
-            markLandedNow();
-            return;
-        }
         if (!level().isClientSide) {
             triggerAnim("actions", "landed");
             getSoundHandler().playMovingEntitySound(ModSounds.CINDERVANE_LANDED.get(), 1.0f, 1.0f, 59);
@@ -2671,7 +2614,7 @@ public class Cindervane extends RideableDragonBase implements DragonFlightCapabl
     public boolean isFlapping() {
         return isFlying() && this.getDeltaMovement().y > -0.1D;
     }
-
+    
     /**
      * Check if this amphithere can be bound (not flying, not dying, etc.)
      */
@@ -2874,6 +2817,26 @@ public class Cindervane extends RideableDragonBase implements DragonFlightCapabl
             cooldownTicks--;
             this.entityData.set(DATA_FEEDING_COOLDOWN, cooldownTicks);
         }
+    }
+
+    private void tickGroundStepAudio() {
+        if (groundStepSoundCooldownTicks > 0) {
+            groundStepSoundCooldownTicks--;
+        }
+        if (isFlying() || isTakeoff() || isLanding() || isHovering() || isInWaterOrBubble() || !onGround()) {
+            groundStepSoundCooldownTicks = 0;
+            return;
+        }
+        int moveState = this.entityData.get(DATA_GROUND_MOVE_STATE);
+        if (moveState != 2) {
+            groundStepSoundCooldownTicks = 0;
+            return;
+        }
+        if (groundStepSoundCooldownTicks > 0) {
+            return;
+        }
+        getSoundHandler().playMovingEntitySound(ModSounds.CINDERVANE_RUN.get(), 1.0f, 1.0f, 22);
+        groundStepSoundCooldownTicks = 30;
     }
 
     @Override

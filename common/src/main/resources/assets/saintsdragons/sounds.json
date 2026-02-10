@@ -1,6 +1,6 @@
 {
   "ivy_trade_start": {
-    "subtitle": "Ivy takes out her backpack",
+    "subtitle": "subtitles.saintsdragons.ivy_trade_start",
     "sounds": [
       {
         "name": "saintsdragons:entity/ivy/ivy_trade_start",
@@ -10,7 +10,7 @@
     ]
   },
   "ivy_trade_stop": {
-    "subtitle": "Ivy puts away her backpack",
+    "subtitle": "subtitles.saintsdragons.ivy_trade_stop",
     "sounds": [
       {
         "name": "saintsdragons:entity/ivy/ivy_trade_stop",
@@ -20,7 +20,7 @@
     ]
   },
   "bleeding_bolt": {
-    "subtitle": "Bleeding Bolt",
+    "subtitle": "subtitles.saintsdragons.bleeding_bolt",
     "sounds": [
       {
         "name": "saintsdragons:songs/bleeding_bolt",
@@ -29,7 +29,7 @@
     ]
   },
   "raevyx_grumble_1": {
-    "subtitle": "Raevyx grumbles",
+    "subtitle": "subtitles.saintsdragons.raevyx_grumble_1",
     "sounds": [
       {
         "name": "saintsdragons:entity/raevyx/raevyx_grumble1",
@@ -39,7 +39,7 @@
     ]
   },
   "raevyx_grumble_2": {
-    "subtitle": "Raevyx grumbles",
+    "subtitle": "subtitles.saintsdragons.raevyx_grumble_2",
     "sounds": [
       {
         "name": "saintsdragons:entity/raevyx/raevyx_grumble2",
@@ -49,7 +49,7 @@
     ]
   },
   "raevyx_grumble_3": {
-    "subtitle": "Raevyx grumbles",
+    "subtitle": "subtitles.saintsdragons.raevyx_grumble_3",
     "sounds": [
       {
         "name": "saintsdragons:entity/raevyx/raevyx_grumble3",
@@ -59,7 +59,7 @@
     ]
   },
   "raevyx_takeoff": {
-    "subtitle": "Raevyx launches into the air",
+    "subtitle": "subtitles.saintsdragons.raevyx_takeoff",
     "sounds": [
       {
         "name": "saintsdragons:entity/raevyx/raevyx_takeoff",
@@ -69,7 +69,7 @@
     ]
   },
   "raevyx_eat": {
-    "subtitle": "Raevyx eats",
+    "subtitle": "subtitles.saintsdragons.raevyx_eat",
     "sounds": [
       {
         "name": "saintsdragons:entity/raevyx/raevyx_eat",
@@ -79,7 +79,7 @@
     ]
   },
   "raevyx_lightning_beam_start": {
-    "subtitle": "Raevyx charges lightning",
+    "subtitle": "subtitles.saintsdragons.raevyx_lightning_beam_start",
     "sounds": [
       {
         "name": "saintsdragons:entity/raevyx/raevyx_lightning_beam_start",
@@ -89,7 +89,7 @@
     ]
   },
   "raevyx_lightning_beaming": {
-    "subtitle": "Raevyx fires a lightning beam",
+    "subtitle": "subtitles.saintsdragons.raevyx_lightning_beaming",
     "sounds": [
       {
         "name": "saintsdragons:entity/raevyx/raevyx_lightning_beaming",
@@ -100,7 +100,7 @@
     ]
   },
   "raevyx_lightning_beam_stop": {
-    "subtitle": "Raevyx vents lightning",
+    "subtitle": "subtitles.saintsdragons.raevyx_lightning_beam_stop",
     "sounds": [
       {
         "name": "saintsdragons:entity/raevyx/raevyx_lightning_beam_stop",
@@ -110,7 +110,7 @@
     ]
   },
   "raevyx_purr": {
-    "subtitle": "Raevyx purrs contentedly",
+    "subtitle": "subtitles.saintsdragons.raevyx_purr",
     "sounds": [
       {
         "name": "saintsdragons:entity/raevyx/raevyx_purr",
@@ -120,7 +120,7 @@
     ]
   },
   "raevyx_chuff": {
-    "subtitle": "Raevyx chuffs",
+    "subtitle": "subtitles.saintsdragons.raevyx_chuff",
     "sounds": [
       {
         "name": "saintsdragons:entity/raevyx/raevyx_chuff",
@@ -130,7 +130,7 @@
     ]
   },
   "raevyx_content": {
-    "subtitle": "Raevyx sounds content",
+    "subtitle": "subtitles.saintsdragons.raevyx_content",
     "sounds": [
       {
         "name": "saintsdragons:entity/raevyx/raevyx_content",
@@ -140,7 +140,7 @@
     ]
   },
   "raevyx_excited": {
-    "subtitle": "Raevyx sounds excited",
+    "subtitle": "subtitles.saintsdragons.raevyx_excited",
     "sounds": [
       {
         "name": "saintsdragons:entity/raevyx/raevyx_excited",
@@ -150,7 +150,7 @@
     ]
   },
   "raevyx_roar": {
-    "subtitle": "Raevyx roars",
+    "subtitle": "subtitles.saintsdragons.raevyx_roar",
     "sounds": [
       {
         "name": "saintsdragons:entity/raevyx/raevyx_roar",
@@ -161,7 +161,7 @@
     ]
   },
   "cindervane_magma_blast": {
-    "subtitle": "Cindervane shoots out magma",
+    "subtitle": "subtitles.saintsdragons.cindervane_magma_blast",
     "sounds": [
       {
         "name": "saintsdragons:entity/cindervane/cindervane_magma_blast",
@@ -172,7 +172,7 @@
     ]
   },
   "cindervane_run": {
-    "subtitle": "Cindervane runs",
+    "subtitle": "subtitles.saintsdragons.cindervane_run",
     "sounds": [
       {
         "name": "saintsdragons:entity/cindervane/cindervane_run",
@@ -183,7 +183,7 @@
     ]
   },
   "cindervane_flap": {
-    "subtitle": "Cindervane beats its wings",
+    "subtitle": "subtitles.saintsdragons.cindervane_flap",
     "sounds": [
       {
         "name": "saintsdragons:entity/cindervane/cindervane_flap",
@@ -193,7 +193,7 @@
     ]
   },
   "cindervane_takeoff": {
-    "subtitle": "Cindervane launches upward",
+    "subtitle": "subtitles.saintsdragons.cindervane_takeoff",
     "sounds": [
       {
         "name": "saintsdragons:entity/cindervane/cindervane_takeoff",
@@ -204,7 +204,7 @@
     ]
   },
   "cindervane_landed": {
-    "subtitle": "Cindervane lands heavily",
+    "subtitle": "subtitles.saintsdragons.cindervane_landed",
     "sounds": [
       {
         "name": "saintsdragons:entity/cindervane/cindervane_landed",
@@ -215,7 +215,7 @@
     ]
   },
   "cindervane_grumble1": {
-    "subtitle": "Cindervane grumbles",
+    "subtitle": "subtitles.saintsdragons.cindervane_grumble1",
     "sounds": [
       {
         "name": "saintsdragons:entity/cindervane/cindervane_grumble1",
@@ -226,7 +226,7 @@
     ]
   },
   "cindervane_grumble2": {
-    "subtitle": "Cindervane grumbles",
+    "subtitle": "subtitles.saintsdragons.cindervane_grumble2",
     "sounds": [
       {
         "name": "saintsdragons:entity/cindervane/cindervane_grumble2",
@@ -237,7 +237,7 @@
     ]
   },
   "cindervane_grumble3": {
-    "subtitle": "Cindervane grumbles",
+    "subtitle": "subtitles.saintsdragons.cindervane_grumble3",
     "sounds": [
       {
         "name": "saintsdragons:entity/cindervane/cindervane_grumble3",
@@ -248,7 +248,7 @@
     ]
   },
   "cindervane_roar": {
-    "subtitle": "Cindervane roars",
+    "subtitle": "subtitles.saintsdragons.cindervane_roar",
     "sounds": [
       {
         "name": "saintsdragons:entity/cindervane/cindervane_roar",
@@ -259,7 +259,7 @@
     ]
   },
   "cindervane_hurt": {
-    "subtitle": "Cindervane screeches in pain",
+    "subtitle": "subtitles.saintsdragons.cindervane_hurt",
     "sounds": [
       {
         "name": "saintsdragons:entity/cindervane/cindervane_hurt",
@@ -270,7 +270,7 @@
     ]
   },
   "cindervane_bite": {
-    "subtitle": "Cindervane bites",
+    "subtitle": "subtitles.saintsdragons.cindervane_bite",
     "sounds": [
       {
         "name": "saintsdragons:entity/cindervane/cindervane_bite",
@@ -281,7 +281,7 @@
     ]
   },
   "cindervane_die": {
-    "subtitle": "Cindervane dying",
+    "subtitle": "subtitles.saintsdragons.cindervane_die",
     "sounds": [
       {
         "name": "saintsdragons:entity/cindervane/cindervane_die",
@@ -292,7 +292,7 @@
     ]
   },
   "cindervane_eat": {
-    "subtitle": "Cindervane eats",
+    "subtitle": "subtitles.saintsdragons.cindervane_eat",
     "sounds": [
       {
         "name": "saintsdragons:entity/cindervane/cindervane_eat",
@@ -302,7 +302,7 @@
     ]
   },
   "raevyx_bite": {
-    "subtitle": "Raevyx bites",
+    "subtitle": "subtitles.saintsdragons.raevyx_bite",
     "sounds": [
       {
         "name": "saintsdragons:entity/raevyx/raevyx_bite",
@@ -313,7 +313,7 @@
     ]
   },
   "raevyx_horngore": {
-    "subtitle": "Raevyx gores with horn",
+    "subtitle": "subtitles.saintsdragons.raevyx_horngore",
     "sounds": [
       {
         "name": "saintsdragons:entity/raevyx/raevyx_horngore",
@@ -324,7 +324,7 @@
     ]
   },
   "raevyx_hurt": {
-    "subtitle": "Raevyx hurt",
+    "subtitle": "subtitles.saintsdragons.raevyx_hurt",
     "sounds": [
       {
         "name": "saintsdragons:entity/raevyx/raevyx_hurt",
@@ -334,7 +334,7 @@
     ]
   },
   "raevyx_die": {
-    "subtitle": "Raevyx dying",
+    "subtitle": "subtitles.saintsdragons.raevyx_die",
     "sounds": [
       {
         "name": "saintsdragons:entity/raevyx/raevyx_die",
@@ -344,7 +344,7 @@
     ]
   },
   "raevyx_walk": {
-    "subtitle": "Raevyx pads forward",
+    "subtitle": "subtitles.saintsdragons.raevyx_walk",
     "sounds": [
       {
         "name": "saintsdragons:entity/raevyx/raevyx_walk",
@@ -355,7 +355,7 @@
     ]
   },
   "raevyx_flap": {
-    "subtitle": "Wings flap",
+    "subtitle": "subtitles.saintsdragons.raevyx_flap",
     "sounds": [
       {
         "name": "saintsdragons:entity/raevyx/raevyx_flap",
@@ -365,7 +365,7 @@
     ]
   },
   "raevyx_summon_storm_ground_start": {
-    "subtitle": "Storm ignition",
+    "subtitle": "subtitles.saintsdragons.raevyx_summon_storm_ground_start",
     "sounds": [
       {
         "name": "saintsdragons:entity/raevyx/raevyx_summon_storm_ground_start",
@@ -376,7 +376,7 @@
     ]
   },
   "raevyx_summon_storm_ground": {
-    "subtitle": "Storm gathers",
+    "subtitle": "subtitles.saintsdragons.raevyx_summon_storm_ground",
     "sounds": [
       {
         "name": "saintsdragons:entity/raevyx/raevyx_summon_storm_ground",
@@ -387,7 +387,7 @@
     ]
   },
   "raevyx_summon_storm_ground_end": {
-    "subtitle": "Storm discharge",
+    "subtitle": "subtitles.saintsdragons.raevyx_summon_storm_ground_end",
     "sounds": [
       {
         "name": "saintsdragons:entity/raevyx/raevyx_summon_storm_ground_end",
@@ -398,7 +398,7 @@
     ]
   },
   "stegonaut_grumble1": {
-    "subtitle": "Stegonaut grumbles",
+    "subtitle": "subtitles.saintsdragons.stegonaut_grumble1",
     "sounds": [
       {
         "name": "saintsdragons:entity/stegonaut/stegonaut_grumble1",
@@ -409,7 +409,7 @@
     ]
   },
   "stegonaut_grumble2": {
-    "subtitle": "Stegonaut grumbles",
+    "subtitle": "subtitles.saintsdragons.stegonaut_grumble2",
     "sounds": [
       {
         "name": "saintsdragons:entity/stegonaut/stegonaut_grumble2",
@@ -420,7 +420,7 @@
     ]
   },
   "stegonaut_grumble3": {
-    "subtitle": "Stegonaut grumbles",
+    "subtitle": "subtitles.saintsdragons.stegonaut_grumble3",
     "sounds": [
       {
         "name": "saintsdragons:entity/stegonaut/stegonaut_grumble3",
@@ -431,7 +431,7 @@
     ]
   },
   "stegonaut_bite": {
-    "subtitle": "Stegonaut bites",
+    "subtitle": "subtitles.saintsdragons.stegonaut_bite",
     "sounds": [
       {
         "name": "saintsdragons:entity/stegonaut/stegonaut_bite",
@@ -442,7 +442,7 @@
     ]
   },
   "stegonaut_chin_slam": {
-    "subtitle": "Stegonaut slams its chin",
+    "subtitle": "subtitles.saintsdragons.stegonaut_chin_slam",
     "sounds": [
       {
         "name": "saintsdragons:entity/stegonaut/stegonaut_chin_slam",
@@ -453,7 +453,7 @@
     ]
   },
   "stegonaut_ground_eating": {
-    "subtitle": "Stegonaut storing projectile",
+    "subtitle": "subtitles.saintsdragons.stegonaut_ground_eating",
     "sounds": [
       {
         "name": "saintsdragons:entity/stegonaut/stegonaut_ground_eating",
@@ -464,7 +464,7 @@
     ]
   },
   "stegonaut_ground_eating_cancel": {
-    "subtitle": "Stegonaut stops storing projectile",
+    "subtitle": "subtitles.saintsdragons.stegonaut_ground_eating_cancel",
     "sounds": [
       {
         "name": "saintsdragons:entity/stegonaut/stegonaut_ground_eating_cancel",
@@ -475,7 +475,7 @@
     ]
   },
   "stegonaut_ground_eating_shoot": {
-    "subtitle": "Stegonaut shoots",
+    "subtitle": "subtitles.saintsdragons.stegonaut_ground_eating_shoot",
     "sounds": [
       {
         "name": "saintsdragons:entity/stegonaut/stegonaut_ground_eating_shoot",
@@ -486,7 +486,7 @@
     ]
   },
   "stegonaut_die": {
-    "subtitle": "Stegonaut dying",
+    "subtitle": "subtitles.saintsdragons.stegonaut_die",
     "sounds": [
       {
         "name": "saintsdragons:entity/stegonaut/stegonaut_die",
@@ -497,7 +497,7 @@
     "attenuation_distance": 32
   },
   "stegonaut_hurt": {
-    "subtitle": "Stegonaut hurts",
+    "subtitle": "subtitles.saintsdragons.stegonaut_hurt",
     "sounds": [
       {
         "name": "saintsdragons:entity/stegonaut/stegonaut_hurt",
@@ -508,7 +508,7 @@
     ]
   },
   "stegonaut_eat": {
-    "subtitle": "Stegonaut eats",
+    "subtitle": "subtitles.saintsdragons.stegonaut_eat",
     "sounds": [
       {
         "name": "saintsdragons:entity/stegonaut/stegonaut_eat",
@@ -519,7 +519,7 @@
     ]
   },
   "stegonaut_walk": {
-    "subtitle": "Stegonaut walks",
+    "subtitle": "subtitles.saintsdragons.stegonaut_walk",
     "sounds": [
       {
         "name": "saintsdragons:entity/stegonaut/stegonaut_walk",
@@ -530,7 +530,7 @@
     ]
   },
   "stegonaut_run": {
-    "subtitle": "Stegonaut runs",
+    "subtitle": "subtitles.saintsdragons.stegonaut_run",
     "sounds": [
       {
         "name": "saintsdragons:entity/stegonaut/stegonaut_run",
@@ -541,7 +541,7 @@
     ]
   },
   "nulljaw_grumble1": {
-    "subtitle": "Nulljaw grumbles",
+    "subtitle": "subtitles.saintsdragons.nulljaw_grumble1",
     "sounds": [
       {
         "name": "saintsdragons:entity/nulljaw/nulljaw_grumble1",
@@ -552,7 +552,7 @@
     ]
   },
   "nulljaw_grumble2": {
-    "subtitle": "Nulljaw grumbles",
+    "subtitle": "subtitles.saintsdragons.nulljaw_grumble2",
     "sounds": [
       {
         "name": "saintsdragons:entity/nulljaw/nulljaw_grumble2",
@@ -563,7 +563,7 @@
     ]
   },
   "nulljaw_grumble3": {
-    "subtitle": "Nulljaw grumbles",
+    "subtitle": "subtitles.saintsdragons.nulljaw_grumble3",
     "sounds": [
       {
         "name": "saintsdragons:entity/nulljaw/nulljaw_grumble3",
@@ -574,7 +574,7 @@
     ]
   },
   "nulljaw_phase1": {
-    "subtitle": "Nulljaw reverts phase",
+    "subtitle": "subtitles.saintsdragons.nulljaw_phase1",
     "sounds": [
       {
         "name": "saintsdragons:entity/nulljaw/nulljaw_phase1",
@@ -585,7 +585,7 @@
     ]
   },
   "nulljaw_phase2_start": {
-    "subtitle": "Nulljaw prepares to switch phase",
+    "subtitle": "subtitles.saintsdragons.nulljaw_phase2_start",
     "sounds": [
       {
         "name": "saintsdragons:entity/nulljaw/nulljaw_phase2_start",
@@ -596,7 +596,7 @@
     ]
   },
   "nulljaw_phase2": {
-    "subtitle": "Nulljaw switches phase",
+    "subtitle": "subtitles.saintsdragons.nulljaw_phase2",
     "sounds": [
       {
         "name": "saintsdragons:entity/nulljaw/nulljaw_phase2",
@@ -607,7 +607,7 @@
     ]
   },
   "nulljaw_phase2_end": {
-    "subtitle": "Nulljaw finishes phase switch",
+    "subtitle": "subtitles.saintsdragons.nulljaw_phase2_end",
     "sounds": [
       {
         "name": "saintsdragons:entity/nulljaw/nulljaw_phase2_end",
@@ -618,7 +618,7 @@
     ]
   },
   "nulljaw_roar": {
-    "subtitle": "Nulljaw roars",
+    "subtitle": "subtitles.saintsdragons.nulljaw_roar",
     "sounds": [
       {
         "name": "saintsdragons:entity/nulljaw/nulljaw_roar",
@@ -629,7 +629,7 @@
     ]
   },
   "nulljaw_roar2": {
-    "subtitle": "Nulljaw roars aggressively",
+    "subtitle": "subtitles.saintsdragons.nulljaw_roar2",
     "sounds": [
       {
         "name": "saintsdragons:entity/nulljaw/nulljaw_roar2",
@@ -640,7 +640,7 @@
     ]
   },
   "nulljaw_walk": {
-    "subtitle": "Nulljaw walks",
+    "subtitle": "subtitles.saintsdragons.nulljaw_walk",
     "sounds": [
       {
         "name": "saintsdragons:entity/nulljaw/nulljaw_walk",
@@ -651,7 +651,7 @@
     ]
   },
   "nulljaw_run": {
-    "subtitle": "Nulljaw runs",
+    "subtitle": "subtitles.saintsdragons.nulljaw_run",
     "sounds": [
       {
         "name": "saintsdragons:entity/nulljaw/nulljaw_run",
@@ -662,7 +662,7 @@
     ]
   },
   "nulljaw_walk2": {
-    "subtitle": "Nulljaw walks (Phase 2)",
+    "subtitle": "subtitles.saintsdragons.nulljaw_walk2",
     "sounds": [
       {
         "name": "saintsdragons:entity/nulljaw/nulljaw_walk2",
@@ -673,7 +673,7 @@
     ]
   },
   "nulljaw_run2": {
-    "subtitle": "Nulljaw runs (Phase 2)",
+    "subtitle": "subtitles.saintsdragons.nulljaw_run2",
     "sounds": [
       {
         "name": "saintsdragons:entity/nulljaw/nulljaw_run2",
@@ -684,7 +684,7 @@
     ]
   },
   "nulljaw_claw": {
-    "subtitle": "Nulljaw slashes",
+    "subtitle": "subtitles.saintsdragons.nulljaw_claw",
     "sounds": [
       {
         "name": "saintsdragons:entity/nulljaw/nulljaw_claw",
@@ -695,7 +695,7 @@
     ]
   },
   "nulljaw_tail_swipe": {
-    "subtitle": "Nulljaw swipes its tail",
+    "subtitle": "subtitles.saintsdragons.nulljaw_tail_swipe",
     "sounds": [
       {
         "name": "saintsdragons:entity/nulljaw/nulljaw_tail_swipe",
@@ -706,7 +706,7 @@
     ]
   },
   "nulljaw_tail_attack": {
-    "subtitle": "Nulljaw swipes its tail",
+    "subtitle": "subtitles.saintsdragons.nulljaw_tail_attack",
     "sounds": [
       {
         "name": "saintsdragons:entity/nulljaw/nulljaw_tail_attack",
@@ -717,7 +717,7 @@
     ]
   },
   "nulljaw_phase2_dash": {
-    "subtitle": "Nulljaw dashes and claws",
+    "subtitle": "subtitles.saintsdragons.nulljaw_phase2_dash",
     "sounds": [
       {
         "name": "saintsdragons:entity/nulljaw/nulljaw_phase2_dash",
@@ -728,7 +728,7 @@
     ]
   },
   "nulljaw_bite": {
-    "subtitle": "Nulljaw bites",
+    "subtitle": "subtitles.saintsdragons.nulljaw_bite",
     "sounds": [
       {
         "name": "saintsdragons:entity/nulljaw/nulljaw_bite",
@@ -739,7 +739,7 @@
     ]
   },
   "nulljaw_horngore": {
-    "subtitle": "Nulljaw gores with horn",
+    "subtitle": "subtitles.saintsdragons.nulljaw_horngore",
     "sounds": [
       {
         "name": "saintsdragons:entity/nulljaw/nulljaw_horngore",
@@ -750,7 +750,7 @@
     ]
   },
   "nulljaw_hurt": {
-    "subtitle": "Nulljaw gets hurt",
+    "subtitle": "subtitles.saintsdragons.nulljaw_hurt",
     "sounds": [
       {
         "name": "saintsdragons:entity/nulljaw/nulljaw_hurt",
@@ -761,7 +761,7 @@
     ]
   },
   "nulljaw_die": {
-    "subtitle": "Nulljaw dying",
+    "subtitle": "subtitles.saintsdragons.nulljaw_die",
     "sounds": [
       {
         "name": "saintsdragons:entity/nulljaw/nulljaw_die",
@@ -772,7 +772,7 @@
     ]
   },
   "nulljaw_eat": {
-    "subtitle": "Nulljaw eats",
+    "subtitle": "subtitles.saintsdragons.nulljaw_eat",
     "sounds": [
       {
         "name": "saintsdragons:entity/nulljaw/nulljaw_eat",
@@ -783,7 +783,7 @@
     ]
   },
   "ignivorus_bite": {
-    "subtitle": "Ignivorus bites",
+    "subtitle": "subtitles.saintsdragons.ignivorus_bite",
     "sounds": [
       {
         "name": "saintsdragons:entity/ignivorus/ignivorus_bite",
@@ -794,7 +794,7 @@
     ]
   },
   "ignivorus_wing_swipe": {
-    "subtitle": "Ignivorus swipes with its wing",
+    "subtitle": "subtitles.saintsdragons.ignivorus_wing_swipe",
     "sounds": [
       {
         "name": "saintsdragons:entity/ignivorus/ignivorus_wing_swipe",
@@ -805,7 +805,7 @@
     ]
   },
   "ignivorus_bulldozing": {
-    "subtitle": "Ignivorus charges",
+    "subtitle": "subtitles.saintsdragons.ignivorus_bulldozing",
     "sounds": [
       {
         "name": "saintsdragons:entity/ignivorus/ignivorus_bulldozing",
@@ -816,7 +816,7 @@
     ]
   },
   "ignivorus_bulldozer_enter": {
-    "subtitle": "Ignivorus lowers its body",
+    "subtitle": "subtitles.saintsdragons.ignivorus_bulldozer_enter",
     "sounds": [
       {
         "name": "saintsdragons:entity/ignivorus/ignivorus_bulldozer_enter",
@@ -827,7 +827,7 @@
     ]
   },
   "ignivorus_bulldozer_exit": {
-    "subtitle": "Ignivorus lifts its body",
+    "subtitle": "subtitles.saintsdragons.ignivorus_bulldozer_exit",
     "sounds": [
       {
         "name": "saintsdragons:entity/ignivorus/ignivorus_bulldozer_exit",
@@ -838,7 +838,7 @@
     ]
   },
   "ignivorus_body_slam": {
-    "subtitle": "Ignivorus slams its body",
+    "subtitle": "subtitles.saintsdragons.ignivorus_body_slam",
     "sounds": [
       {
         "name": "saintsdragons:entity/ignivorus/ignivorus_body_slam",
@@ -849,7 +849,7 @@
     ]
   },
   "ignivorus_impact": {
-    "subtitle": "Ignivorus slams its body",
+    "subtitle": "subtitles.saintsdragons.ignivorus_impact",
     "sounds": [
       {
         "name": "saintsdragons:entity/ignivorus/ignivorus_impact",
@@ -860,7 +860,7 @@
     ]
   },
   "ignivorus_leap": {
-    "subtitle": "Ignivorus leaps",
+    "subtitle": "subtitles.saintsdragons.ignivorus_leap",
     "sounds": [
       {
         "name": "saintsdragons:entity/ignivorus/ignivorus_leap",
@@ -871,7 +871,7 @@
     ]
   },
   "ignivorus_roar": {
-    "subtitle": "Ignivorus roars",
+    "subtitle": "subtitles.saintsdragons.ignivorus_roar",
     "sounds": [
       {
         "name": "saintsdragons:entity/ignivorus/ignivorus_roar",
@@ -882,7 +882,7 @@
     ]
   },
   "ignivorus_magma_pillar": {
-    "subtitle": "Magma pillars emerge",
+    "subtitle": "subtitles.saintsdragons.ignivorus_magma_pillar",
     "sounds": [
       {
         "name": "saintsdragons:entity/ignivorus/ignivorus_magma_pillar",
@@ -893,7 +893,7 @@
     ]
   },
   "ignivorus_walk": {
-    "subtitle": "Ignivorus steps",
+    "subtitle": "subtitles.saintsdragons.ignivorus_walk",
     "sounds": [
       {
         "name": "saintsdragons:entity/ignivorus/ignivorus_walk",
@@ -904,7 +904,7 @@
     ]
   },
   "ignivorus_phase2_enter": {
-    "subtitle": "Ignivorus switches stance",
+    "subtitle": "subtitles.saintsdragons.ignivorus_phase2_enter",
     "sounds": [
       {
         "name": "saintsdragons:entity/ignivorus/ignivorus_phase2_enter",
@@ -915,7 +915,7 @@
     ]
   },
   "ignivorus_phase2_walk": {
-    "subtitle": "Ignivorus steps",
+    "subtitle": "subtitles.saintsdragons.ignivorus_phase2_walk",
     "sounds": [
       {
         "name": "saintsdragons:entity/ignivorus/ignivorus_phase2_walk",
@@ -926,7 +926,7 @@
     ]
   },
   "ignivorus_run": {
-    "subtitle": "Ignivorus charges",
+    "subtitle": "subtitles.saintsdragons.ignivorus_run",
     "sounds": [
       {
         "name": "saintsdragons:entity/ignivorus/ignivorus_run",
@@ -937,7 +937,7 @@
     ]
   },
   "ignivorus_phase2_run": {
-    "subtitle": "Ignivorus charges",
+    "subtitle": "subtitles.saintsdragons.ignivorus_phase2_run",
     "sounds": [
       {
         "name": "saintsdragons:entity/ignivorus/ignivorus_phase2_run",
@@ -948,7 +948,7 @@
     ]
   },
   "ignivorus_hurt": {
-    "subtitle": "Ignivorus bellows in pain",
+    "subtitle": "subtitles.saintsdragons.ignivorus_hurt",
     "sounds": [
       {
         "name": "saintsdragons:entity/ignivorus/ignivorus_hurt",
@@ -958,7 +958,7 @@
     ]
   },
   "ignivorus_die": {
-    "subtitle": "Ignivorus collapses",
+    "subtitle": "subtitles.saintsdragons.ignivorus_die",
     "sounds": [
       {
         "name": "saintsdragons:entity/ignivorus/ignivorus_die",
@@ -969,7 +969,7 @@
     ]
   },
   "ignivorus_fire_breath_start": {
-    "subtitle": "Ignivorus inhales fire",
+    "subtitle": "subtitles.saintsdragons.ignivorus_fire_breath_start",
     "sounds": [
       {
         "name": "saintsdragons:entity/ignivorus/ignivorus_fire_breath_start",
@@ -979,7 +979,7 @@
     ]
   },
   "ignivorus_fire_breathing": {
-    "subtitle": "Ignivorus breathes fire",
+    "subtitle": "subtitles.saintsdragons.ignivorus_fire_breathing",
     "sounds": [
       {
         "name": "saintsdragons:entity/ignivorus/ignivorus_fire_breathing",
@@ -990,7 +990,7 @@
     ]
   },
   "ignivorus_fire_breath_end": {
-    "subtitle": "Ignivorus exhales the last flames",
+    "subtitle": "subtitles.saintsdragons.ignivorus_fire_breath_end",
     "sounds": [
       {
         "name": "saintsdragons:entity/ignivorus/ignivorus_fire_breath_end",
@@ -1000,7 +1000,7 @@
     ]
   },
   "ignivorus_level1_charge": {
-    "subtitle": "Ignivorus charges",
+    "subtitle": "subtitles.saintsdragons.ignivorus_level1_charge",
     "sounds": [
       {
         "name": "saintsdragons:entity/ignivorus/ignivorus_level1_charge",
@@ -1011,7 +1011,7 @@
     ]
   },
   "ignivorus_level1_shoots": {
-    "subtitle": "Ignivorus shoots a fireball",
+    "subtitle": "subtitles.saintsdragons.ignivorus_level1_shoots",
     "sounds": [
       {
         "name": "saintsdragons:entity/ignivorus/ignivorus_level1_shoots",
@@ -1022,7 +1022,7 @@
     ]
   },
   "ignivorus_level2_charge": {
-    "subtitle": "Ignivorus charges",
+    "subtitle": "subtitles.saintsdragons.ignivorus_level2_charge",
     "sounds": [
       {
         "name": "saintsdragons:entity/ignivorus/ignivorus_level2_charge",
@@ -1033,7 +1033,7 @@
     ]
   },
   "ignivorus_level2_shoots": {
-    "subtitle": "Ignivorus shoots a fireball",
+    "subtitle": "subtitles.saintsdragons.ignivorus_level2_shoots",
     "sounds": [
       {
         "name": "saintsdragons:entity/ignivorus/ignivorus_level2_shoots",
@@ -1044,7 +1044,7 @@
     ]
   },
   "ignivorus_level3_charge": {
-    "subtitle": "Ignivorus charges",
+    "subtitle": "subtitles.saintsdragons.ignivorus_level3_charge",
     "sounds": [
       {
         "name": "saintsdragons:entity/ignivorus/ignivorus_level3_charge",
@@ -1055,7 +1055,7 @@
     ]
   },
   "ignivorus_level3_shoots": {
-    "subtitle": "Ignivorus shoots a fireball",
+    "subtitle": "subtitles.saintsdragons.ignivorus_level3_shoots",
     "sounds": [
       {
         "name": "saintsdragons:entity/ignivorus/ignivorus_level3_shoots",
@@ -1066,7 +1066,7 @@
     ]
   },
   "ignivorus_grumble1": {
-    "subtitle": "Ignivorus grumbles",
+    "subtitle": "subtitles.saintsdragons.ignivorus_grumble1",
     "sounds": [
       {
         "name": "saintsdragons:entity/ignivorus/ignivorus_grumble1",
@@ -1077,7 +1077,7 @@
     ]
   },
   "ignivorus_grumble2": {
-    "subtitle": "Ignivorus grumbles",
+    "subtitle": "subtitles.saintsdragons.ignivorus_grumble2",
     "sounds": [
       {
         "name": "saintsdragons:entity/ignivorus/ignivorus_grumble2",
@@ -1088,7 +1088,7 @@
     ]
   },
   "ignivorus_grumble3": {
-    "subtitle": "Ignivorus grumbles",
+    "subtitle": "subtitles.saintsdragons.ignivorus_grumble3",
     "sounds": [
       {
         "name": "saintsdragons:entity/ignivorus/ignivorus_grumble3",
@@ -1099,7 +1099,7 @@
     ]
   },
   "ignivorus_takeoff": {
-    "subtitle": "Ignivorus launches skyward",
+    "subtitle": "subtitles.saintsdragons.ignivorus_takeoff",
     "sounds": [
       {
         "name": "saintsdragons:entity/ignivorus/ignivorus_takeoff",
@@ -1110,7 +1110,7 @@
     ]
   },
   "ignivorus_flap": {
-    "subtitle": "Ignivorus beats its wings",
+    "subtitle": "subtitles.saintsdragons.ignivorus_flap",
     "sounds": [
       {
         "name": "saintsdragons:entity/ignivorus/ignivorus_flap",
@@ -1120,7 +1120,7 @@
     ]
   },
   "raevyx_summon_storm_air_start": {
-    "subtitle": "Storm gathers aloft",
+    "subtitle": "subtitles.saintsdragons.raevyx_summon_storm_air_start",
     "sounds": [
       {
         "name": "saintsdragons:entity/raevyx/raevyx_summon_storm_air_start",
@@ -1131,7 +1131,7 @@
     ]
   },
   "raevyx_summon_storm_air": {
-    "subtitle": "Storm roars aloft",
+    "subtitle": "subtitles.saintsdragons.raevyx_summon_storm_air",
     "sounds": [
       {
         "name": "saintsdragons:entity/raevyx/raevyx_summon_storm_air",
@@ -1142,7 +1142,7 @@
     ]
   },
   "raevyx_summon_storm_air_end": {
-    "subtitle": "Storm ends",
+    "subtitle": "subtitles.saintsdragons.raevyx_summon_storm_air_end",
     "sounds": [
       {
         "name": "saintsdragons:entity/raevyx/raevyx_summon_storm_air_end",
@@ -1153,7 +1153,7 @@
     ]
   },
   "ignivorus_ultimate_start": {
-    "subtitle": "Ignivorus prepares ultimate attack",
+    "subtitle": "subtitles.saintsdragons.ignivorus_ultimate_start",
     "sounds": [
       {
         "name": "saintsdragons:entity/ignivorus/ignivorus_ultimate_start",
@@ -1164,7 +1164,7 @@
     ]
   },
   "ignivorus_ultimate_start_air": {
-    "subtitle": "Ignivorus prepares ultimate attack",
+    "subtitle": "subtitles.saintsdragons.ignivorus_ultimate_start_air",
     "sounds": [
       {
         "name": "saintsdragons:entity/ignivorus/ignivorus_ultimate_start_air",
@@ -1175,7 +1175,7 @@
     ]
   },
   "ignivorus_ultimate": {
-    "subtitle": "Ignivorus unleashes ultimate power",
+    "subtitle": "subtitles.saintsdragons.ignivorus_ultimate",
     "sounds": [
       {
         "name": "saintsdragons:entity/ignivorus/ignivorus_ultimate",
@@ -1186,7 +1186,7 @@
     ]
   },
   "ignivorus_ultimate_air": {
-    "subtitle": "Ignivorus unleashes ultimate power",
+    "subtitle": "subtitles.saintsdragons.ignivorus_ultimate_air",
     "sounds": [
       {
         "name": "saintsdragons:entity/ignivorus/ignivorus_ultimate_air",
@@ -1197,7 +1197,7 @@
     ]
   },
   "ignivorus_ultimate_end": {
-    "subtitle": "Ignivorus calms the inferno",
+    "subtitle": "subtitles.saintsdragons.ignivorus_ultimate_end",
     "sounds": [
       {
         "name": "saintsdragons:entity/ignivorus/ignivorus_ultimate_end",
@@ -1208,7 +1208,7 @@
     ]
   },
   "ignivorus_ultimate_end_air": {
-    "subtitle": "Ignivorus calms the inferno",
+    "subtitle": "subtitles.saintsdragons.ignivorus_ultimate_end_air",
     "sounds": [
       {
         "name": "saintsdragons:entity/ignivorus/ignivorus_ultimate_end_air",
@@ -1219,7 +1219,7 @@
     ]
   },
   "ignivorus_stomp": {
-    "subtitle": "Ignivorus stomps",
+    "subtitle": "subtitles.saintsdragons.ignivorus_stomp",
     "sounds": [
       {
         "name": "saintsdragons:entity/ignivorus/ignivorus_stomp",
@@ -1230,7 +1230,7 @@
     ]
   },
   "ignivorus_landed": {
-    "subtitle": "Ignivorus lands heavily",
+    "subtitle": "subtitles.saintsdragons.ignivorus_landed",
     "sounds": [
       {
         "name": "saintsdragons:entity/ignivorus/ignivorus_landed",
@@ -1241,7 +1241,7 @@
     ]
   },
   "ignivorus_phase2_landed": {
-    "subtitle": "Ignivorus lands heavily",
+    "subtitle": "subtitles.saintsdragons.ignivorus_phase2_landed",
     "sounds": [
       {
         "name": "saintsdragons:entity/ignivorus/ignivorus_phase2_landed",
@@ -1252,7 +1252,7 @@
     ]
   },
   "ignivorus_eat": {
-    "subtitle": "Ignivorus eats",
+    "subtitle": "subtitles.saintsdragons.ignivorus_eat",
     "sounds": [
       {
         "name": "saintsdragons:entity/ignivorus/ignivorus_eat",
@@ -1262,7 +1262,7 @@
     ]
   },
   "raevyx_run": {
-    "subtitle": "Raevyx sprints",
+    "subtitle": "subtitles.saintsdragons.raevyx_run",
     "sounds": [
       {
         "name": "saintsdragons:entity/raevyx/raevyx_run",
@@ -1273,7 +1273,7 @@
     ]
   },
   "raevyx_landed": {
-    "subtitle": "Raevyx lands heavily",
+    "subtitle": "subtitles.saintsdragons.raevyx_landed",
     "sounds": [
       {
         "name": "saintsdragons:entity/raevyx/raevyx_landed",
@@ -1284,7 +1284,7 @@
     ]
   },
   "raevyx_dodge": {
-    "subtitle": "Raevyx dodges",
+    "subtitle": "subtitles.saintsdragons.raevyx_dodge",
     "sounds": [
       {
         "name": "saintsdragons:entity/raevyx/raevyx_dodge",
@@ -1295,7 +1295,7 @@
     ]
   },
   "raevyx_dash": {
-    "subtitle": "Raevyx dashes",
+    "subtitle": "subtitles.saintsdragons.raevyx_dash",
     "sounds": [
       {
         "name": "saintsdragons:entity/raevyx/raevyx_dash",
@@ -1306,7 +1306,7 @@
     ]
   },
   "ignivorus_phase2_exit": {
-    "subtitle": "Ignivorus reverts stance",
+    "subtitle": "subtitles.saintsdragons.ignivorus_phase2_exit",
     "sounds": [
       {
         "name": "saintsdragons:entity/ignivorus/ignivorus_phase2_exit",

@@ -4,6 +4,7 @@ import com.leon.saintsdragons.common.SaintsDragonsCommon;
 import com.leon.saintsdragons.common.config.dragon.DragonAttributeConfig;
 import com.leon.saintsdragons.common.config.dragon.DragonAttributeConfigLoader;
 import com.leon.saintsdragons.common.registry.ModItems;
+import com.leon.saintsdragons.common.registry.ModSounds;
 import com.leon.saintsdragons.server.entity.dragons.handlers.AbstractDragonInteractionHandler;
 import com.leon.saintsdragons.server.entity.dragons.cindervane.Cindervane;
 import net.minecraft.network.chat.Component;
@@ -57,7 +58,7 @@ public class CindervaneInteractionHandler extends AbstractDragonInteractionHandl
 
             // Trigger eat animation
             dragon.triggerAnim("actions", "eat");
-            dragon.playEatMovingSound();
+            dragon.getSoundHandler().playMovingEntitySound(ModSounds.CINDERVANE_EAT.get(), 1.0f, dragon.isBaby() ? 1.6f : 1.0f, 44);
 
             // Set feeding cooldown (2.2083 seconds * 20 ticks/second = 44 ticks)
             dragon.setFeedingCooldown(44);
@@ -230,7 +231,7 @@ public class CindervaneInteractionHandler extends AbstractDragonInteractionHandl
             }
 
             dragon.triggerAnim("actions", "eat");
-            dragon.playEatMovingSound();
+            dragon.getSoundHandler().playMovingEntitySound(ModSounds.CINDERVANE_EAT.get(), 1.0f, dragon.isBaby() ? 1.6f : 1.0f, 44);
             dragon.setFeedingCooldown(61);
             dragon.setInLove(player);
             sendStatusMessage(player, "entity.saintsdragons.cindervane.breeding_ready");
@@ -261,7 +262,7 @@ public class CindervaneInteractionHandler extends AbstractDragonInteractionHandl
 
             // Trigger eat animation
             dragon.triggerAnim("actions", "eat");
-            dragon.playEatMovingSound();
+            dragon.getSoundHandler().playMovingEntitySound(ModSounds.CINDERVANE_EAT.get(), 1.0f, dragon.isBaby() ? 1.6f : 1.0f, 44);
 
             // Set feeding cooldown (2.2083 seconds * 20 ticks/second = 44 ticks)
             dragon.setFeedingCooldown(44);
@@ -383,7 +384,7 @@ public class CindervaneInteractionHandler extends AbstractDragonInteractionHandl
             }
 
             dragon.triggerAnim("actions", "eat");
-            dragon.playEatMovingSound();
+            dragon.getSoundHandler().playMovingEntitySound(ModSounds.CINDERVANE_EAT.get(), 1.0f, dragon.isBaby() ? 1.6f : 1.0f, 44);
             dragon.setFeedingCooldown(44);
 
             if (hearty) {
