@@ -23,12 +23,10 @@ import com.leon.saintsdragons.server.entity.handler.DragonSoundHandler;
 import com.leon.saintsdragons.server.entity.interfaces.*;
 import com.leon.saintsdragons.common.network.DragonRiderAction;
 import com.leon.saintsdragons.common.registry.ModSounds;
-import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.util.RandomSource;
 import com.leon.saintsdragons.server.entity.controller.nulljaw.NulljawRiderController;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.Holder;
 import net.minecraft.core.Direction;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
@@ -60,16 +58,15 @@ import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.FluidState;
-import net.minecraft.world.level.pathfinder.PathType;
+import net.minecraft.world.level.pathfinder.BlockPathTypes;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import javax.annotation.Nonnull;
-import software.bernie.geckolib.animatable.instance.AnimatableInstanceCache;
-import software.bernie.geckolib.animation.AnimatableManager;
-import software.bernie.geckolib.animation.AnimationController;
-import software.bernie.geckolib.animation.keyframe.event.SoundKeyframeEvent;
+import software.bernie.geckolib.core.animatable.instance.AnimatableInstanceCache;
+import software.bernie.geckolib.core.animation.AnimatableManager;
+import software.bernie.geckolib.core.animation.AnimationController;
 import software.bernie.geckolib.util.GeckoLibUtil;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.effect.MobEffectInstance;
@@ -190,6 +187,7 @@ public class Nulljaw extends RideableDragonBase implements SemiAquaticDragon, Sh
     private int wildRideTicks = 0;
     private int nextBuckAttemptTick = 0;
     private int cumulativeWildRideProgress = 0;
+    private int groundStepSoundCooldownTicks = 0;
 
     // Client-side animation initialization grace period (fixes T-pose on world rejoin with shaders)
     private int clientAnimInitTicks = 0;
@@ -217,19 +215,15 @@ public class Nulljaw extends RideableDragonBase implements SemiAquaticDragon, Sh
         return cooldownTicks <= 0;
     }
 
-    @Override
-    public float maxUpStep() {
-        return 1.4F;
-    }
-
     public void setFeedingCooldown(int ticks) {
         this.entityData.set(DATA_FEEDING_COOLDOWN, ticks);
     }
 
     public Nulljaw(EntityType<? extends Nulljaw> type, Level level) {
         super(type, level);
-        this.setPathfindingMalus(PathType.WATER, 0.0F);
-        this.setPathfindingMalus(PathType.WATER_BORDER, 0.0F);
+        this.setPathfindingMalus(BlockPathTypes.WATER, 0.0F);
+        this.setPathfindingMalus(BlockPathTypes.WATER_BORDER, 0.0F);
+        this.setMaxUpStep(1.4F);
         this.groundNavigation = new DragonPathNavigateGround(this, level);
         this.landMoveControl = new RiftDrakeMoveControl(this);
         this.landLookControl = new RiftDrakeLookController(this);
@@ -249,6 +243,7 @@ public class Nulljaw extends RideableDragonBase implements SemiAquaticDragon, Sh
         }
     }
 
+
     @Override
     protected float getRiderLockYawBlend() {
         return this.isPhaseTwoActive() ? 0.25F : 0.18F;
@@ -261,6 +256,7 @@ public class Nulljaw extends RideableDragonBase implements SemiAquaticDragon, Sh
 
     @Override
     public boolean areRiderControlsLocked() {
+        // Nulljaw-specific: also consider wild ride active state
         return super.areRiderControlsLocked() || isWildRideActive();
     }
 
@@ -271,8 +267,8 @@ public class Nulljaw extends RideableDragonBase implements SemiAquaticDragon, Sh
 
     @Override
     public void lockRiderControls(int ticks) {
-        super.lockRiderControls(ticks); // Base handles tick counting and entity data
-        // Nulljaw-specific: reset movement states during lock
+        super.lockRiderControls(ticks);  // Base handles tick counting and entity data
+        // Nulljaw-specific: reset rider inputs and movement states during lock
         this.setAccelerating(false);
         this.setLastRiderForward(0.0F);
         this.setLastRiderStrafe(0.0F);
@@ -285,6 +281,7 @@ public class Nulljaw extends RideableDragonBase implements SemiAquaticDragon, Sh
             this.setTarget(null);
         }
     }
+
 
     public void lockAbilities(int ticks) {
         combatManager.lockGlobalCooldown(ticks);
@@ -301,8 +298,8 @@ public class Nulljaw extends RideableDragonBase implements SemiAquaticDragon, Sh
     }
 
     @Override
-    public @NotNull net.minecraft.world.entity.EntityDimensions getDefaultDimensions(@NotNull net.minecraft.world.entity.Pose pose) {
-        net.minecraft.world.entity.EntityDimensions baseDimensions = super.getDefaultDimensions(pose);
+    public @NotNull net.minecraft.world.entity.EntityDimensions getDimensions(@NotNull net.minecraft.world.entity.Pose pose) {
+        net.minecraft.world.entity.EntityDimensions baseDimensions = super.getDimensions(pose);
         if (isBaby()) {
             return baseDimensions.scale(BABY_HITBOX_SCALE);
         }
@@ -474,8 +471,14 @@ public class Nulljaw extends RideableDragonBase implements SemiAquaticDragon, Sh
         if (phaseTwo) {
             lastDashWasRight = !lastDashWasRight;
             triggerAnim("instant", lastDashWasRight ? "phase2_dash_right" : "phase2_dash_left");
+            if (!this.level().isClientSide) {
+                this.getSoundHandler().playMovingEntitySound(ModSounds.NULLJAW_PHASE2_DASH.get(), 1.0f, 1.0f, LEAP_DURATION);
+            }
         } else {
             triggerAnim("instant", "tail_swipe_left");
+            if (!this.level().isClientSide) {
+                this.getSoundHandler().playMovingEntitySound(ModSounds.NULLJAW_TAIL_SWIPE.get(), 1.0f, 1.0f, 100);
+            }
         }
         return true;
     }
@@ -562,27 +565,27 @@ public class Nulljaw extends RideableDragonBase implements SemiAquaticDragon, Sh
     }
 
     @Override
-    protected void defineSynchedData(SynchedEntityData.Builder builder) {
-        super.defineSynchedData(builder);
-        builder.define(DATA_SWIMMING, false);
-        builder.define(DATA_SWIM_TURN, 0);
-        builder.define(DATA_SWIM_PITCH, 0);
-        builder.define(DATA_SWIM_PITCH_RAD, 0.0F);
-        builder.define(DATA_PITCH_KEY_MODE, false);
-        builder.define(DATA_PHASE_TWO, false);
-        builder.define(DATA_SCREEN_SHAKE_AMOUNT, 0.0F);
-        builder.define(DATA_FEEDING_COOLDOWN, 0);
+    protected void defineSynchedData() {
+        super.defineSynchedData();
+        this.entityData.define(DATA_SWIMMING, false);
+        this.entityData.define(DATA_SWIM_TURN, 0);
+        this.entityData.define(DATA_SWIM_PITCH, 0);
+        this.entityData.define(DATA_SWIM_PITCH_RAD, 0.0F);
+        this.entityData.define(DATA_PITCH_KEY_MODE, false);
+        this.entityData.define(DATA_PHASE_TWO, false);
+        this.entityData.define(DATA_SCREEN_SHAKE_AMOUNT, 0.0F);
+        this.entityData.define(DATA_FEEDING_COOLDOWN, 0);
     }
     
     @Override
-    protected void defineRideableDragonData(SynchedEntityData.Builder builder) {
-        builder.define(DATA_GROUND_MOVE_STATE, 0);
-        builder.define(DATA_RIDER_FORWARD, 0.0F);
-        builder.define(DATA_RIDER_STRAFE, 0.0F);
-        builder.define(DATA_ACCELERATING, false);
-        builder.define(DATA_FLIGHT_MODE, -1);
-        builder.define(DATA_GOING_UP, false);
-        builder.define(DATA_GOING_DOWN, false);
+    protected void defineRideableDragonData() {
+        this.entityData.define(DATA_GROUND_MOVE_STATE, 0);
+        this.entityData.define(DATA_RIDER_FORWARD, 0.0F);
+        this.entityData.define(DATA_RIDER_STRAFE, 0.0F);
+        this.entityData.define(DATA_ACCELERATING, false);
+        this.entityData.define(DATA_FLIGHT_MODE, -1);
+        this.entityData.define(DATA_GOING_UP, false);
+        this.entityData.define(DATA_GOING_DOWN, false);
     }
     
     // ===== REQUIRED ABSTRACT METHODS FROM RIDEABLEDRAGONBASE =====
@@ -666,10 +669,9 @@ public class Nulljaw extends RideableDragonBase implements SemiAquaticDragon, Sh
         AnimationController<Nulljaw> instantActions =
                 new AnimationController<>(this, "instant", 10, animationHandler::instantActionPredicate);
 
-        // Sound keyframes
-        movementController.setSoundKeyframeHandler(this::onAnimationSound);
-        actions.setSoundKeyframeHandler(this::onAnimationSound);
-        instantActions.setSoundKeyframeHandler(this::onAnimationSound);
+        movementController.setSoundKeyframeHandler(event -> {});
+        actions.setSoundKeyframeHandler(event -> {});
+        instantActions.setSoundKeyframeHandler(event -> {});
 
         // Setup animation triggers
         animationHandler.setupActionController(actions);
@@ -799,6 +801,7 @@ public class Nulljaw extends RideableDragonBase implements SemiAquaticDragon, Sh
             tickLeapState();
             handleAmbientSounds();
             tickRiderControlLock();
+            tickGroundStepAudio();
             boolean inWater = this.isInWaterOrBubble();
             if (inWater) {
                 this.setAirSupply(this.getMaxAirSupply());
@@ -820,12 +823,6 @@ public class Nulljaw extends RideableDragonBase implements SemiAquaticDragon, Sh
             // Ensure proper look control when being ridden
             if (this.getControllingPassenger() != null && this.lookControl != landLookControl) {
                 this.lookControl = landLookControl;
-            }
-
-            // Lock head and body rotation when sleeping to prevent look goals from rotating the dragon
-            if (isSleeping() || isSleepingEntering() || isSleepingExiting()) {
-                this.setYHeadRot(this.yBodyRot);
-                this.yHeadRotO = this.yBodyRot;
             }
 
             if ((isSleeping() || isSleepingEntering() || isSleepingExiting())
@@ -927,7 +924,7 @@ public class Nulljaw extends RideableDragonBase implements SemiAquaticDragon, Sh
     public void awardTamingAdvancement(Player player) {
         if (player instanceof ServerPlayer serverPlayer) {
             var advancement = serverPlayer.server.getAdvancements()
-                    .get(SaintsDragonsCommon.rl("tame_nulljaw"));
+                    .getAdvancement(SaintsDragonsCommon.rl("tame_nulljaw"));
             if (advancement != null) {
                 serverPlayer.getAdvancements().award(advancement, "tame_nulljaw");
             }
@@ -948,7 +945,7 @@ public class Nulljaw extends RideableDragonBase implements SemiAquaticDragon, Sh
         }
     }
 
-    private void setAttributeBase(Holder<Attribute> attribute, double value) {
+    private void setAttributeBase(Attribute attribute, double value) {
         AttributeInstance instance = this.getAttribute(attribute);
         if (instance != null) {
             instance.setBaseValue(value);
@@ -1054,7 +1051,7 @@ public class Nulljaw extends RideableDragonBase implements SemiAquaticDragon, Sh
 
 
     public void handleJumpRequest() {
-       if (this.onGround()) {
+        if (this.onGround()) {
             // Ground jump - standard jump height
             Vec3 movement = this.getDeltaMovement();
             this.setDeltaMovement(movement.x, 1.0, movement.z);
@@ -1106,6 +1103,8 @@ public class Nulljaw extends RideableDragonBase implements SemiAquaticDragon, Sh
 
     @Override
     public void removePassenger(@NotNull Entity passenger) {
+        // Base implementation handles clearing control lock
+
         super.removePassenger(passenger);
         if (!this.level().isClientSide && !this.isTame() && wildRideActive) {
             endWildRide(false);
@@ -1121,7 +1120,7 @@ public class Nulljaw extends RideableDragonBase implements SemiAquaticDragon, Sh
     // Let RideableDragonBase handle tickAnimationStates() for proper networking
 
     @Override
-    public boolean causeFallDamage(float fallDistance, float damageMultiplier, DamageSource source) {
+    public boolean causeFallDamage(float fallDistance, float damageMultiplier, @NotNull DamageSource source) {
         if (fallDistance <= 16.0F) {
             return false;
         }
@@ -1209,13 +1208,13 @@ public class Nulljaw extends RideableDragonBase implements SemiAquaticDragon, Sh
     // ===== RIDING METHODS =====
     
     @Override
-    protected void positionRider(@Nonnull @NotNull Entity passenger, Entity.MoveFunction moveFunction) {
-        riderController.positionRider(passenger, moveFunction);
+    public double getPassengersRidingOffset() {
+        return riderController.getPassengersRidingOffset();
     }
 
     @Override
-    public Vec3 getPassengerRidingPosition(@NotNull Entity passenger) {
-        return riderController.getPassengerPosition(passenger);
+    protected void positionRider(@Nonnull @NotNull Entity passenger, @Nonnull @NotNull Entity.MoveFunction moveFunction) {
+        riderController.positionRider(passenger, moveFunction);
     }
 
     @Override
@@ -1254,7 +1253,7 @@ public class Nulljaw extends RideableDragonBase implements SemiAquaticDragon, Sh
             java.util.UUID ownerId = this.getOwnerUUID();
             if (ownerId != null) {
                 baby.setOwnerUUID(ownerId);
-                baby.setTame(true, true);
+                baby.setTame(true);
             }
 
             baby.skipRespawnTicks = 5;
@@ -1690,9 +1689,46 @@ public class Nulljaw extends RideableDragonBase implements SemiAquaticDragon, Sh
         return NulljawAbilities.NULLJAW_PHASE_SHIFT;
     }
 
-    public void onAnimationSound(SoundKeyframeEvent<Nulljaw> event) {
-        // Delegate all keyframed sounds to the sound handler
-        this.getSoundHandler().handleAnimationSound(this, event.getKeyframeData(), event.getController());
+    private void tickGroundStepAudio() {
+        if (groundStepSoundCooldownTicks > 0) {
+            groundStepSoundCooldownTicks--;
+        }
+        if (this.isInWaterOrBubble() || this.isSwimming() || !this.onGround() || this.areRiderControlsLocked()) {
+            groundStepSoundCooldownTicks = 0;
+            return;
+        }
+        int moveState = this.entityData.get(DATA_GROUND_MOVE_STATE);
+        if (moveState <= 0) {
+            double speedSqr = this.getDeltaMovement().horizontalDistanceSqr();
+            if (speedSqr > 0.02D) {
+                moveState = 2;
+            } else if (speedSqr > 0.001D) {
+                moveState = 1;
+            }
+        }
+        if (moveState <= 0) {
+            groundStepSoundCooldownTicks = 0;
+            return;
+        }
+        if (groundStepSoundCooldownTicks > 0) {
+            return;
+        }
+        boolean running = moveState == 2;
+        if (this.isPhaseTwoActive()) {
+            int duration = running ? 24 : 38;
+            this.getSoundHandler().playMovingEntitySound(
+                    running ? ModSounds.NULLJAW_RUN2.get() : ModSounds.NULLJAW_WALK2.get(),
+                    1.0f, 1.0f, duration
+            );
+            groundStepSoundCooldownTicks = duration;
+            return;
+        }
+        int duration = running ? 27 : 35;
+        this.getSoundHandler().playMovingEntitySound(
+                running ? ModSounds.NULLJAW_RUN.get() : ModSounds.NULLJAW_WALK.get(),
+                1.0f, 1.0f, duration
+        );
+        groundStepSoundCooldownTicks = duration;
     }
 
     private void handleRiddenSwimming(Vec3 input) {
@@ -1860,8 +1896,8 @@ public class Nulljaw extends RideableDragonBase implements SemiAquaticDragon, Sh
                 return;
             }
 
-            // Don't update look rotation when sleeping
-            if (this.dragon.isSleeping() || this.dragon.isSleepTransitioning()) {
+            // Stay still while sleeping or in sleep transitions
+            if (dragon.isSleeping() || dragon.isSleepTransitioning()) {
                 return;
             }
 
@@ -1983,7 +2019,7 @@ public class Nulljaw extends RideableDragonBase implements SemiAquaticDragon, Sh
             // Load taming chance from config
             DragonAttributeConfig config = DragonAttributeConfigLoader.getInstance()
                     .getConfig(DragonAttributeConfigLoader.NULLJAW_ID);
-            double tamingChanceConfig = config.extraDouble("taming_chance_base", config.extraDouble("taming_chance", 6.0));
+            double tamingChanceConfig = config.extraDoubles().getOrDefault("taming_chance", 6.0);
 
             // Convert config value to per-tick success chance
             // Higher values = much harder to tame (exponential scaling)
@@ -2041,7 +2077,7 @@ public class Nulljaw extends RideableDragonBase implements SemiAquaticDragon, Sh
 
     private void applyWildRideMotion() {
         // Frantic running - pick random sprint targets
-        if (this.getNavigation().isDone() || this.getRandom().nextInt(35) == 0) {
+        if (this.getNavigation().isDone()) {
             double targetX = this.getX() + (this.getRandom().nextDouble() - 0.5D) * 22.0D;
             double targetZ = this.getZ() + (this.getRandom().nextDouble() - 0.5D) * 22.0D;
             double targetY = this.getY();
@@ -2216,6 +2252,7 @@ public class Nulljaw extends RideableDragonBase implements SemiAquaticDragon, Sh
             clientSwimPitchRad = Mth.lerp(0.5f, clientSwimPitchRad, targetPitch);
         }
     }
+
 
     private void tickFeedingCooldown() {
         int cooldownTicks = this.entityData.get(DATA_FEEDING_COOLDOWN);
@@ -2475,13 +2512,13 @@ public class Nulljaw extends RideableDragonBase implements SemiAquaticDragon, Sh
     }
 
     @Override
-    protected void dropAllDeathLoot(@NotNull ServerLevel level, @NotNull DamageSource source) {
+    protected void dropAllDeathLoot(@NotNull DamageSource source) {
         // Don't drop loot until death animation completes
         if (deathTime < getDeathAnimationDurationTicks()) {
             return;
         }
 
-        super.dropAllDeathLoot(level, source);
+        super.dropAllDeathLoot(source);
 
         DragonAttributeConfig config = DragonAttributeConfigLoader.getInstance()
                 .getConfig(DragonAttributeConfigLoader.NULLJAW_ID);
@@ -2524,7 +2561,7 @@ public class Nulljaw extends RideableDragonBase implements SemiAquaticDragon, Sh
             setRiderPitchKeyMode(tag.getBoolean("RiderPitchKeyMode"));
         }
 
-        // Apply config attributes when loading from NBT (NeoForge fix)
+        // Apply config attributes when loading from NBT (Forge fix)
         applyConfiguredAttributes();
     }
 
