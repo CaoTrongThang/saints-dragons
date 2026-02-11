@@ -36,7 +36,7 @@ public class VillageIvySpawner {
     private static final int VILLAGE_CLUSTER_SIZE = 96;
     private static final TagKey<Biome> IVY_VILLAGE_BIOME_TAG = TagKey.create(
             Registries.BIOME,
-            new ResourceLocation("saintsdragons", "has_ivy_village_spawn")
+            ResourceLocation.fromNamespaceAndPath("saintsdragons", "has_ivy_village_spawn")
     );
 
     /**

@@ -9,7 +9,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
-import net.minecraft.world.item.alchemy.PotionUtils;
+import net.minecraft.world.item.alchemy.PotionContents;
 
 import java.util.function.Supplier;
 
@@ -39,7 +39,10 @@ public class SaintsCreativeTab {
                                 output.accept(ModItems.IGNIVORUS_TEETH.get());
                                 output.accept(ModItems.NULLJAW_SCALE.get());
                                 output.accept(ModItems.STEGONAUT_SCALE.get());
-                                output.accept(PotionUtils.setPotion(new ItemStack(Items.POTION), ModPotions.NULLJAW_TIDEGUARD.get()));
+                                output.accept(PotionContents.createItemStack(
+                                        Items.POTION,
+                                        BuiltInRegistries.POTION.wrapAsHolder(ModPotions.NULLJAW_TIDEGUARD.get())
+                                ));
                                 output.accept(ModItems.BLEEDING_BOLT_MUSIC_DISC.get());
                                 output.accept(ModItems.HEARTY_DRAGON_MEAL.get());
                                 output.accept(ModItems.RAEVYX_EGG.get());

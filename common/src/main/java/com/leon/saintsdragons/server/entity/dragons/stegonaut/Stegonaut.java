@@ -395,18 +395,18 @@ public class Stegonaut extends RideableDragonBase implements SoundHandledDragon,
     }
 
     @Override
-    protected void dropAllDeathLoot(@NotNull DamageSource source) {
+    protected void dropAllDeathLoot(@NotNull ServerLevel level, @NotNull DamageSource source) {
         // Keep loot timing aligned with death animation completion.
         if (deathTime < getDeathAnimationDurationTicks()) {
             return;
         }
 
-        super.dropAllDeathLoot(source);
+        super.dropAllDeathLoot(level, source);
 
         DragonAttributeConfig config = DragonAttributeConfigLoader.getInstance()
                 .getConfig(DragonAttributeConfigLoader.STEGONAUT_ID);
         double eggDropChance = config.extraDouble("egg_drop_chance", 0.12D);
-        if (!level().isClientSide && getGender() == DragonGender.FEMALE && this.random.nextDouble() < eggDropChance) {
+        if (getGender() == DragonGender.FEMALE && this.random.nextDouble() < eggDropChance) {
             this.spawnAtLocation(ModItems.STEGONAUT_EGG.get());
         }
     }

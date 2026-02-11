@@ -64,9 +64,9 @@ public class CodexEcologyPanel {
             ResourceLocation.fromNamespaceAndPath("saintsdragons", "hearty_dragon_meal")
     );
     private static final List<ResourceLocation> STEGONAUT_DROPS = List.of(
-            new ResourceLocation("saintsdragons", "stegonaut_scale"),
-            new ResourceLocation("minecraft", "amethyst_shard"),
-            new ResourceLocation("saintsdragons", "stegonaut_egg")
+            ResourceLocation.fromNamespaceAndPath("saintsdragons", "stegonaut_scale"),
+            ResourceLocation.fromNamespaceAndPath("minecraft", "amethyst_shard"),
+            ResourceLocation.fromNamespaceAndPath("saintsdragons", "stegonaut_egg")
     );
     private Button ecologyPrevPageButton;
     private Button ecologyNextPageButton;
