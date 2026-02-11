@@ -1936,6 +1936,9 @@ public class Raevyx extends RideableDragonBase implements FlyingAnimal, RangedAt
         }
 
         tamingController.tickServer();
+        if (isTamingStunned()) {
+            tamingController.enforceGroundingTick();
+        }
         handleAmbientSounds();
         tickBeamEnergy(); // Regenerate beam energy when not beaming
         if (isFlying() || isTakeoff()) {
@@ -3610,7 +3613,15 @@ public class Raevyx extends RideableDragonBase implements FlyingAnimal, RangedAt
     
     
     public boolean isSupercharged() { return superchargeTicks > 0; }
-    public float getDamageMultiplier() { return isSupercharged() ? 2.0f : 1.0f; }
+    public float getDamageMultiplier() {
+        if (!isSupercharged()) {
+            return 1.0f;
+        }
+        double configured = DragonAttributeConfigLoader.getInstance()
+                .getConfig(DragonAttributeConfigLoader.RAEVYX_ID)
+                .extraDouble("summon_storm_supercharge_damage_multiplier", 2.0D);
+        return (float) Math.max(0.0D, configured);
+    }
     // Temporary invulnerability timer (e.g., during Summon Storm windup)
     private int tempInvulnTicks = 0;
     public void startTemporaryInvuln(int ticks) {

@@ -53,7 +53,11 @@ public final class DragonGroomingComponent {
         GroomingProfile profile = getProfile(dragon);
         if (canDropRewards && dragon.getRandom().nextFloat() <= profile.dropChance()) {
             int amount = Mth.nextInt(dragon.getRandom(), profile.minDrops(), profile.maxDrops());
-            dragon.spawnAtLocation(new ItemStack(profile.dropItem(), amount));
+            Item dropItem = profile.dropItem();
+            if (dragon instanceof Stegonaut && dragon.getRandom().nextBoolean()) {
+                dropItem = Items.AMETHYST_SHARD;
+            }
+            dragon.spawnAtLocation(new ItemStack(dropItem, amount));
         }
 
         brushStack.hurtAndBreak(1, player, net.minecraft.world.entity.EquipmentSlot.MAINHAND);
@@ -76,13 +80,13 @@ public final class DragonGroomingComponent {
             return new GroomingProfile(0.35F, ModItems.RAEVYX_SCALE.get(), 1, 2);
         }
         if (dragon instanceof Nulljaw) {
-            return new GroomingProfile(0.30F, Items.PRISMARINE_SHARD, 1, 2);
+            return new GroomingProfile(0.30F, ModItems.NULLJAW_SCALE.get(), 1, 2);
         }
         if (dragon instanceof Cindervane) {
             return new GroomingProfile(0.30F, ModItems.CINDERVANE_SCALE.get(), 1, 1);
         }
         if (dragon instanceof Stegonaut) {
-            return new GroomingProfile(0.30F, Items.TURTLE_SCUTE, 1, 2);
+            return new GroomingProfile(0.30F, ModItems.STEGONAUT_SCALE.get(), 1, 2);
         }
         return new GroomingProfile(0.25F, Items.TURTLE_SCUTE, 1, 1);
     }

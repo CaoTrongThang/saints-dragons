@@ -149,6 +149,30 @@ public final class ModItems {
                             new Item.Properties()
                     ));
 
+    public static final Supplier<Item> IGNIVORUS_HEART =
+            REGISTER.register("ignivorus_heart",
+                    () -> new Item(
+                            new Item.Properties()
+                    ));
+
+    public static final Supplier<Item> IGNIVORUS_TEETH =
+            REGISTER.register("ignivorus_teeth",
+                    () -> new Item(
+                            new Item.Properties()
+                    ));
+
+    public static final Supplier<Item> NULLJAW_SCALE =
+            REGISTER.register("nulljaw_scale",
+                    () -> new Item(
+                            new Item.Properties()
+                    ));
+
+    public static final Supplier<Item> STEGONAUT_SCALE =
+            REGISTER.register("stegonaut_scale",
+                    () -> new Item(
+                            new Item.Properties()
+                    ));
+
     public static final Supplier<Item> STEGONAUT_BINDER =
             REGISTER.register("stegonaut_binder",
                     () -> new StegonautBinderItem(
