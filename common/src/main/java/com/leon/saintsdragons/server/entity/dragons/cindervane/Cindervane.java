@@ -1528,8 +1528,8 @@ public class Cindervane extends RideableDragonBase implements DragonFlightCapabl
 
     @Override
     protected void applyRiderMovementInput(Player player, float forward, float strafe, float yaw, boolean locked) {
-        float fwd = applyInputDeadzone(forward);
-        float str = applyInputDeadzone(strafe);
+        float fwd = locked ? 0f : applyInputDeadzone(forward);
+        float str = locked ? 0f : applyInputDeadzone(strafe);
         setLastRiderForward(fwd);
         setLastRiderStrafe(str);
         if (!isFlying()) {
