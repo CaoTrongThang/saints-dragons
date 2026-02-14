@@ -155,8 +155,8 @@ public final class ModItems {
                             new Item.Properties()
                     ));
 
-    public static final Supplier<Item> IGNIVORUS_TEETH =
-            REGISTER.register("ignivorus_teeth",
+    public static final Supplier<Item> IGNIVORUS_TOOTH =
+            REGISTER.register("ignivorus_tooth",
                     () -> new Item(
                             new Item.Properties()
                     ));

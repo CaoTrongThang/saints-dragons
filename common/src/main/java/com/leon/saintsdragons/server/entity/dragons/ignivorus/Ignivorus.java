@@ -657,7 +657,7 @@ public class Ignivorus extends RideableDragonBase implements DragonFlightCapable
                 && damageSource.getEntity() != null
                 && teethChipDropCooldownTicks <= 0
                 && this.random.nextFloat() < 0.12F) {
-            this.spawnAtLocation(ModItems.IGNIVORUS_TEETH.get());
+            this.spawnAtLocation(ModItems.IGNIVORUS_TOOTH.get());
             teethChipDropCooldownTicks = 30;
         }
         return hurt;
@@ -4079,7 +4079,7 @@ public class Ignivorus extends RideableDragonBase implements DragonFlightCapable
 
         if (!level().isClientSide) {
             if (this.random.nextFloat() < 0.35F) {
-                this.spawnAtLocation(ModItems.IGNIVORUS_TEETH.get());
+                this.spawnAtLocation(ModItems.IGNIVORUS_TOOTH.get());
             }
             if (this.random.nextFloat() < 0.90F) {
                 this.spawnAtLocation(ModItems.IGNIVORUS_HEART.get());
