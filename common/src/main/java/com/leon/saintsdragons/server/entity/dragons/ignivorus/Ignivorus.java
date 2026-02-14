@@ -3637,7 +3637,12 @@ public class Ignivorus extends RideableDragonBase implements DragonFlightCapable
         // Movement controller handles idle/walk/run/flight/sit animations
         AnimationController<Ignivorus> movementController =
             new AnimationController<>(this, "movement", 8, animationHandler::handleMovementAnimation);
-        movementController.setSoundKeyframeHandler(this::onAnimationSound);
+        movementController.setSoundKeyframeHandler(event -> {
+            String soundKey = event.getKeyframeData().getSound();
+            if (soundKey != null && !soundKey.isEmpty()) {
+                handleAnimationSound(soundKey);
+            }
+        });
 
         // Action controller for triggerable animations (sit transitions, fire breath, etc.)
         AnimationController<Ignivorus> actionController =
@@ -3652,11 +3657,21 @@ public class Ignivorus extends RideableDragonBase implements DragonFlightCapable
         AnimationController<Ignivorus> instantController =
             new AnimationController<>(this, "instant", 1, animationHandler::instantActionPredicate);
         animationHandler.setupInstantActionController(instantController);
-        instantController.setSoundKeyframeHandler(this::onAnimationSound);
+        instantController.setSoundKeyframeHandler(event -> {
+            String soundKey = event.getKeyframeData().getSound();
+            if (soundKey != null && !soundKey.isEmpty()) {
+                handleAnimationSound(soundKey);
+            }
+        });
 
         // Register all action animations via handler
         animationHandler.setupActionController(actionController);
-        actionController.setSoundKeyframeHandler(this::onAnimationSound);
+        actionController.setSoundKeyframeHandler(event -> {
+            String soundKey = event.getKeyframeData().getSound();
+            if (soundKey != null && !soundKey.isEmpty()) {
+                handleAnimationSound(soundKey);
+            }
+        });
 
         controllers.add(movementController, instantController, actionController);
     }
@@ -3743,6 +3758,18 @@ public class Ignivorus extends RideableDragonBase implements DragonFlightCapable
     @Override
     public DragonSoundHandler getSoundHandler() {
         return soundHandler;
+    }
+
+    private void handleAnimationSound(String soundKey) {
+        DragonSoundProfile profile = getSoundProfile();
+        if (profile != null) {
+            // Let the profile handle it (it knows about flaps, steps, etc.)
+            boolean handled = profile.handleAnimationSound(getSoundHandler(), this, soundKey, null);
+            if (!handled) {
+                // Profile didn't handle it, try as vocal
+                getSoundHandler().playVocal(soundKey);
+            }
+        }
     }
 
     @Override

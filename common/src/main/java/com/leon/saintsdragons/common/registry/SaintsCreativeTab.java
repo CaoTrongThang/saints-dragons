@@ -8,8 +8,6 @@ import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.Items;
-import net.minecraft.world.item.alchemy.PotionContents;
 
 import java.util.function.Supplier;
 
@@ -39,30 +37,8 @@ public class SaintsCreativeTab {
                                 output.accept(ModItems.IGNIVORUS_TOOTH.get());
                                 output.accept(ModItems.NULLJAW_SCALE.get());
                                 output.accept(ModItems.STEGONAUT_SCALE.get());
-                                output.accept(PotionContents.createItemStack(
-                                        Items.POTION,
-                                        BuiltInRegistries.POTION.wrapAsHolder(ModPotions.NULLJAW_TIDEGUARD.get())
-                                ));
-                                output.accept(PotionContents.createItemStack(
-                                        Items.SPLASH_POTION,
-                                        BuiltInRegistries.POTION.wrapAsHolder(ModPotions.NULLJAW_TIDEGUARD.get())
-                                ));
-                                output.accept(PotionContents.createItemStack(
-                                        Items.LINGERING_POTION,
-                                        BuiltInRegistries.POTION.wrapAsHolder(ModPotions.NULLJAW_TIDEGUARD.get())
-                                ));
-                                output.accept(PotionContents.createItemStack(
-                                        Items.POTION,
-                                        BuiltInRegistries.POTION.wrapAsHolder(ModPotions.SEARING.get())
-                                ));
-                                output.accept(PotionContents.createItemStack(
-                                        Items.SPLASH_POTION,
-                                        BuiltInRegistries.POTION.wrapAsHolder(ModPotions.SEARING.get())
-                                ));
-                                output.accept(PotionContents.createItemStack(
-                                        Items.LINGERING_POTION,
-                                        BuiltInRegistries.POTION.wrapAsHolder(ModPotions.SEARING.get())
-                                ));
+                                output.accept(ModItems.POTION_OF_TIDEGUARD.get());
+                                output.accept(ModItems.POTION_OF_SEARING.get());
                                 output.accept(ModItems.BLEEDING_BOLT_MUSIC_DISC.get());
                                 output.accept(ModItems.HEARTY_DRAGON_MEAL.get());
                                 output.accept(ModItems.RAEVYX_EGG.get());
