@@ -259,6 +259,7 @@ public class Cindervane extends RideableDragonBase implements DragonFlightCapabl
 
     // ===== CLIENT LOCATOR CACHE (client-side only) =====
     private final Map<String, Vec3> clientLocatorCache = new java.util.concurrent.ConcurrentHashMap<>();
+    private final Map<String, Vec3> serverBonePositionCache = new java.util.concurrent.ConcurrentHashMap<>();
 
     // ===== Client animation overrides (for robust observer sync) =====
 
@@ -1595,7 +1596,10 @@ public class Cindervane extends RideableDragonBase implements DragonFlightCapabl
 
     @Override
     public RiderAbilityBinding getAttackRiderAbility() {
-        return new RiderAbilityBinding(CindervaneAbilities.BITE_ID, RiderAbilityBinding.Activation.PRESS);
+        String abilityId = getMeleeMode() == 0
+                ? CindervaneAbilities.BITE_ID
+                : CindervaneAbilities.SLASH_GRAB_ID;
+        return new RiderAbilityBinding(abilityId, RiderAbilityBinding.Activation.PRESS);
     }
 
 
@@ -2134,12 +2138,14 @@ public class Cindervane extends RideableDragonBase implements DragonFlightCapabl
 
     @Override
     public DragonAbilityType<?, ?> getPrimaryAttackAbility() {
-        return CindervaneAbilities.BITE;
+        return getMeleeMode() == 0
+                ? CindervaneAbilities.BITE
+                : CindervaneAbilities.SLASH_GRAB;
     }
 
     @Override
     public boolean hasSecondaryMelee() {
-        return false; // Cindervane only has bite, no secondary melee
+        return true;
     }
 
     @Override
@@ -2230,7 +2236,11 @@ public class Cindervane extends RideableDragonBase implements DragonFlightCapabl
             return;
         }
         DragonAbilityType<?, ?> type = AbilityRegistry.get(abilityName);
-        if (type == CindervaneAbilities.BITE || type == CindervaneAbilities.FIRE_BODY || type == CindervaneAbilities.ROAR || type == CindervaneAbilities.FIRE_BREATH_VOLLEY) {
+        if (type == CindervaneAbilities.BITE
+                || type == CindervaneAbilities.SLASH_GRAB
+                || type == CindervaneAbilities.FIRE_BODY
+                || type == CindervaneAbilities.ROAR
+                || type == CindervaneAbilities.FIRE_BREATH_VOLLEY) {
             combatManager.tryUseAbility(type);
         }
     }
@@ -2243,9 +2253,9 @@ public class Cindervane extends RideableDragonBase implements DragonFlightCapabl
 
     @Override
     public boolean doHurtTarget(net.minecraft.world.entity.@NotNull Entity target) {
-        // Use bite ability for melee attacks
+        // Use selected melee ability for AI melee attacks
         if (!this.isVehicle() && !this.isOrderedToSit()) {
-            combatManager.tryUseAbility(CindervaneAbilities.BITE);
+            combatManager.tryUseAbility(getPrimaryAttackAbility());
         }
         // Return true to indicate we handled the attack
         return true;
@@ -2681,6 +2691,23 @@ public class Cindervane extends RideableDragonBase implements DragonFlightCapabl
     public Vec3 getClientLocatorPosition(String name) {
         if (name == null) return null;
         return this.clientLocatorCache.get(name);
+    }
+
+    public void setServerBonePosition(String boneName, Vec3 position) {
+        if (boneName == null || position == null) {
+            return;
+        }
+        this.serverBonePositionCache.put(boneName, position);
+    }
+
+    public Vec3 getBonePositionForPassenger(String boneName) {
+        if (boneName == null) {
+            return null;
+        }
+        if (this.level().isClientSide) {
+            return this.clientLocatorCache.get(boneName);
+        }
+        return this.serverBonePositionCache.get(boneName);
     }
 
     @Override

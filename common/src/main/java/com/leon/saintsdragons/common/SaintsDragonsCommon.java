@@ -42,6 +42,7 @@ public final class SaintsDragonsCommon {
         ModPotions.register();
         ModSounds.register();
         ModParticles.register();
+        ModMenus.register();
         SaintsCreativeTab.register();
 
         // Ensure ability registries are loaded on both logical sides.

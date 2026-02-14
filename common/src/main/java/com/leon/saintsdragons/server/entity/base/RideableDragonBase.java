@@ -133,6 +133,7 @@ public abstract class RideableDragonBase extends DragonEntity implements Rideabl
             case DOUBLE_TAP_A -> { if (!locked) onRiderDodge(player, true); }
             case DOUBLE_TAP_D -> { if (!locked) onRiderDodge(player, false); }
             case DOUBLE_TAP_W -> { if (!locked) onRiderBulldoze(player); }
+            case OPEN_INVENTORY -> { if (!locked) onRiderOpenInventory(player); }
             default -> { }
         }
     }
@@ -157,7 +158,7 @@ public abstract class RideableDragonBase extends DragonEntity implements Rideabl
             case TAKEOFF_REQUEST, ACCELERATE, STOP_ACCELERATE, TOGGLE_MELEE -> true;
             case ABILITY_USE, ABILITY_STOP,
                  DOUBLE_TAP_A, DOUBLE_TAP_D, DOUBLE_TAP_W, DOUBLE_TAP_S,
-                 TAUNT, TOGGLE_PITCH_MODE -> false;
+                 TAUNT, TOGGLE_PITCH_MODE, OPEN_INVENTORY -> false;
             default -> true;
         };
     }
@@ -269,6 +270,12 @@ public abstract class RideableDragonBase extends DragonEntity implements Rideabl
         if (!supportsRiderAction(DragonRiderAction.ABILITY_STOP)) {
             warnMissingAction("ability_stop");
             return;
+        }
+    }
+
+    protected void onRiderOpenInventory(Player player) {
+        if (!supportsRiderAction(DragonRiderAction.OPEN_INVENTORY)) {
+            warnMissingAction("open_inventory");
         }
     }
 

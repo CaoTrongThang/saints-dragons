@@ -22,6 +22,7 @@ public record MessageDragonBonePositions(
 ) {
     // Bone names that we sync for hitbox positioning
     public static final String[] SYNCED_BONES = {
+            "automountBoneRight",
             "headController",
             "neck3Controller",
             "hip",
@@ -88,17 +89,24 @@ public record MessageDragonBonePositions(
 
         // Find the entity in the server world
         Entity entity = player.serverLevel().getEntity(msg.entityId());
-        if (!(entity instanceof com.leon.saintsdragons.server.entity.dragons.ignivorus.Ignivorus ignivorus)) {
+        if (entity instanceof com.leon.saintsdragons.server.entity.dragons.ignivorus.Ignivorus ignivorus) {
+            // Only accept bone updates for the dragon the sender is actively controlling.
+            if (player.getVehicle() != ignivorus || !ignivorus.canBeControlledBy(player)) {
+                return;
+            }
+            for (Map.Entry<String, Vec3> entry : msg.bonePositions().entrySet()) {
+                ignivorus.setServerBonePosition(entry.getKey(), entry.getValue());
+            }
             return;
         }
 
-        // Only accept bone updates for the dragon the sender is actively controlling.
-        if (player.getVehicle() != ignivorus || !ignivorus.canBeControlledBy(player)) {
-            return;
-        }
-
-        for (Map.Entry<String, Vec3> entry : msg.bonePositions().entrySet()) {
-            ignivorus.setServerBonePosition(entry.getKey(), entry.getValue());
+        if (entity instanceof com.leon.saintsdragons.server.entity.dragons.cindervane.Cindervane cindervane) {
+            if (player.getVehicle() != cindervane || !cindervane.canBeControlledBy(player)) {
+                return;
+            }
+            for (Map.Entry<String, Vec3> entry : msg.bonePositions().entrySet()) {
+                cindervane.setServerBonePosition(entry.getKey(), entry.getValue());
+            }
         }
     }
 }

@@ -22,6 +22,7 @@ import com.leon.saintsdragons.server.entity.handler.DragonSoundHandler;
 import com.leon.saintsdragons.server.entity.interfaces.DragonSoundProfile;
 import com.leon.saintsdragons.server.entity.interfaces.PackMember;
 import com.leon.saintsdragons.server.entity.interfaces.SoundHandledDragon;
+import com.leon.saintsdragons.server.menu.StegonautInventoryMenu;
 import com.leon.saintsdragons.common.network.DragonRiderAction;
 import net.minecraft.core.Direction;
 import net.minecraft.world.entity.EntityType;
@@ -41,6 +42,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.phys.Vec3;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.AgeableMob;
 import net.minecraft.network.syncher.SynchedEntityData;
 import java.util.Map;
@@ -59,8 +61,13 @@ import com.leon.saintsdragons.common.block.StegonautEggBlockEntity;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
+import net.minecraft.world.SimpleContainer;
+import net.minecraft.world.SimpleMenuProvider;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
 import net.minecraft.network.chat.Component;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.world.Container;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import javax.annotation.Nonnull;
@@ -76,6 +83,7 @@ public class Stegonaut extends RideableDragonBase implements SoundHandledDragon,
     private final StegonautAnimationHandler animationController = new StegonautAnimationHandler(this);
     private final DragonSoundHandler soundHandler = new DragonSoundHandler(this);
     private final StegonautRiderController riderController = new StegonautRiderController(this);
+    private final SimpleContainer stegonautChestInventory = new SimpleContainer(STEGONAUT_CHEST_SLOTS);
     // Passive aura that applies resistance and absorption to allies
     private final StegonautPassiveBuffAbility passiveBuffAbility =
             new StegonautPassiveBuffAbility(this);
@@ -143,6 +151,10 @@ public class Stegonaut extends RideableDragonBase implements SoundHandledDragon,
             net.minecraft.network.syncher.SynchedEntityData.defineId(Stegonaut.class, net.minecraft.network.syncher.EntityDataSerializers.BOOLEAN);
     private static final net.minecraft.network.syncher.EntityDataAccessor<Boolean> DATA_RUNNING =
             net.minecraft.network.syncher.SynchedEntityData.defineId(Stegonaut.class, net.minecraft.network.syncher.EntityDataSerializers.BOOLEAN);
+    private static final net.minecraft.network.syncher.EntityDataAccessor<Boolean> DATA_HAS_CHEST =
+            net.minecraft.network.syncher.SynchedEntityData.defineId(Stegonaut.class, net.minecraft.network.syncher.EntityDataSerializers.BOOLEAN);
+
+    private static final int STEGONAUT_CHEST_SLOTS = 15;
 
     // ===== RIDING SPEED CONSTANTS =====
     public static final double RIDER_WALK_SPEED = 0.1D;
@@ -198,6 +210,7 @@ public class Stegonaut extends RideableDragonBase implements SoundHandledDragon,
         builder.define(DATA_GOING_UP, false);
         builder.define(DATA_GOING_DOWN, false);
         builder.define(DATA_RUNNING, false);
+        builder.define(DATA_HAS_CHEST, false);
     }
 
     @Override
@@ -276,7 +289,7 @@ public class Stegonaut extends RideableDragonBase implements SoundHandledDragon,
     @Override
     protected boolean supportsRiderAction(DragonRiderAction action) {
         return switch (action) {
-            case ABILITY_USE, ABILITY_STOP -> true;
+            case ABILITY_USE, ABILITY_STOP, OPEN_INVENTORY -> true;
             default -> super.supportsRiderAction(action);
         };
     }
@@ -299,6 +312,13 @@ public class Stegonaut extends RideableDragonBase implements SoundHandledDragon,
                 }
             }
             forceEndActiveAbility();
+        }
+    }
+
+    @Override
+    protected void onRiderOpenInventory(Player player) {
+        if (player instanceof ServerPlayer serverPlayer) {
+            openStegonautInventory(serverPlayer);
         }
     }
     @Override
@@ -730,6 +750,28 @@ public class Stegonaut extends RideableDragonBase implements SoundHandledDragon,
 
         // Fall back to base implementation for other interactions
         return super.mobInteract(player, hand);
+    }
+
+    private void dropStegonautChestContents() {
+        if (this.level().isClientSide) {
+            return;
+        }
+        for (int i = 0; i < stegonautChestInventory.getContainerSize(); i++) {
+            ItemStack stack = stegonautChestInventory.getItem(i);
+            if (!stack.isEmpty()) {
+                this.spawnAtLocation(stack.copy());
+                stegonautChestInventory.setItem(i, ItemStack.EMPTY);
+            }
+        }
+    }
+
+    public void removeStegonautChestAndDropContents() {
+        if (this.level().isClientSide || !hasStegonautChest()) {
+            return;
+        }
+        dropStegonautChestContents();
+        this.spawnAtLocation(new ItemStack(Items.CHEST));
+        setStegonautChest(false);
     }
 
     private InteractionResult handleMounting(Player player) {
@@ -1363,6 +1405,35 @@ public class Stegonaut extends RideableDragonBase implements SoundHandledDragon,
 
     // ===== SAVE/LOAD DATA =====
 
+    public boolean hasStegonautChest() {
+        return this.entityData.get(DATA_HAS_CHEST);
+    }
+
+    public void setStegonautChest(boolean value) {
+        this.entityData.set(DATA_HAS_CHEST, value);
+        if (!value) {
+            stegonautChestInventory.clearContent();
+        }
+    }
+
+    public Container getStegonautChestInventory() {
+        return stegonautChestInventory;
+    }
+
+    public int getStegonautChestColumns() {
+        return 5;
+    }
+
+    private void openStegonautInventory(ServerPlayer player) {
+        if (!this.isAlive() || player.distanceToSqr(this) > 64.0D) {
+            return;
+        }
+        player.openMenu(new SimpleMenuProvider(
+                (containerId, playerInventory, ignored) -> new StegonautInventoryMenu(containerId, playerInventory, this),
+                this.getDisplayName()
+        ));
+    }
+
     @Override
     public void addAdditionalSaveData(net.minecraft.nbt.@NotNull CompoundTag tag) {
         super.addAdditionalSaveData(tag);
@@ -1379,6 +1450,11 @@ public class Stegonaut extends RideableDragonBase implements SoundHandledDragon,
         tag.putBoolean("BoundToBinder", boundToBinder);
         if (this.packLeaderUuid != null) {
             tag.putUUID("PackLeaderUuid", this.packLeaderUuid);
+        }
+
+        tag.putBoolean("StegonautHasChest", hasStegonautChest());
+        if (hasStegonautChest()) {
+            tag.put("StegonautChestItems", stegonautChestInventory.createTag(this.registryAccess()));
         }
 
         // Save sit progress for animation state
@@ -1410,6 +1486,14 @@ public class Stegonaut extends RideableDragonBase implements SoundHandledDragon,
         this.packLeaderUuid = tag.hasUUID("PackLeaderUuid") ? tag.getUUID("PackLeaderUuid") : null;
         if (this.isTame()) {
             this.packLeaderUuid = null;
+        }
+
+        setStegonautChest(tag.getBoolean("StegonautHasChest"));
+        if (hasStegonautChest() && tag.contains("StegonautChestItems", net.minecraft.nbt.Tag.TAG_LIST)) {
+            stegonautChestInventory.fromTag(
+                    tag.getList("StegonautChestItems", net.minecraft.nbt.Tag.TAG_COMPOUND),
+                    this.registryAccess()
+            );
         }
 
         // Load sit progress for animation state prior to command refresh so poses align immediately

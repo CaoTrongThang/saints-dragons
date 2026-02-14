@@ -8,6 +8,7 @@ import com.leon.saintsdragons.server.entity.ability.abilities.cindervane.Cinderv
 import com.leon.saintsdragons.server.entity.ability.abilities.cindervane.CindervaneFireBodyAbility;
 import com.leon.saintsdragons.server.entity.ability.abilities.cindervane.CindervaneVolleyAbility;
 import com.leon.saintsdragons.server.entity.ability.abilities.cindervane.CindervaneRoarAbility;
+import com.leon.saintsdragons.server.entity.ability.abilities.cindervane.CindervaneSlashGrabAbility;
 import com.leon.saintsdragons.server.entity.dragons.cindervane.Cindervane;
 
 /**
@@ -20,6 +21,7 @@ public final class CindervaneAbilities {
     public static final String FIRE_BODY_ID = "cindervane_fire_body";
     public static final String ROAR_ID = "cindervane_roar";
     public static final String FIRE_BREATH_VOLLEY_ID = "cindervane_fire_breath_volley";
+    public static final String SLASH_GRAB_ID = "cindervane_slash_grab";
     public static final String HURT_ID = "cindervane_hurt";
     public static final String DIE_ID = "cindervane_die";
 
@@ -35,6 +37,9 @@ public final class CindervaneAbilities {
 
     public static final DragonAbilityType<Cindervane, CindervaneVolleyAbility> FIRE_BREATH_VOLLEY =
             AbilityRegistry.register(new DragonAbilityType<>(FIRE_BREATH_VOLLEY_ID, CindervaneVolleyAbility::new));
+
+    public static final DragonAbilityType<Cindervane, CindervaneSlashGrabAbility> SLASH_GRAB =
+            AbilityRegistry.register(new DragonAbilityType<>(SLASH_GRAB_ID, CindervaneSlashGrabAbility::new));
 
     public static final DragonAbilityType<Cindervane, HurtAbility<Cindervane>> HURT =
             AbilityRegistry.register(new DragonAbilityType<>(HURT_ID, HurtAbility::new));
