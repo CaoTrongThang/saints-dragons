@@ -80,74 +80,56 @@ public final class SaintsDragonsConfig {
 
         builder.push("spawning");
         builder.comment("Dragon spawn configuration - control where and how often dragons spawn");
+        builder.comment("Note: spawn weights are relative per biome/category roll.");
+        builder.comment("Final spawn frequency also depends on each dragon's spawn predicate and placement checks.");
 
         builder.comment("Raevyx spawn settings");
-        builder.translation("saintsdragons.config.raevyxSpawnWeight");
         RAEVYX_SPAWN_WEIGHT = builder.defineInt("raevyxSpawnWeight", RAEVYX_SPAWN_WEIGHT_DEFAULT, 0, 100);
-        builder.translation("saintsdragons.config.raevyxMinGroupSize");
         RAEVYX_MIN_GROUP_SIZE = builder.defineInt("raevyxMinGroupSize", RAEVYX_MIN_GROUP_SIZE_DEFAULT, 1, 10);
-        builder.translation("saintsdragons.config.raevyxMaxGroupSize");
         RAEVYX_MAX_GROUP_SIZE = builder.defineInt("raevyxMaxGroupSize", RAEVYX_MAX_GROUP_SIZE_DEFAULT, 1, 10);
-        builder.comment("Additional biomes where Raevyx can spawn (e.g., \"minecraft:desert\", \"terralith:volcanic_crater\")");
-        builder.translation("saintsdragons.config.raevyxAdditionalBiomes");
+        builder.comment("Additional biome IDs or biome tags where Raevyx can spawn (e.g., \"minecraft:desert\", \"terralith:volcanic_crater\", \"#c:is_overworld\")");
         RAEVYX_ADDITIONAL_BIOMES = builder.defineList("raevyxAdditionalBiomes", Collections.emptyList());
-        builder.comment("Default tagged biomes where Raevyx should NOT spawn");
+        builder.comment("Biome IDs or biome tags to exclude from default Raevyx spawns (e.g., \"minecraft:plains\", \"#minecraft:is_ocean\")");
         RAEVYX_EXCLUDED_BIOMES = builder.defineList("raevyxExcludedBiomes", Collections.emptyList());
 
-        builder.comment("Stegonaut spawn settings");
-        builder.translation("saintsdragons.config.stegonautSpawnWeight");
+        builder.comment("Stegonaut spawn settings (land-focused; broaden via additional biome IDs/tags as needed)");
         STEGONAUT_SPAWN_WEIGHT = builder.defineInt("stegonautSpawnWeight", STEGONAUT_SPAWN_WEIGHT_DEFAULT, 0, 100);
-        builder.translation("saintsdragons.config.stegonautMinGroupSize");
         STEGONAUT_MIN_GROUP_SIZE = builder.defineInt("stegonautMinGroupSize", STEGONAUT_MIN_GROUP_SIZE_DEFAULT, 1, 10);
-        builder.translation("saintsdragons.config.stegonautMaxGroupSize");
         STEGONAUT_MAX_GROUP_SIZE = builder.defineInt("stegonautMaxGroupSize", STEGONAUT_MAX_GROUP_SIZE_DEFAULT, 1, 10);
-        builder.comment("Additional biomes where Stegonaut can spawn (e.g., \"minecraft:desert\", \"terralith:volcanic_crater\")");
-        builder.translation("saintsdragons.config.stegonautAdditionalBiomes");
+        builder.comment("Additional biome IDs or biome tags where Stegonaut can spawn (e.g., \"minecraft:desert\", \"terralith:volcanic_crater\", \"#c:is_overworld\")");
         STEGONAUT_ADDITIONAL_BIOMES = builder.defineList("stegonautAdditionalBiomes", Collections.emptyList());
-        builder.comment("Default tagged biomes where Stegonaut should NOT spawn");
+        builder.comment("Biome IDs or biome tags to exclude from default Stegonaut spawns (e.g., \"minecraft:plains\", \"#minecraft:is_ocean\")");
         STEGONAUT_EXCLUDED_BIOMES = builder.defineList("stegonautExcludedBiomes", Collections.emptyList());
 
         builder.comment("Cindervane spawn settings");
-        builder.translation("saintsdragons.config.cindervaneSpawnWeight");
         CINDERVANE_SPAWN_WEIGHT = builder.defineInt("cindervaneSpawnWeight", CINDERVANE_SPAWN_WEIGHT_DEFAULT, 0, 100);
-        builder.translation("saintsdragons.config.cindervaneMinGroupSize");
         CINDERVANE_MIN_GROUP_SIZE = builder.defineInt("cindervaneMinGroupSize", CINDERVANE_MIN_GROUP_SIZE_DEFAULT, 1, 10);
-        builder.translation("saintsdragons.config.cindervaneMaxGroupSize");
         CINDERVANE_MAX_GROUP_SIZE = builder.defineInt("cindervaneMaxGroupSize", CINDERVANE_MAX_GROUP_SIZE_DEFAULT, 1, 10);
-        builder.comment("Additional biomes where Cindervane can spawn (e.g., \"minecraft:desert\", \"terralith:volcanic_crater\")");
-        builder.translation("saintsdragons.config.cindervaneAdditionalBiomes");
+        builder.comment("Additional biome IDs or biome tags where Cindervane can spawn (e.g., \"minecraft:desert\", \"terralith:volcanic_crater\", \"#c:is_overworld\")");
         CINDERVANE_ADDITIONAL_BIOMES = builder.defineList("cindervaneAdditionalBiomes", Collections.emptyList());
-        builder.comment("Default tagged biomes where Cindervane should NOT spawn");
+        builder.comment("Biome IDs or biome tags to exclude from default Cindervane spawns (e.g., \"minecraft:plains\", \"#minecraft:is_ocean\")");
         CINDERVANE_EXCLUDED_BIOMES = builder.defineList("cindervaneExcludedBiomes", Collections.emptyList());
         builder.comment("Whether Cindervane egg blocks generate in worldgen feature patches");
         CINDERVANE_EGG_BLOCK_WORLDGEN = builder.defineBoolean("cindervaneEggBlockWorldgen", CINDERVANE_EGG_BLOCK_WORLDGEN_DEFAULT);
 
-        builder.comment("Nulljaw spawn settings");
-        builder.translation("saintsdragons.config.nulljawSpawnWeight");
+        builder.comment("Nulljaw spawn settings (semi-aquatic; biome tags can massively expand coverage)");
         NULLJAW_SPAWN_WEIGHT = builder.defineInt("nulljawSpawnWeight", NULLJAW_SPAWN_WEIGHT_DEFAULT, 0, 100);
-        builder.translation("saintsdragons.config.nulljawMinGroupSize");
         NULLJAW_MIN_GROUP_SIZE = builder.defineInt("nulljawMinGroupSize", NULLJAW_MIN_GROUP_SIZE_DEFAULT, 1, 10);
-        builder.translation("saintsdragons.config.nulljawMaxGroupSize");
         NULLJAW_MAX_GROUP_SIZE = builder.defineInt("nulljawMaxGroupSize", NULLJAW_MAX_GROUP_SIZE_DEFAULT, 1, 10);
-        builder.comment("Additional biomes where Nulljaw can spawn (e.g., \"minecraft:desert\", \"terralith:volcanic_crater\")");
-        builder.translation("saintsdragons.config.nulljawAdditionalBiomes");
+        builder.comment("Additional biome IDs or biome tags where Nulljaw can spawn (e.g., \"minecraft:desert\", \"terralith:volcanic_crater\", \"#c:is_overworld\")");
         NULLJAW_ADDITIONAL_BIOMES = builder.defineList("nulljawAdditionalBiomes", Collections.emptyList());
-        builder.comment("Default tagged biomes where Nulljaw should NOT spawn");
+        builder.comment("Biome IDs or biome tags to exclude from default Nulljaw spawns (e.g., \"minecraft:plains\", \"#minecraft:is_ocean\")");
         NULLJAW_EXCLUDED_BIOMES = builder.defineList("nulljawExcludedBiomes", Collections.emptyList());
         builder.comment("Whether Nulljaw egg blocks generate in worldgen feature patches");
         NULLJAW_EGG_BLOCK_WORLDGEN = builder.defineBoolean("nulljawEggBlockWorldgen", NULLJAW_EGG_BLOCK_WORLDGEN_DEFAULT);
 
         builder.comment("Ignivorus spawn settings");
-        builder.translation("saintsdragons.config.ignivorusSpawnWeight");
         IGNIVORUS_SPAWN_WEIGHT = builder.defineInt("ignivorusSpawnWeight", IGNIVORUS_SPAWN_WEIGHT_DEFAULT, 0, 100);
-        builder.translation("saintsdragons.config.ignivorusMinGroupSize");
         IGNIVORUS_MIN_GROUP_SIZE = builder.defineInt("ignivorusMinGroupSize", IGNIVORUS_MIN_GROUP_SIZE_DEFAULT, 1, 10);
-        builder.translation("saintsdragons.config.ignivorusMaxGroupSize");
         IGNIVORUS_MAX_GROUP_SIZE = builder.defineInt("ignivorusMaxGroupSize", IGNIVORUS_MAX_GROUP_SIZE_DEFAULT, 1, 10);
-        builder.comment("Additional biomes where Ignivorus can spawn (e.g., \"minecraft:desert\", \"terralith:volcanic_crater\")");
-        builder.translation("saintsdragons.config.ignivorusAdditionalBiomes");
+        builder.comment("Additional biome IDs or biome tags where Ignivorus can spawn (e.g., \"minecraft:desert\", \"terralith:volcanic_crater\", \"#c:is_overworld\")");
         IGNIVORUS_ADDITIONAL_BIOMES = builder.defineList("ignivorusAdditionalBiomes", Collections.emptyList());
-        builder.comment("Default tagged biomes where Ignivorus should NOT spawn");
+        builder.comment("Biome IDs or biome tags to exclude from default Ignivorus spawns (e.g., \"minecraft:plains\", \"#minecraft:is_ocean\")");
         IGNIVORUS_EXCLUDED_BIOMES = builder.defineList("ignivorusExcludedBiomes", Collections.emptyList());
 
         builder.pop();

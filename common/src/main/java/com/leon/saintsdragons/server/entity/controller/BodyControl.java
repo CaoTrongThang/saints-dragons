@@ -1,5 +1,6 @@
 package com.leon.saintsdragons.server.entity.controller;
 
+import com.leon.saintsdragons.server.entity.base.DragonEntity;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.ai.control.BodyRotationControl;
@@ -13,7 +14,7 @@ import net.minecraft.world.entity.ai.control.BodyRotationControl;
  * - Prevents jitter by locking body rotation during movement
  */
 public class BodyControl extends BodyRotationControl {
-    private static final double MOVING_EPSILON_SQ = 2.5E-7;
+    private static final double MOVING_EPSILON_SQ = 1.0E-4;
     private static final int HISTORY_SIZE = 10;
     private final Mob entity;
     private float targetYawHead;
@@ -51,6 +52,10 @@ public class BodyControl extends BodyRotationControl {
         // Skip if ridden (rider controls rotation, synced from server)
         // CRITICAL: Also skip for observers - let vanilla sync handle body rotation!
         if (this.entity.isVehicle()) {
+            return;
+        }
+        if (shouldLockForSitting()) {
+            freezeSeatedRotation();
             return;
         }
 
@@ -98,6 +103,10 @@ public class BodyControl extends BodyRotationControl {
     public void serverTick() {
         // Skip if ridden (rider controls rotation)
         if (this.entity.isVehicle()) {
+            return;
+        }
+        if (shouldLockForSitting()) {
+            freezeSeatedRotation();
             return;
         }
 
@@ -184,5 +193,19 @@ public class BodyControl extends BodyRotationControl {
         float delta = Mth.wrapDegrees(target - current);
         delta = Mth.clamp(delta, -maxDelta, maxDelta);
         return current + delta * speed;
+    }
+
+    private boolean shouldLockForSitting() {
+        if (!(this.entity instanceof DragonEntity dragon)) {
+            return false;
+        }
+        return dragon.isOrderedToSit() || dragon.getSitProgress() > 0.0f;
+    }
+
+    private void freezeSeatedRotation() {
+        float yaw = this.entity.getYRot();
+        this.entity.yBodyRot = yaw;
+        this.entity.yHeadRot = yaw;
+        this.targetYawHead = yaw;
     }
 }
