@@ -32,6 +32,7 @@ import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.ai.goal.FloatGoal;
+import net.minecraft.world.entity.ai.goal.target.NearestAttackableTargetGoal;
 import net.minecraft.world.entity.ai.goal.target.HurtByTargetGoal;
 import net.minecraft.world.entity.animal.Animal;
 import net.minecraft.world.entity.player.Player;
@@ -55,6 +56,7 @@ import com.leon.saintsdragons.common.registry.ModItems;
 import com.leon.saintsdragons.common.registry.ModSounds;
 import com.leon.saintsdragons.common.registry.AbilityRegistry;
 import com.leon.saintsdragons.common.registry.stegonaut.StegonautAbilities;
+import com.leon.saintsdragons.server.entity.util.ClientAnimationInitHelper;
 import com.leon.saintsdragons.common.config.dragon.DragonAttributeConfig;
 import com.leon.saintsdragons.common.config.dragon.DragonAttributeConfigLoader;
 import com.leon.saintsdragons.common.block.StegonautEggBlockEntity;
@@ -131,7 +133,6 @@ public class Stegonaut extends RideableDragonBase implements SoundHandledDragon,
 
     // Client-side animation initialization grace period (fixes T-pose on world rejoin with shaders)
     private int clientAnimInitTicks = 0;
-    private static final int ANIM_INIT_GRACE_PERIOD = 5; // Wait 5 ticks for entity data sync
 
     // Synced ground movement state for reliable animation
     private static final net.minecraft.network.syncher.EntityDataAccessor<Integer> DATA_GROUND_MOVE_STATE =
@@ -244,6 +245,8 @@ public class Stegonaut extends RideableDragonBase implements SoundHandledDragon,
         this.targetSelector.addGoal(3, new DragonOwnerHurtTargetGoal(this));
         this.targetSelector.addGoal(4, new DragonPackDefendPackGoal<>(this, Stegonaut.class, 36.0D));
         this.targetSelector.addGoal(5, new HurtByTargetGoal(this));
+        this.targetSelector.addGoal(6, new NearestAttackableTargetGoal<>(this, Player.class, 10, true, false,
+                target -> isAggressiveWild()));
     }
 
     @Override
@@ -1192,10 +1195,8 @@ public class Stegonaut extends RideableDragonBase implements SoundHandledDragon,
         // Tick sound handler
         soundHandler.tick();
 
-        // Increment animation initialization counter on client (prevents T-pose on rejoin with shaders)
-        if (level().isClientSide && clientAnimInitTicks < ANIM_INIT_GRACE_PERIOD) {
-            clientAnimInitTicks++;
-        }
+        // Grace period avoids shader-time race conditions that can cause brief T-poses on rejoin.
+        clientAnimInitTicks = ClientAnimationInitHelper.tickClientCounter(level().isClientSide, clientAnimInitTicks);
 
         // Handle ambient sounds (server-side only)
         if (!level().isClientSide) {
@@ -1238,7 +1239,7 @@ public class Stegonaut extends RideableDragonBase implements SoundHandledDragon,
     }
     // Animation initialization system (fixes T-pose on world rejoin with shaders)
     public boolean isClientAnimationReady() {
-        return clientAnimInitTicks >= ANIM_INIT_GRACE_PERIOD;
+        return ClientAnimationInitHelper.isReady(clientAnimInitTicks);
     }
 
     // ===== SOUND KEYFRAME HANDLING =====
@@ -1575,10 +1576,19 @@ public class Stegonaut extends RideableDragonBase implements SoundHandledDragon,
             return false;
         }
         if (entity instanceof Player player && !this.isTame()) {
-            // Wild Stegonauts should only retaliate against players that actually hurt them.
-            return this.getLastHurtByMob() == player;
+            // Aggressive mode: attack on sight. Default mode: retaliation-only targeting.
+            if (isAggressiveWild()) {
+                return !player.isCreative() && !player.isSpectator();
+            }
+            return this.getLastHurtByMob() == player || this.getTarget() == player;
         }
         return super.canTarget(entity);
+    }
+
+    private boolean isAggressiveWild() {
+        return DragonAttributeConfigLoader.getInstance()
+                .getConfig(DragonAttributeConfigLoader.STEGONAUT_ID)
+                .extraBoolean("aggressive_wild", false);
     }
 
     @Override

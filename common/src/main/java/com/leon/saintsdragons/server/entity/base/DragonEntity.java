@@ -683,7 +683,7 @@ public abstract class DragonEntity extends TamableAnimal implements GeoEntity {
         if (directAttacker instanceof Player player && player.getVehicle() == this) {
             return true;
         }
-        if (directAttacker == this.getControllingPassenger()) {
+        if (directAttacker != null && directAttacker == this.getControllingPassenger()) {
             return true;
         }
 
@@ -693,7 +693,7 @@ public abstract class DragonEntity extends TamableAnimal implements GeoEntity {
             if (projectileOwner instanceof Player player && player.getVehicle() == this) {
                 return true;
             }
-            return projectileOwner == this.getControllingPassenger();
+            return projectileOwner != null && projectileOwner == this.getControllingPassenger();
         }
 
         return false;

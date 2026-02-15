@@ -2,6 +2,7 @@ package com.leon.saintsdragons.server.entity.effect.ignivorus;
 
 import com.leon.saintsdragons.common.registry.ModEntities;
 import com.leon.saintsdragons.server.entity.dragons.ignivorus.Ignivorus;
+import com.leon.saintsdragons.server.entity.dragons.util.DragonGriefingRules;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.nbt.CompoundTag;
@@ -17,6 +18,7 @@ import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.Pose;
 import net.minecraft.world.entity.EntityDimensions;
 import net.minecraft.world.entity.projectile.ProjectileUtil;
+import net.minecraft.world.level.GameRules;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
@@ -223,6 +225,9 @@ public class IgnivorusMagmaBlockEntity extends Entity {
         float scale = getVisualScale();
         BlockPos impactPos = BlockPos.containing(impact);
         boolean aiFireball = owner != null && owner.getControllingPassenger() == null;
+        boolean allowGriefing = !aiFireball
+                && server.getGameRules().getBoolean(GameRules.RULE_MOBGRIEFING)
+                && DragonGriefingRules.canIgnivorusGriefing();
 
         // Core explosion particles - scale with fireball size
         server.sendParticles(ParticleTypes.LAVA, impact.x, impact.y + 0.5D * scale, impact.z, capParticles(10, scale, 60),
@@ -240,7 +245,7 @@ public class IgnivorusMagmaBlockEntity extends Entity {
                     1.2D * scale, 1.0D * scale, 1.2D * scale, 0.1D);
 
             // Destroy blocks for charge level 2+ (radius 6 = ~13 block diameter crater)
-            if (!aiFireball) {
+            if (allowGriefing) {
                 destroyBlocks(server, impactPos, 6, false);
             }
         }
@@ -254,7 +259,7 @@ public class IgnivorusMagmaBlockEntity extends Entity {
                     2.0D * scale, 1.0D * scale, 2.0D * scale, 0.2D);
 
             // Massive block destruction radius for max charge (radius 12 = ~25 block diameter crater)
-            if (!aiFireball) {
+            if (allowGriefing) {
                 destroyBlocks(server, impactPos, 12, true);
             }
         }
@@ -281,7 +286,7 @@ public class IgnivorusMagmaBlockEntity extends Entity {
             }
         }
 
-        if (!aiFireball) {
+        if (allowGriefing) {
             igniteArea(server, impactPos);
         }
         discard();

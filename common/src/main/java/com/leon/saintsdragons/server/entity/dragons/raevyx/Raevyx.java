@@ -35,6 +35,7 @@ import com.leon.saintsdragons.server.entity.controller.raevyx.RaevyxRiderControl
 import com.leon.saintsdragons.server.entity.handler.DragonSoundHandler;
 import com.leon.saintsdragons.server.entity.ability.DragonAbility;
 import com.leon.saintsdragons.server.entity.ability.DragonAbilityType;
+import com.leon.saintsdragons.server.entity.util.ClientAnimationInitHelper;
 import com.leon.saintsdragons.common.registry.ModEntities;
 import com.leon.saintsdragons.common.registry.ModSounds;
 import com.leon.saintsdragons.common.registry.AbilityRegistry;
@@ -104,6 +105,9 @@ import java.util.concurrent.ConcurrentHashMap;
 public class Raevyx extends RideableDragonBase implements FlyingAnimal, RangedAttackMob,
         DragonFlightCapable, ShakesScreen, SoundHandledDragon, ElectricalConductivityCapable {
     private static final float TAMING_HEALTH_RATIO = 1.0F / 3.0F;
+    private static final float DEFAULT_DASH_DAMAGE = 10.0F;
+    public static final int VARIANT_DEFAULT = 0;
+    public static final int VARIANT_NIGHT_GOLD = 1;
 
     // ===== CONSTANTS =====
 
@@ -387,7 +391,6 @@ public class Raevyx extends RideableDragonBase implements FlyingAnimal, RangedAt
 
     // Client-side animation initialization grace period (fixes T-pose on world rejoin with shaders)
     private int clientAnimInitTicks = 0;
-    private static final int ANIM_INIT_GRACE_PERIOD = 5; // Wait 5 ticks for entity data sync
 
     private boolean allowGroundBeamDuringStorm = false;
     // Sit transition state
@@ -1775,8 +1778,8 @@ public class Raevyx extends RideableDragonBase implements FlyingAnimal, RangedAt
                     continue; // Skip this entity, still on cooldown
                 }
 
-                // Apply damage (10 HP)
-                target.hurt(this.damageSources().mobAttack(this), 10.0F);
+                // Apply configured dash impact damage
+                target.hurt(this.damageSources().mobAttack(this), getConfiguredDashDamage());
 
                 // Apply knockback from mouth position
                 double knockbackStrength = 1.5D;
@@ -1851,7 +1854,13 @@ public class Raevyx extends RideableDragonBase implements FlyingAnimal, RangedAt
 
     // Animation initialization system (fixes T-pose on world rejoin with shaders)
     public boolean isClientAnimationReady() {
-        return clientAnimInitTicks >= ANIM_INIT_GRACE_PERIOD;
+        return ClientAnimationInitHelper.isReady(clientAnimInitTicks);
+    }
+
+    private float getConfiguredDashDamage() {
+        return (float) DragonAttributeConfigLoader.getInstance()
+                .getConfig(DragonAttributeConfigLoader.RAEVYX_ID)
+                .abilityDamage("dash", DEFAULT_DASH_DAMAGE);
     }
 
     // ===== MAIN TICK METHOD =====
@@ -1869,10 +1878,8 @@ public class Raevyx extends RideableDragonBase implements FlyingAnimal, RangedAt
 
         // === CLIENT-SIDE ONLY ===
         if (level().isClientSide) {
-            // Increment animation initialization counter (prevents T-pose on rejoin with shaders)
-            if (clientAnimInitTicks < ANIM_INIT_GRACE_PERIOD) {
-                clientAnimInitTicks++;
-            }
+            // Grace period avoids shader-time race conditions that can cause brief T-poses on rejoin.
+            clientAnimInitTicks = ClientAnimationInitHelper.tickClientCounter(true, clientAnimInitTicks);
             tickSound();
             return; // Early exit for client - nothing else needed
         }
@@ -3562,7 +3569,6 @@ public class Raevyx extends RideableDragonBase implements FlyingAnimal, RangedAt
     public AABB getBoundingBoxForCulling() {
         return super.getBoundingBoxForCulling().inflate(5.0, 3.0, 5.0);
     }
-
     // Lightning immunity is now handled by DragonEntity base class via DragonType.LIGHTNING elemental profile
 
     // ===== BREATHING / AIR SUPPLY =====
