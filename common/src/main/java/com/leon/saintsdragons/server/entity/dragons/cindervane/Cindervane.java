@@ -367,11 +367,6 @@ public class Cindervane extends RideableDragonBase implements DragonFlightCapabl
     @Override
     public void ageBoundaryReached() {
         super.ageBoundaryReached();
-        // Babies use shared baby texture; roll adult variant on adulthood.
-        // Preserve explicitly set non-default variants (e.g., admin/command override).
-        if (this.getTextureVariant() == 0) {
-            this.setTextureVariant(this.rollRandomTextureVariant());
-        }
         // Refresh attributes when baby grows into adult
         applyConfiguredAttributes();
         this.refreshDimensions();

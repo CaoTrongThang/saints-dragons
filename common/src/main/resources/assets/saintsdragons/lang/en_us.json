@@ -132,6 +132,7 @@
 
   "saintsdragons.tooltip.cindervane_binder.description": "§6The wind hums within, restless yet graceful.§r",
   "saintsdragons.tooltip.cindervane_binder.empty": "Right-click on a tamed Cindervane to bind it",
+  "saintsdragons.tooltip.cindervane_binder.right_click_dragon_to_bind": "Ensure the Cindervane is grounded before binding",
   "saintsdragons.tooltip.cindervane_binder.right_click_cindervane_to_bind": "Right-click on ground to release bound Cindervane",
   "saintsdragons.tooltip.cindervane_binder.bound": "Contains: %s",
   "saintsdragons.tooltip.cindervane_binder.right_click_to_release": "Right-click on ground to release bound Cindervane",
@@ -139,6 +140,7 @@
   "saintsdragons.tooltip.ignivorus_binder.bound": "Contains: %s",
   "saintsdragons.tooltip.ignivorus_binder.right_click_to_release": "Right-click on ground to release bound Ignivorus",
   "saintsdragons.tooltip.ignivorus_binder.empty": "Right-click on a tamed Ignivorus to bind it",
+  "saintsdragons.tooltip.ignivorus_binder.right_click_dragon_to_bind": "Ensure the Ignivorus is grounded before binding",
   "saintsdragons.tooltip.ignivorus_binder.right_click_ignivorus_to_bind": "Ensure the Ignivorus is grounded before binding",
 
 
@@ -147,9 +149,15 @@
   "saintsdragons.tooltip.nulljaw.right_click_nulljaw_to_bind": "Right-click on ground to release bound Nulljaw",
   "saintsdragons.tooltip.nulljaw.bound": "Contains: %s",
   "saintsdragons.tooltip.nulljaw.right_click_to_release": "Right-click on ground to release bound Nulljaw",
+  "saintsdragons.tooltip.nulljaw_binder.description": "§1A shard of the abyss hums quietly inside.§1",
+  "saintsdragons.tooltip.nulljaw_binder.empty": "Right-click on a tamed Nulljaw to bind it",
+  "saintsdragons.tooltip.nulljaw_binder.right_click_dragon_to_bind": "Right-click on a tamed Nulljaw to bind it",
+  "saintsdragons.tooltip.nulljaw_binder.bound": "Contains: %s",
+  "saintsdragons.tooltip.nulljaw_binder.right_click_to_release": "Right-click on ground to release bound Nulljaw",
   
   "saintsdragons.message.dragon_not_found": "Dragon not found",
   "saintsdragons.message.not_dragon_owner": "You don't own this dragon",
+  "saintsdragons.message.binder_data_corrupted": "Binder data was corrupted and has been cleared",
   
   "saintsdragons.message.stegonaut_captured": "Bound %s in Stegonaut Binder!",
   "saintsdragons.message.stegonaut_released": "Released %s from Stegonaut Binder!",

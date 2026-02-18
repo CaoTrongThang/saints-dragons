@@ -2,6 +2,7 @@ package com.leon.saintsdragons.neoforge;
 
 import com.leon.saintsdragons.common.SaintsDragonsCommon;
 import com.leon.saintsdragons.common.config.dragon.DragonAttributeConfigLoader;
+import com.leon.saintsdragons.neoforge.init.NeoForgeBrewingRecipes;
 import com.leon.saintsdragons.neoforge.loot.ModLootModifiers;
 import com.leon.saintsdragons.neoforge.world.AddDragonsBiomeModifier;
 import com.mojang.serialization.MapCodec;
@@ -51,6 +52,9 @@ public class SaintsDragonsNeoForge {
         modContainer.registerConfig(ModConfig.Type.COMMON,
                 com.leon.saintsdragons.neoforge.platform.NeoForgeDragonAttributesConfig.ATTRIBUTES_SPEC,
                 "saintsdragons-attributes.toml");
+
+        // Register custom brewing recipes
+        NeoForge.EVENT_BUS.addListener(NeoForgeBrewingRecipes::register);
 
         // Register config screen for in-game editing
         modContainer.registerExtensionPoint(IConfigScreenFactory.class, ConfigurationScreen::new);

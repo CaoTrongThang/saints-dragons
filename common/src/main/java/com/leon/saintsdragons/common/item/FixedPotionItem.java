@@ -15,10 +15,8 @@ import net.minecraft.world.item.Items;
 import net.minecraft.world.item.PotionItem;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.item.alchemy.Potion;
-import net.minecraft.world.item.alchemy.Potions;
-import net.minecraft.world.item.alchemy.PotionUtils;
 import net.minecraft.world.level.Level;
-import org.jetbrains.annotations.Nullable;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 import java.util.function.Supplier;
@@ -31,16 +29,9 @@ public class FixedPotionItem extends PotionItem {
         this.potion = potion;
     }
 
-    private ItemStack ensurePotion(ItemStack stack) {
-        if (PotionUtils.getPotion(stack) == Potions.EMPTY) {
-            PotionUtils.setPotion(stack, this.potion.get());
-        }
-        return stack;
-    }
-
     @Override
     public ItemStack getDefaultInstance() {
-        return ensurePotion(super.getDefaultInstance());
+        return super.getDefaultInstance();
     }
 
     @Override
@@ -50,8 +41,6 @@ public class FixedPotionItem extends PotionItem {
 
     @Override
     public InteractionResultHolder<ItemStack> use(Level level, Player player, InteractionHand hand) {
-        ItemStack stack = player.getItemInHand(hand);
-        ensurePotion(stack);
         return super.use(level, player, hand);
     }
 
@@ -63,8 +52,8 @@ public class FixedPotionItem extends PotionItem {
 
         if (!level.isClientSide) {
             for (MobEffectInstance effectInstance : this.potion.get().getEffects()) {
-                if (effectInstance.getEffect().isInstantenous()) {
-                    effectInstance.getEffect().applyInstantenousEffect(
+                if (effectInstance.getEffect().value().isInstantenous()) {
+                    effectInstance.getEffect().value().applyInstantenousEffect(
                             null,
                             null,
                             livingEntity,
@@ -101,7 +90,12 @@ public class FixedPotionItem extends PotionItem {
     }
 
     @Override
-    public void appendHoverText(ItemStack stack, @Nullable Level level, List<Component> tooltipComponents, TooltipFlag tooltipFlag) {
-        PotionUtils.addPotionTooltip(this.potion.get().getEffects(), tooltipComponents, 1.0F);
+    public void appendHoverText(@NotNull ItemStack stack,
+                                @NotNull Item.TooltipContext context,
+                                @NotNull List<Component> tooltipComponents,
+                                @NotNull TooltipFlag tooltipFlag) {
+        for (MobEffectInstance effectInstance : this.potion.get().getEffects()) {
+            tooltipComponents.add(Component.translatable(effectInstance.getDescriptionId()));
+        }
     }
 }

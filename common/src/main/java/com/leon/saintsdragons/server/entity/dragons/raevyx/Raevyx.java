@@ -106,9 +106,6 @@ public class Raevyx extends RideableDragonBase implements FlyingAnimal, RangedAt
         DragonFlightCapable, ShakesScreen, SoundHandledDragon, ElectricalConductivityCapable {
     private static final float TAMING_HEALTH_RATIO = 1.0F / 3.0F;
     private static final float DEFAULT_DASH_DAMAGE = 10.0F;
-    public static final int VARIANT_DEFAULT = 0;
-    public static final int VARIANT_NIGHT_GOLD = 1;
-    private static final float NIGHT_GOLD_VARIANT_CHANCE = 0.15F;
 
     // ===== CONSTANTS =====
 
@@ -426,29 +423,6 @@ public class Raevyx extends RideableDragonBase implements FlyingAnimal, RangedAt
         this.entityData.set(DATA_FEEDING_COOLDOWN, ticks);
     }
 
-    @Override
-    protected int getMaxTextureVariant() {
-        // 0 = default, 1 = night_gold
-        return VARIANT_NIGHT_GOLD;
-    }
-
-    @Override
-    protected int chooseSpawnTextureVariant(@NotNull ServerLevelAccessor levelAccessor,
-                                            @NotNull DifficultyInstance difficulty,
-                                            @NotNull MobSpawnType reason,
-                                            @Nullable SpawnGroupData spawnData,
-                                            @Nullable CompoundTag spawnTag) {
-        // Night Gold is rare: 15% chance, default is 85%.
-        return rollAdultVariant();
-    }
-
-    @Override
-    public java.util.Map<String, Integer> getTextureVariantNameMap() {
-        return java.util.Map.of(
-                "default", VARIANT_DEFAULT,
-                "night_gold", VARIANT_NIGHT_GOLD
-        );
-    }
     public boolean isTamingStunned() {
         return this.entityData.get(DATA_TAMING_STUNNED);
     }
@@ -4363,18 +4337,9 @@ public class Raevyx extends RideableDragonBase implements FlyingAnimal, RangedAt
     @Override
     public void ageBoundaryReached() {
         super.ageBoundaryReached();
-        // Babies use shared baby textures; when reaching adulthood, roll adult skin variant.
-        // Keep an explicitly-set non-default variant (e.g., command/admin override).
-        if (this.getTextureVariant() == VARIANT_DEFAULT) {
-            this.setTextureVariant(rollAdultVariant());
-        }
         // Refresh hitbox dimensions when baby grows into adult
         applyConfiguredAttributes();
         this.refreshDimensions();
-    }
-
-    private int rollAdultVariant() {
-        return this.getRandom().nextFloat() < NIGHT_GOLD_VARIANT_CHANCE ? VARIANT_NIGHT_GOLD : VARIANT_DEFAULT;
     }
     @Override
     public boolean canMate(@Nonnull Animal otherAnimal) {

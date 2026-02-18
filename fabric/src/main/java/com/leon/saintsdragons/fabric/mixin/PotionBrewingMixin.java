@@ -2,10 +2,12 @@ package com.leon.saintsdragons.fabric.mixin;
 
 import com.leon.saintsdragons.common.registry.ModItems;
 import com.leon.saintsdragons.common.registry.ModPotions;
+import net.minecraft.core.component.DataComponents;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.alchemy.PotionBrewing;
-import net.minecraft.world.item.alchemy.PotionUtils;
+import net.minecraft.world.item.alchemy.PotionContents;
 import net.minecraft.world.item.alchemy.Potions;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
@@ -28,7 +30,8 @@ public final class PotionBrewingMixin {
             return;
         }
 
-        if (PotionUtils.getPotion(input) != Potions.AWKWARD) {
+        PotionContents potionContents = input.getOrDefault(DataComponents.POTION_CONTENTS, PotionContents.EMPTY);
+        if (!potionContents.is(Potions.AWKWARD)) {
             return;
         }
 
@@ -43,20 +46,25 @@ public final class PotionBrewingMixin {
             ItemStack input,
             CallbackInfoReturnable<ItemStack> cir
     ) {
-        if (PotionUtils.getPotion(input) != Potions.AWKWARD || !input.is(Items.POTION)) {
+        PotionContents potionContents = input.getOrDefault(DataComponents.POTION_CONTENTS, PotionContents.EMPTY);
+        if (!potionContents.is(Potions.AWKWARD) || !input.is(Items.POTION)) {
             return;
         }
 
         if (ingredient.is(ModItems.NULLJAW_SCALE.get())) {
-            ItemStack output = new ItemStack(ModItems.POTION_OF_TIDEGUARD.get());
-            PotionUtils.setPotion(output, ModPotions.NULLJAW_TIDEGUARD.get());
+            ItemStack output = PotionContents.createItemStack(
+                    ModItems.POTION_OF_TIDEGUARD.get(),
+                    BuiltInRegistries.POTION.wrapAsHolder(ModPotions.NULLJAW_TIDEGUARD.get())
+            );
             cir.setReturnValue(output);
             return;
         }
 
         if (ingredient.is(ModItems.IGNIVORUS_TOOTH.get())) {
-            ItemStack output = new ItemStack(ModItems.POTION_OF_SEARING.get());
-            PotionUtils.setPotion(output, ModPotions.SEARING.get());
+            ItemStack output = PotionContents.createItemStack(
+                    ModItems.POTION_OF_SEARING.get(),
+                    BuiltInRegistries.POTION.wrapAsHolder(ModPotions.SEARING.get())
+            );
             cir.setReturnValue(output);
         }
     }
