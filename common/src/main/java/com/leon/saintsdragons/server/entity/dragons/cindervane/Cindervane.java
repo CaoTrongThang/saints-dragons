@@ -101,6 +101,9 @@ import javax.annotation.Nonnull;
 
 public class Cindervane extends RideableDragonBase implements DragonFlightCapable, SoundHandledDragon, ShakesScreen {
     // Note: DATA_FIRE_BREATHING will be defined in defineSynchedData() using a unique ID
+    public static final int VARIANT_DEFAULT = 0;
+    public static final int VARIANT_ALBINO = 1;
+    private static final float ALBINO_VARIANT_CHANCE = 0.15F;
     private static final int LANDING_SETTLE_TICKS = 4;
     // 1.25s * 20 TPS = 25 ticks.
     public static final int TAKEOFF_ANIMATION_TICKS = 24;
@@ -321,6 +324,9 @@ public class Cindervane extends RideableDragonBase implements DragonFlightCapabl
 
         applyConfiguredAttributes();
         this.setHealth(this.getMaxHealth());
+        if (!this.isBaby() && this.getTextureVariant() == VARIANT_DEFAULT) {
+            this.setTextureVariant(rollAdultVariant());
+        }
         return data;
     }
 
@@ -367,6 +373,9 @@ public class Cindervane extends RideableDragonBase implements DragonFlightCapabl
     @Override
     public void ageBoundaryReached() {
         super.ageBoundaryReached();
+        if (this.getTextureVariant() == VARIANT_DEFAULT) {
+            this.setTextureVariant(rollAdultVariant());
+        }
         // Refresh attributes when baby grows into adult
         applyConfiguredAttributes();
         this.refreshDimensions();
@@ -441,6 +450,9 @@ public class Cindervane extends RideableDragonBase implements DragonFlightCapabl
     /** Entity data accessor for feeding cooldown ticks */
     private static final EntityDataAccessor<Integer> DATA_FEEDING_COOLDOWN =
             SynchedEntityData.defineId(Cindervane.class, EntityDataSerializers.INT);
+    /** Tracks the texture variant (0 = default, 1 = albino) */
+    private static final EntityDataAccessor<Integer> DATA_TEXTURE_VARIANT =
+            SynchedEntityData.defineId(Cindervane.class, EntityDataSerializers.INT);
 
     @Override
     protected void defineSynchedData(SynchedEntityData.Builder builder) {
@@ -451,6 +463,7 @@ public class Cindervane extends RideableDragonBase implements DragonFlightCapabl
         builder.define(DATA_FLIGHT_PITCH, 0f);
         builder.define(DATA_PITCH_KEY_MODE, false);
         builder.define(DATA_FEEDING_COOLDOWN, 0);
+        builder.define(DATA_TEXTURE_VARIANT, VARIANT_DEFAULT);
     }
 
     @Override
@@ -2395,6 +2408,7 @@ public class Cindervane extends RideableDragonBase implements DragonFlightCapabl
 
         // Persist feeding cooldown (synced via entity data but saved for redundancy)
         tag.putInt("FeedingCooldownTicks", Math.max(0, this.entityData.get(DATA_FEEDING_COOLDOWN)));
+        tag.putInt("TextureVariant", this.entityData.get(DATA_TEXTURE_VARIANT));
 
         if (shouldSpawnBabies) {
             tag.putBoolean("FamilySpawnPending", true);
@@ -2434,6 +2448,9 @@ public class Cindervane extends RideableDragonBase implements DragonFlightCapabl
         if (tag.contains("FeedingCooldownTicks")) {
             this.entityData.set(DATA_FEEDING_COOLDOWN, Math.max(0, tag.getInt("FeedingCooldownTicks")));
         }
+        if (tag.contains("TextureVariant")) {
+            this.entityData.set(DATA_TEXTURE_VARIANT, tag.getInt("TextureVariant"));
+        }
 
         // Force animation state sync after loading to prevent thrashing
         if (!level().isClientSide) {
@@ -2443,6 +2460,18 @@ public class Cindervane extends RideableDragonBase implements DragonFlightCapabl
 
         // Apply config attributes when loading from NBT (NeoForge fix)
         applyConfiguredAttributes();
+    }
+
+    public int getTextureVariant() {
+        return this.entityData.get(DATA_TEXTURE_VARIANT);
+    }
+
+    public void setTextureVariant(int variant) {
+        this.entityData.set(DATA_TEXTURE_VARIANT, variant);
+    }
+
+    private int rollAdultVariant() {
+        return this.getRandom().nextFloat() < ALBINO_VARIANT_CHANCE ? VARIANT_ALBINO : VARIANT_DEFAULT;
     }
 
     /**

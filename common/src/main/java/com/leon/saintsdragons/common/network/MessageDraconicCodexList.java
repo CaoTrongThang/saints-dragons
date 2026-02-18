@@ -59,7 +59,7 @@ public class MessageDraconicCodexList {
                     dragon.getAttributeValue(net.minecraft.world.entity.ai.attributes.Attributes.ARMOR),
                     dragon.getHunger(),
                     dragon.getHappiness(),
-                    dragon instanceof com.leon.saintsdragons.server.entity.dragons.ignivorus.Ignivorus ignivorus ? ignivorus.getTextureVariant() : 0,
+                    resolveVariantId(dragon),
                     dragon.getGender().getId(),
                     dragon.hasGender(),
                     dragonType,
@@ -89,6 +89,19 @@ public class MessageDraconicCodexList {
             return "stegonaut";
         }
         return "ignivorus"; // Default fallback
+    }
+
+    private static int resolveVariantId(DragonEntity dragon) {
+        if (dragon instanceof com.leon.saintsdragons.server.entity.dragons.ignivorus.Ignivorus ignivorus) {
+            return ignivorus.getTextureVariant();
+        }
+        if (dragon instanceof com.leon.saintsdragons.server.entity.dragons.cindervane.Cindervane cindervane) {
+            return cindervane.getTextureVariant();
+        }
+        if (dragon instanceof com.leon.saintsdragons.server.entity.dragons.raevyx.Raevyx raevyx) {
+            return raevyx.getTextureVariant();
+        }
+        return 0;
     }
 
     public static MessageDraconicCodexList fromEntries(List<DragonCodexSavedData.DragonCodexEntry> codexEntries) {

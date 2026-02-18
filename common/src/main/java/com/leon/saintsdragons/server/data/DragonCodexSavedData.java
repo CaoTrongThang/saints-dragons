@@ -397,6 +397,12 @@ public class DragonCodexSavedData extends SavedData {
         if (dragon instanceof com.leon.saintsdragons.server.entity.dragons.ignivorus.Ignivorus ignivorus) {
             return ignivorus.getTextureVariant();
         }
+        if (dragon instanceof com.leon.saintsdragons.server.entity.dragons.cindervane.Cindervane cindervane) {
+            return cindervane.getTextureVariant();
+        }
+        if (dragon instanceof com.leon.saintsdragons.server.entity.dragons.raevyx.Raevyx raevyx) {
+            return raevyx.getTextureVariant();
+        }
         return 0;
     }
 

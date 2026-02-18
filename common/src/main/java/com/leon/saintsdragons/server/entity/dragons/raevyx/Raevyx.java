@@ -106,6 +106,9 @@ public class Raevyx extends RideableDragonBase implements FlyingAnimal, RangedAt
         DragonFlightCapable, ShakesScreen, SoundHandledDragon, ElectricalConductivityCapable {
     private static final float TAMING_HEALTH_RATIO = 1.0F / 3.0F;
     private static final float DEFAULT_DASH_DAMAGE = 10.0F;
+    public static final int VARIANT_DEFAULT = 0;
+    public static final int VARIANT_NIGHT_GOLD = 1;
+    private static final float NIGHT_GOLD_VARIANT_CHANCE = 0.15F;
 
     // ===== CONSTANTS =====
 
@@ -250,6 +253,9 @@ public class Raevyx extends RideableDragonBase implements FlyingAnimal, RangedAt
     /** Entity data accessor for beam depleted lockout (true = must fully recharge before use) */
     public static final EntityDataAccessor<Boolean> DATA_BEAM_DEPLETED =
             net.minecraft.network.syncher.SynchedEntityData.defineId(Raevyx.class, net.minecraft.network.syncher.EntityDataSerializers.BOOLEAN);
+    /** Tracks the texture variant (0 = default, 1 = night gold) */
+    public static final EntityDataAccessor<Integer> DATA_TEXTURE_VARIANT =
+            net.minecraft.network.syncher.SynchedEntityData.defineId(Raevyx.class, net.minecraft.network.syncher.EntityDataSerializers.INT);
 
     // ===== OTHER CONSTANTS =====
 
@@ -671,6 +677,7 @@ public class Raevyx extends RideableDragonBase implements FlyingAnimal, RangedAt
         builder.define(DATA_PITCH_KEY_MODE, false);
         builder.define(DATA_BEAM_ENERGY, 1.0f);
         builder.define(DATA_BEAM_DEPLETED, false);
+        builder.define(DATA_TEXTURE_VARIANT, VARIANT_DEFAULT);
     }
 
     @Override
@@ -3347,6 +3354,9 @@ public class Raevyx extends RideableDragonBase implements FlyingAnimal, RangedAt
         }
         applyConfiguredAttributes();
         this.setHealth(this.getMaxHealth());
+        if (!this.isBaby() && this.getTextureVariant() == VARIANT_DEFAULT) {
+            this.setTextureVariant(rollAdultVariant());
+        }
         return spawnData;
     }
 
@@ -4011,6 +4021,7 @@ public class Raevyx extends RideableDragonBase implements FlyingAnimal, RangedAt
         tag.putInt("FeedingCooldownTicks", Math.max(0, this.entityData.get(DATA_FEEDING_COOLDOWN)));
         tag.putFloat("BeamEnergy", getBeamEnergy());
         tag.putBoolean("BeamDepleted", isBeamDepleted());
+        tag.putInt("TextureVariant", this.entityData.get(DATA_TEXTURE_VARIANT));
         if (shouldSpawnBabies) {
             tag.putBoolean("FamilySpawnPending", true);
             tag.putInt("FamilySpawnCount", babiesToSpawn);
@@ -4081,6 +4092,9 @@ public class Raevyx extends RideableDragonBase implements FlyingAnimal, RangedAt
             setBeamDepleted(tag.getBoolean("BeamDepleted"));
         } else {
             setBeamDepleted(false); // Default to unlocked for older saves
+        }
+        if (tag.contains("TextureVariant")) {
+            this.entityData.set(DATA_TEXTURE_VARIANT, tag.getInt("TextureVariant"));
         }
         if (tag.contains("FamilySpawnPending")) {
             this.shouldSpawnBabies = tag.getBoolean("FamilySpawnPending");
@@ -4337,9 +4351,24 @@ public class Raevyx extends RideableDragonBase implements FlyingAnimal, RangedAt
     @Override
     public void ageBoundaryReached() {
         super.ageBoundaryReached();
+        if (this.getTextureVariant() == VARIANT_DEFAULT) {
+            this.setTextureVariant(rollAdultVariant());
+        }
         // Refresh hitbox dimensions when baby grows into adult
         applyConfiguredAttributes();
         this.refreshDimensions();
+    }
+
+    public int getTextureVariant() {
+        return this.entityData.get(DATA_TEXTURE_VARIANT);
+    }
+
+    public void setTextureVariant(int variant) {
+        this.entityData.set(DATA_TEXTURE_VARIANT, variant);
+    }
+
+    private int rollAdultVariant() {
+        return this.getRandom().nextFloat() < NIGHT_GOLD_VARIANT_CHANCE ? VARIANT_NIGHT_GOLD : VARIANT_DEFAULT;
     }
     @Override
     public boolean canMate(@Nonnull Animal otherAnimal) {

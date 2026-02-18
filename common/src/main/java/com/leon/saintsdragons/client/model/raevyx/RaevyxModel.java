@@ -28,6 +28,8 @@ public class RaevyxModel extends DefaultedEntityGeoModel<Raevyx> {
 
     private static final ResourceLocation MALE_TEXTURE = SaintsDragonsCommon.rl("textures/entity/raevyx/raevyx.png");
     private static final ResourceLocation FEMALE_TEXTURE = SaintsDragonsCommon.rl("textures/entity/raevyx/raevyx_female.png");
+    private static final ResourceLocation NIGHT_GOLD_TEXTURE = SaintsDragonsCommon.rl("textures/entity/raevyx/raevyx_night_gold.png");
+    private static final ResourceLocation NIGHT_GOLD_FEMALE_TEXTURE = SaintsDragonsCommon.rl("textures/entity/raevyx/raevyx_night_gold_female.png");
     private static final ResourceLocation BABY_TEXTURE = SaintsDragonsCommon.rl("textures/entity/raevyx/baby_raevyx.png");
 
 
@@ -46,6 +48,9 @@ public class RaevyxModel extends DefaultedEntityGeoModel<Raevyx> {
     public ResourceLocation getTextureResource(Raevyx entity) {
         if (entity.isBaby()) {
             return BABY_TEXTURE;
+        }
+        if (entity.getTextureVariant() == Raevyx.VARIANT_NIGHT_GOLD) {
+            return entity.isFemale() ? NIGHT_GOLD_FEMALE_TEXTURE : NIGHT_GOLD_TEXTURE;
         }
         return entity.isFemale() ? FEMALE_TEXTURE : MALE_TEXTURE;
     }

@@ -22,6 +22,8 @@ public class CindervaneModel extends DefaultedEntityGeoModel<Cindervane> {
     private static final ResourceLocation BABY_ANIM = SaintsDragonsCommon.rl("animations/entity/baby_cindervane.animation.json");
     private static final ResourceLocation MALE_TEXTURE = SaintsDragonsCommon.rl("textures/entity/cindervane/cindervane.png");
     private static final ResourceLocation FEMALE_TEXTURE = SaintsDragonsCommon.rl("textures/entity/cindervane/cindervane_female.png");
+    private static final ResourceLocation ALBINO_MALE_TEXTURE = SaintsDragonsCommon.rl("textures/entity/cindervane/cindervane_albino.png");
+    private static final ResourceLocation ALBINO_FEMALE_TEXTURE = SaintsDragonsCommon.rl("textures/entity/cindervane/cindervane_albino_female.png");
     private static final ResourceLocation BABY_MALE_TEXTURE = SaintsDragonsCommon.rl("textures/entity/cindervane/baby_cindervane.png");
     private static final ResourceLocation BABY_FEMALE_TEXTURE = SaintsDragonsCommon.rl("textures/entity/cindervane/baby_cindervane_female.png");
 
@@ -62,6 +64,9 @@ public class CindervaneModel extends DefaultedEntityGeoModel<Cindervane> {
     public ResourceLocation getTextureResource(Cindervane entity) {
         if (entity.isBaby()) {
             return entity.isFemale() ? BABY_FEMALE_TEXTURE : BABY_MALE_TEXTURE;
+        }
+        if (entity.getTextureVariant() == Cindervane.VARIANT_ALBINO) {
+            return entity.isFemale() ? ALBINO_FEMALE_TEXTURE : ALBINO_MALE_TEXTURE;
         }
         return entity.isFemale() ? FEMALE_TEXTURE : MALE_TEXTURE;
     }

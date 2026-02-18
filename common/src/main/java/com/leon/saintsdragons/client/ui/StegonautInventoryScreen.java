@@ -11,6 +11,8 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Inventory;
+import org.joml.Quaternionf;
+import org.joml.Vector3f;
 import org.jetbrains.annotations.Nullable;
 
 public class StegonautInventoryScreen extends AbstractContainerScreen<StegonautInventoryMenu> {
@@ -23,7 +25,7 @@ public class StegonautInventoryScreen extends AbstractContainerScreen<StegonautI
     private static final int PREVIEW_OFFSET_X = 51;
     private static final int PREVIEW_OFFSET_Y = 60;
     private static final int PREVIEW_SCALE = 10;
-    private static final int PREVIEW_MOUSE_Y_OFFSET = 24;
+    private static final int PREVIEW_VERTICAL_LIFT = 8;
 
     private static final ResourceLocation BASE_TEXTURE =
             SaintsDragonsCommon.rl("textures/gui/stegonaut/stegonaut_inventory_gui.png");
@@ -58,24 +60,50 @@ public class StegonautInventoryScreen extends AbstractContainerScreen<StegonautI
         }
 
         if (this.stegonaut != null) {
-            int x1 = x + 26;
-            int y1 = y + 18;
-            int x2 = x + 78;
-            int y2 = y + 70;
-            float mouseOffsetX = ((x1 + x2) * 0.5F) - mouseX;
-            float mouseOffsetY = (y2 - PREVIEW_MOUSE_Y_OFFSET) - mouseY;
-            InventoryScreen.renderEntityInInventoryFollowsMouse(
-                    guiGraphics,
-                    x1,
-                    y1,
-                    x2,
-                    y2,
-                    PREVIEW_SCALE,
-                    mouseOffsetX,
-                    mouseOffsetY,
-                    0.0F,
-                    this.stegonaut
-            );
+            int centerX = x + PREVIEW_OFFSET_X;
+            int centerY = y + PREVIEW_OFFSET_Y - PREVIEW_VERTICAL_LIFT;
+
+            // Mirror codex portrait behavior so the inventory preview follows the mouse.
+            DraconicCodexScreen.RENDERING_IN_GUI.set(true);
+            try {
+                float yaw = (float) Math.atan((centerX - mouseX) / 40.0F);
+                float pitch = (float) Math.atan((centerY - mouseY) / 40.0F);
+
+                float oldBodyRot = stegonaut.yBodyRot;
+                float oldYRot = stegonaut.getYRot();
+                float oldXRot = stegonaut.getXRot();
+                float oldHeadRot = stegonaut.yHeadRot;
+                float oldHeadRotO = stegonaut.yHeadRotO;
+
+                stegonaut.yBodyRot = 180.0F + yaw * 20.0F;
+                stegonaut.setYRot(180.0F + yaw * 40.0F);
+                stegonaut.setXRot(-pitch * 20.0F);
+                stegonaut.yHeadRot = stegonaut.getYRot();
+                stegonaut.yHeadRotO = stegonaut.getYRot();
+
+                Quaternionf bodyRotation = new Quaternionf().rotateZ((float) Math.PI);
+                Quaternionf headRotation = new Quaternionf().rotateX(pitch * 20.0F * 0.017453292F);
+                bodyRotation.mul(headRotation);
+                Vector3f translate = new Vector3f(0.0F, stegonaut.getBbHeight() / 2.0F, 0.0F);
+                InventoryScreen.renderEntityInInventory(
+                        guiGraphics,
+                        centerX,
+                        centerY,
+                        PREVIEW_SCALE,
+                        translate,
+                        bodyRotation,
+                        headRotation,
+                        this.stegonaut
+                );
+
+                stegonaut.yBodyRot = oldBodyRot;
+                stegonaut.setYRot(oldYRot);
+                stegonaut.setXRot(oldXRot);
+                stegonaut.yHeadRot = oldHeadRot;
+                stegonaut.yHeadRotO = oldHeadRotO;
+            } finally {
+                DraconicCodexScreen.RENDERING_IN_GUI.set(false);
+            }
         }
     }
 

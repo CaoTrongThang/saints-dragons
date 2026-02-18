@@ -23,6 +23,10 @@ public class RaevyxGlowLayer extends GeoRenderLayer<Raevyx> {
             SaintsDragonsCommon.rl("textures/entity/raevyx/raevyx_glow.png");
     private static final ResourceLocation FEMALE_GLOW_TEXTURE =
             SaintsDragonsCommon.rl("textures/entity/raevyx/raevyx_female_glow.png");
+    private static final ResourceLocation NIGHT_GOLD_GLOW_TEXTURE =
+            SaintsDragonsCommon.rl("textures/entity/raevyx/raevyx_night_gold_glow.png");
+    private static final ResourceLocation NIGHT_GOLD_FEMALE_GLOW_TEXTURE =
+            SaintsDragonsCommon.rl("textures/entity/raevyx/raevyx_night_gold_female_glow.png");
 
     public RaevyxGlowLayer(GeoRenderer<Raevyx> renderer) {
         super(renderer);
@@ -44,7 +48,13 @@ public class RaevyxGlowLayer extends GeoRenderLayer<Raevyx> {
         // Faster pulse: 0.25F = ~1.25 seconds per cycle (was 0.12F = ~2.6 seconds)
         float pulse = pulseBase + pulseSwing * (0.5f + 0.5f * Mth.sin(ticks * 0.25F));
 
-        ResourceLocation texture = animatable.isFemale() ? FEMALE_GLOW_TEXTURE : GLOW_TEXTURE;
+        boolean nightGold = animatable.getTextureVariant() == Raevyx.VARIANT_NIGHT_GOLD;
+        ResourceLocation texture;
+        if (nightGold) {
+            texture = animatable.isFemale() ? NIGHT_GOLD_FEMALE_GLOW_TEXTURE : NIGHT_GOLD_GLOW_TEXTURE;
+        } else {
+            texture = animatable.isFemale() ? FEMALE_GLOW_TEXTURE : GLOW_TEXTURE;
+        }
         RenderType glowType = RenderType.entityTranslucent(texture);
         VertexConsumer glowBuffer = bufferSource.getBuffer(glowType);
 

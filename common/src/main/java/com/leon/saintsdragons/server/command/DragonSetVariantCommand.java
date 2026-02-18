@@ -1,7 +1,9 @@
 package com.leon.saintsdragons.server.command;
 
 import com.leon.saintsdragons.server.entity.base.DragonEntity;
+import com.leon.saintsdragons.server.entity.dragons.cindervane.Cindervane;
 import com.leon.saintsdragons.server.entity.dragons.ignivorus.Ignivorus;
+import com.leon.saintsdragons.server.entity.dragons.raevyx.Raevyx;
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.arguments.ArgumentType;
 import com.mojang.brigadier.arguments.StringArgumentType;
@@ -27,9 +29,11 @@ import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.Vec3;
 
 /**
- * Command to change Ignivorus dragon variant (default/crimson).
- * The variant texture displayed depends on both variant and gender (male/female).
- * Usage: /setvariant <dragon_uuid> <default|crimson>
+ * Command to change dragon texture variants.
+ * Supported:
+ * Ignivorus: default|crimson
+ * Cindervane: default|albino
+ * Raevyx: default|night_gold
  */
 public final class DragonSetVariantCommand {
     private static final double HIT_RANGE = 64.0D;
@@ -38,8 +42,7 @@ public final class DragonSetVariantCommand {
         CommandSourceStack source = context.getSource();
         Set<DragonEntity> ordered = new LinkedHashSet<>();
 
-        // Only suggest the dragon being looked at if it's an Ignivorus
-        DragonEntity lookedAt = findLookedAtIgnivorus(source);
+        DragonEntity lookedAt = findLookedAtSupportedDragon(source);
         if (lookedAt != null) {
             ordered.add(lookedAt);
         }
@@ -52,7 +55,7 @@ public final class DragonSetVariantCommand {
     };
 
     private static final SuggestionProvider<CommandSourceStack> VARIANT_SUGGESTIONS = (context, builder) ->
-        SharedSuggestionProvider.suggest(new String[]{"default", "crimson"}, builder);
+        SharedSuggestionProvider.suggest(new String[]{"default", "crimson", "albino", "night_gold"}, builder);
 
     private static final DynamicCommandExceptionType ERROR_UNKNOWN_DRAGON =
         new DynamicCommandExceptionType(id -> Component.translatable("saintsdragons.command.setvariant.not_found", id));
@@ -60,8 +63,8 @@ public final class DragonSetVariantCommand {
     private static final SimpleCommandExceptionType ERROR_INVALID_VARIANT =
         new SimpleCommandExceptionType(Component.translatable("saintsdragons.command.setvariant.invalid_variant"));
 
-    private static final SimpleCommandExceptionType ERROR_NOT_IGNIVORUS =
-        new SimpleCommandExceptionType(Component.translatable("saintsdragons.command.setvariant.not_ignivorus"));
+    private static final SimpleCommandExceptionType ERROR_NOT_SUPPORTED_DRAGON =
+        new SimpleCommandExceptionType(Component.translatable("saintsdragons.command.setvariant.not_supported"));
 
     private DragonSetVariantCommand() {
     }
@@ -85,33 +88,29 @@ public final class DragonSetVariantCommand {
         String variantStr = StringArgumentType.getString(context, "variant").toLowerCase();
         CommandSourceStack source = context.getSource();
 
-        // Parse variant
-        int variant;
-        switch (variantStr) {
-            case "default":
-                variant = 0;
-                break;
-            case "crimson":
-                variant = 1;
-                break;
-            default:
-                throw ERROR_INVALID_VARIANT.create();
-        }
-
         // Find dragon
         DragonEntity dragon = findDragon(source, dragonId);
         if (dragon == null) {
             throw ERROR_UNKNOWN_DRAGON.create(dragonId.toString());
         }
 
-        // Check if dragon is an Ignivorus
-        if (!(dragon instanceof Ignivorus ignivorus)) {
-            throw ERROR_NOT_IGNIVORUS.create();
+        int oldVariant;
+        int newVariant;
+        if (dragon instanceof Ignivorus ignivorus) {
+            oldVariant = ignivorus.getTextureVariant();
+            newVariant = parseVariantForIgnivorus(variantStr);
+            ignivorus.setTextureVariant(newVariant);
+        } else if (dragon instanceof Cindervane cindervane) {
+            oldVariant = cindervane.getTextureVariant();
+            newVariant = parseVariantForCindervane(variantStr);
+            cindervane.setTextureVariant(newVariant);
+        } else if (dragon instanceof Raevyx raevyx) {
+            oldVariant = raevyx.getTextureVariant();
+            newVariant = parseVariantForRaevyx(variantStr);
+            raevyx.setTextureVariant(newVariant);
+        } else {
+            throw ERROR_NOT_SUPPORTED_DRAGON.create();
         }
-
-        // Set variant
-        int oldVariant = ignivorus.getTextureVariant();
-        ignivorus.setTextureVariant(variant);
 
         // Send success message
         Component successMessage = Component.translatable(
@@ -122,7 +121,7 @@ public final class DragonSetVariantCommand {
         source.sendSuccess(() -> successMessage, false);
 
         // Info message if variant didn't change
-        if (oldVariant == variant) {
+        if (oldVariant == newVariant) {
             Component infoMessage = Component.translatable(
                 "saintsdragons.command.setvariant.unchanged",
                 dragon.getDisplayName()
@@ -141,7 +140,7 @@ public final class DragonSetVariantCommand {
         return null;
     }
 
-    private static DragonEntity findLookedAtIgnivorus(CommandSourceStack source) {
+    private static DragonEntity findLookedAtSupportedDragon(CommandSourceStack source) {
         Entity sourceEntity = source.getEntity();
         if (!(sourceEntity instanceof LivingEntity living)) {
             return null;
@@ -158,12 +157,40 @@ public final class DragonSetVariantCommand {
             start,
             end,
             box,
-            target -> target instanceof Ignivorus && target.isPickable()
+            target -> isSupportedDragon(target) && target.isPickable()
         );
 
         if (result != null && result.getEntity() instanceof DragonEntity dragon) {
             return dragon;
         }
         return null;
+    }
+
+    private static boolean isSupportedDragon(Entity entity) {
+        return entity instanceof Ignivorus || entity instanceof Cindervane || entity instanceof Raevyx;
+    }
+
+    private static int parseVariantForIgnivorus(String variant) throws CommandSyntaxException {
+        return switch (variant) {
+            case "default" -> 0;
+            case "crimson" -> 1;
+            default -> throw ERROR_INVALID_VARIANT.create();
+        };
+    }
+
+    private static int parseVariantForCindervane(String variant) throws CommandSyntaxException {
+        return switch (variant) {
+            case "default" -> Cindervane.VARIANT_DEFAULT;
+            case "albino" -> Cindervane.VARIANT_ALBINO;
+            default -> throw ERROR_INVALID_VARIANT.create();
+        };
+    }
+
+    private static int parseVariantForRaevyx(String variant) throws CommandSyntaxException {
+        return switch (variant) {
+            case "default" -> Raevyx.VARIANT_DEFAULT;
+            case "night_gold" -> Raevyx.VARIANT_NIGHT_GOLD;
+            default -> throw ERROR_INVALID_VARIANT.create();
+        };
     }
 }
