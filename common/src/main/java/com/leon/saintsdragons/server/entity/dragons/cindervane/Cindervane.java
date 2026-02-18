@@ -285,7 +285,9 @@ public class Cindervane extends RideableDragonBase implements DragonFlightCapabl
         this.riderController = new CindervaneRiderController(this);
 
         this.setPathfindingMalus(PathType.LEAVES, -1.0F);
-        this.setPathfindingMalus(PathType.DANGER_FIRE, -1.0F);
+        // Fire dragon behavior: path through fire like Ignivorus when chasing.
+        this.setPathfindingMalus(PathType.DANGER_FIRE, 0.0F);
+        this.setPathfindingMalus(PathType.DAMAGE_FIRE, 0.0F);
 
         RandomSource rng = this.getRandom();
         this.ambientSoundTimer = rng.nextInt(80);
@@ -365,6 +367,11 @@ public class Cindervane extends RideableDragonBase implements DragonFlightCapabl
     @Override
     public void ageBoundaryReached() {
         super.ageBoundaryReached();
+        // Babies use shared baby texture; roll adult variant on adulthood.
+        // Preserve explicitly set non-default variants (e.g., admin/command override).
+        if (this.getTextureVariant() == 0) {
+            this.setTextureVariant(this.rollRandomTextureVariant());
+        }
         // Refresh attributes when baby grows into adult
         applyConfiguredAttributes();
         this.refreshDimensions();
