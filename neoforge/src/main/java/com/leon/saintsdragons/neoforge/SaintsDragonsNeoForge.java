@@ -10,13 +10,13 @@ import com.mojang.serialization.MapCodec;
 import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.ai.attributes.RangedAttribute;
+import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.ModContainer;
 import net.neoforged.fml.common.Mod;
 import net.neoforged.fml.config.ModConfig;
 import net.neoforged.fml.event.config.ModConfigEvent;
-import net.neoforged.neoforge.client.gui.ConfigurationScreen;
-import net.neoforged.neoforge.client.gui.IConfigScreenFactory;
+import net.neoforged.fml.loading.FMLLoader;
 import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.common.world.BiomeModifier;
 import net.neoforged.neoforge.event.AddReloadListenerEvent;
@@ -63,8 +63,10 @@ public class SaintsDragonsNeoForge {
         // Register custom brewing recipes
         NeoForge.EVENT_BUS.addListener(NeoForgeBrewingRecipes::register);
 
-        // Register config screen for in-game editing
-        modContainer.registerExtensionPoint(IConfigScreenFactory.class, ConfigurationScreen::new);
+        // Register config screen for in-game editing (client-only)
+        if (FMLLoader.getDist() == Dist.CLIENT) {
+            com.leon.saintsdragons.neoforge.client.NeoForgeClientConfigScreen.register(modContainer);
+        }
 
         // Refresh dragon attributes when the NeoForge config loads/changes
         modEventBus.addListener(this::onModConfigEvent);
