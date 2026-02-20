@@ -60,6 +60,7 @@ public class DragonCodexSavedData extends SavedData {
                 entry.setIsBaby(dragon.isBaby());
                 entry.setPosition(dragon.getX(), dragon.getY(), dragon.getZ());
                 entry.setBiomeId(resolveBiomeId(dragon));
+                entry.setBoundInBinder(false);
                 setDirty();
                 return;
             }
@@ -80,7 +81,8 @@ public class DragonCodexSavedData extends SavedData {
                 dragon.getX(),
                 dragon.getY(),
                 dragon.getZ(),
-                resolveBiomeId(dragon)
+                resolveBiomeId(dragon),
+                false
         ));
         setDirty();
     }
@@ -140,7 +142,27 @@ public class DragonCodexSavedData extends SavedData {
                 entry.setIsBaby(dragon.isBaby());
                 entry.setPosition(dragon.getX(), dragon.getY(), dragon.getZ());
                 entry.setBiomeId(resolveBiomeId(dragon));
+                entry.setBoundInBinder(false);
                 setDirty();
+                return;
+            }
+        }
+    }
+
+    public void setDragonBoundState(UUID ownerId, UUID dragonId, boolean boundInBinder) {
+        if (ownerId == null || dragonId == null) {
+            return;
+        }
+        List<DragonCodexEntry> entries = entriesByOwner.get(ownerId);
+        if (entries == null) {
+            return;
+        }
+        for (DragonCodexEntry entry : entries) {
+            if (entry.dragonId().equals(dragonId)) {
+                if (entry.boundInBinder() != boundInBinder) {
+                    entry.setBoundInBinder(boundInBinder);
+                    setDirty();
+                }
                 return;
             }
         }
@@ -182,6 +204,7 @@ public class DragonCodexSavedData extends SavedData {
                 dragonTag.putDouble("PosY", dragonEntry.posY());
                 dragonTag.putDouble("PosZ", dragonEntry.posZ());
                 dragonTag.putString("BiomeId", dragonEntry.biomeId());
+                dragonTag.putBoolean("BoundInBinder", dragonEntry.boundInBinder());
                 dragonList.add(dragonTag);
             }
             playerTag.put("Dragons", dragonList);
@@ -225,8 +248,9 @@ public class DragonCodexSavedData extends SavedData {
                         double posY = dragonTag.contains("PosY") ? dragonTag.getDouble("PosY") : 0.0D;
                         double posZ = dragonTag.contains("PosZ") ? dragonTag.getDouble("PosZ") : 0.0D;
                         String biomeId = dragonTag.contains("BiomeId") ? dragonTag.getString("BiomeId") : "minecraft:unknown";
+                        boolean boundInBinder = dragonTag.contains("BoundInBinder") && dragonTag.getBoolean("BoundInBinder");
                         entries.add(new DragonCodexEntry(dragonId, name, maxHealth, currentHealth, armor, hunger, happiness,
-                                variantId, genderId, genderKnown, dragonType, isBaby, posX, posY, posZ, biomeId));
+                                variantId, genderId, genderKnown, dragonType, isBaby, posX, posY, posZ, biomeId, boundInBinder));
                     }
                 }
                 data.entriesByOwner.put(ownerId, entries);
@@ -252,10 +276,12 @@ public class DragonCodexSavedData extends SavedData {
         private double posY;
         private double posZ;
         private String biomeId;
+        private boolean boundInBinder;
 
         public DragonCodexEntry(UUID dragonId, String displayName, double maxHealth, double currentHealth, double armor,
                                 double hunger, double happiness, int variantId, byte genderId, boolean genderKnown,
-                                String dragonType, boolean isBaby, double posX, double posY, double posZ, String biomeId) {
+                                String dragonType, boolean isBaby, double posX, double posY, double posZ, String biomeId,
+                                boolean boundInBinder) {
             this.dragonId = dragonId;
             this.displayName = displayName;
             this.maxHealth = maxHealth;
@@ -272,6 +298,7 @@ public class DragonCodexSavedData extends SavedData {
             this.posY = posY;
             this.posZ = posZ;
             this.biomeId = biomeId;
+            this.boundInBinder = boundInBinder;
         }
 
         public UUID dragonId() {
@@ -390,6 +417,14 @@ public class DragonCodexSavedData extends SavedData {
 
         public void setBiomeId(String biomeId) {
             this.biomeId = biomeId;
+        }
+
+        public boolean boundInBinder() {
+            return boundInBinder;
+        }
+
+        public void setBoundInBinder(boolean boundInBinder) {
+            this.boundInBinder = boundInBinder;
         }
     }
 

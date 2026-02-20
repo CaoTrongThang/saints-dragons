@@ -413,6 +413,25 @@ public record RaevyxRiderController(Raevyx wyvern) {
      * Forces the wyvern to take off when being ridden. Called when player presses Space while on ground.
      */
     public void requestRiderTakeoff() {
-        wyvern.requestRiderTakeoff();
+        if (!wyvern.isTame() || getControllingPassenger() == null || wyvern.isFlying()) {
+            return;
+        }
+        if (!wyvern.canTakeoff()) {
+            return;
+        }
+
+        wyvern.getNavigation().stop();
+        wyvern.setGoingDown(false);
+        wyvern.setGoingUp(true); // latch ascend intent so held Space keeps climb after takeoff
+        wyvern.setFlying(true);
+        wyvern.setTakeoff(true);
+        wyvern.setHovering(false);
+        wyvern.setLanding(false);
+        wyvern.setRiderTakeoffTicks(Raevyx.TAKEOFF_ANIMATION_TICKS);
+
+        Vec3 current = wyvern.getDeltaMovement();
+        double upward = Math.max(current.y, 0.55D); // initial shove to clear ground reliably
+        wyvern.setDeltaMovement(current.x, upward, current.z);
+        wyvern.hasImpulse = true;
     }
 }

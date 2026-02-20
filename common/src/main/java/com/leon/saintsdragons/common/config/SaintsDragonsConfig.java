@@ -80,6 +80,7 @@ public final class SaintsDragonsConfig {
         ConfigHelper.ConfigBuilder builder = Services.PLATFORM.getConfigHelper()
                 .commonBuilder("saintsdragonsspawning.toml");
 
+        builder.translation("saintsdragons.configuration.spawning");
         builder.push("spawning");
         builder.comment("Dragon spawn configuration - control where and how often dragons spawn");
         builder.comment("Note: spawn weights are relative per biome/category roll.");
@@ -136,6 +137,7 @@ public final class SaintsDragonsConfig {
 
         builder.pop();
 
+        builder.translation("saintsdragons.configuration.gameplay");
         builder.push("gameplay");
         builder.comment("Master switch for all dragon-caused block destruction/terrain griefing.");
         DRAGON_GRIEFING_ENABLED = builder.defineBoolean("dragonGriefingEnabled", DRAGON_GRIEFING_ENABLED_DEFAULT);

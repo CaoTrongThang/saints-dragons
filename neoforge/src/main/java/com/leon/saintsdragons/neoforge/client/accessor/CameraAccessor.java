@@ -16,6 +16,7 @@ public final class CameraAccessor {
     private static Method setRotationMethod;
     private static Method getXRotMethod;
     private static Method getYRotMethod;
+    private static Method getMaxZoomMethod;
     private static boolean initialized = false;
 
     private CameraAccessor() {}
@@ -104,6 +105,22 @@ public final class CameraAccessor {
         return 0.0f;
     }
 
+    public static float invokeGetMaxZoom(Camera camera, float desiredDistance) {
+        if (!initialized) {
+            initializeReflection();
+        }
+
+        try {
+            if (getMaxZoomMethod != null) {
+                return (float) getMaxZoomMethod.invoke(camera, desiredDistance);
+            }
+        } catch (Exception e) {
+            LOGGER.error("Failed to invoke Camera.getMaxZoom()", e);
+        }
+        // Safe fallback: no additional clamp if method is inaccessible.
+        return desiredDistance;
+    }
+
     private static void initializeReflection() {
         initialized = true;
         try {
@@ -129,6 +146,12 @@ public final class CameraAccessor {
             getYRotMethod.setAccessible(true);
         } catch (NoSuchMethodException e) {
             LOGGER.warn("Could not find Camera.getYRot() method, will try direct access");
+        }
+        try {
+            getMaxZoomMethod = Camera.class.getDeclaredMethod("getMaxZoom", float.class);
+            getMaxZoomMethod.setAccessible(true);
+        } catch (NoSuchMethodException e) {
+            LOGGER.warn("Could not find Camera.getMaxZoom(float) method, camera zoom collision clamp will be skipped");
         }
     }
 }

@@ -1,10 +1,14 @@
 package com.leon.saintsdragons.common.network;
 
+import com.leon.saintsdragons.common.item.util.BinderComponentUtil;
 import com.leon.saintsdragons.server.data.DragonCodexSavedData;
 import com.leon.saintsdragons.server.entity.base.DragonEntity;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.entity.item.ItemEntity;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
 
 import java.util.Comparator;
 import java.util.List;
@@ -65,6 +69,21 @@ public class MessageDraconicCodexRequest {
                     entry.setDisplayName(dragon.getName().getString());
                 }
             }
+
+            boolean removedStaleBoundEntries = false;
+            for (DragonCodexSavedData.DragonCodexEntry entry : new java.util.ArrayList<>(entries)) {
+                if (!entry.boundInBinder()) {
+                    continue;
+                }
+                if (hasBoundDragonInAnyBinder(serverLevel, entry.dragonId())) {
+                    continue;
+                }
+                data.removeDragon(player.getUUID(), entry.dragonId());
+                removedStaleBoundEntries = true;
+            }
+            if (removedStaleBoundEntries) {
+                entries = data.getEntriesFor(player);
+            }
         }
 
         List<DragonCodexSavedData.DragonCodexEntry> sortedEntries = new java.util.ArrayList<>(entries);
@@ -118,5 +137,61 @@ public class MessageDraconicCodexRequest {
             }
         }
         return null;
+    }
+
+    private static boolean hasBoundDragonInAnyBinder(ServerLevel originLevel, UUID dragonId) {
+        if (originLevel.getServer() == null) {
+            return false;
+        }
+
+        for (ServerPlayer serverPlayer : originLevel.getServer().getPlayerList().getPlayers()) {
+            if (hasBoundDragonInPlayerInventories(serverPlayer, dragonId)) {
+                return true;
+            }
+        }
+
+        for (ServerLevel level : originLevel.getServer().getAllLevels()) {
+            var border = level.getWorldBorder();
+            var bounds = new net.minecraft.world.phys.AABB(
+                    border.getMinX(),
+                    level.getMinBuildHeight(),
+                    border.getMinZ(),
+                    border.getMaxX(),
+                    level.getMaxBuildHeight(),
+                    border.getMaxZ()
+            );
+            for (ItemEntity itemEntity : level.getEntitiesOfClass(ItemEntity.class, bounds)) {
+                if (BinderComponentUtil.matchesBoundDragon(itemEntity.getItem(), dragonId)) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
+
+    private static boolean hasBoundDragonInPlayerInventories(Player player, UUID dragonId) {
+        for (ItemStack stack : player.getInventory().items) {
+            if (BinderComponentUtil.matchesBoundDragon(stack, dragonId)) {
+                return true;
+            }
+        }
+        for (ItemStack stack : player.getInventory().offhand) {
+            if (BinderComponentUtil.matchesBoundDragon(stack, dragonId)) {
+                return true;
+            }
+        }
+        for (ItemStack stack : player.getInventory().armor) {
+            if (BinderComponentUtil.matchesBoundDragon(stack, dragonId)) {
+                return true;
+            }
+        }
+        var ender = player.getEnderChestInventory();
+        for (int slot = 0; slot < ender.getContainerSize(); slot++) {
+            if (BinderComponentUtil.matchesBoundDragon(ender.getItem(slot), dragonId)) {
+                return true;
+            }
+        }
+        return false;
     }
 }

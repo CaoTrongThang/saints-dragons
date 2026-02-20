@@ -148,7 +148,7 @@ public class NeoForgeClientEventHandler {
                 verticalCameraShift += (targetVerticalShift - verticalCameraShift) * verticalBlendRate;
 
                 // Apply the smoothed zoom and lateral shift using the accessor
-                CameraAccessor.invokeMove(camera, -raevyxCameraZoom, 0, 0);
+                moveBackWithCollision(camera, raevyxCameraZoom);
                 // Apply lateral and vertical shifts
                 CameraAccessor.invokeMove(camera, 0, verticalCameraShift, raevyxCameraShift);
                 // Slight downward tilt for better forward visibility
@@ -214,7 +214,7 @@ public class NeoForgeClientEventHandler {
 
             // Apply the smoothed zoom and lateral shift using the accessor
             // Move camera: back (zoom), no vertical, lateral shift based on banking
-            CameraAccessor.invokeMove(camera, -cindervaneCameraZoom, 0, 0);
+            moveBackWithCollision(camera, cindervaneCameraZoom);
             // Apply lateral and vertical shifts
             CameraAccessor.invokeMove(camera, 0, verticalCameraShift, cindervaneCameraShift);
             // Slight downward tilt for better forward visibility
@@ -285,7 +285,7 @@ public class NeoForgeClientEventHandler {
             verticalCameraShift += (targetVerticalShift - verticalCameraShift) * verticalBlendRate;
 
             // Apply the smoothed zoom using the accessor
-            CameraAccessor.invokeMove(camera, -ignivorusCameraZoom, 0, 0);
+            moveBackWithCollision(camera, ignivorusCameraZoom);
             // Apply lateral and vertical shifts
             CameraAccessor.invokeMove(camera, 0, verticalCameraShift, ignivorusCameraShift);
             // Slight downward tilt for better forward visibility
@@ -329,7 +329,7 @@ public class NeoForgeClientEventHandler {
                 double verticalBlendRate = 0.12;
                 verticalCameraShift += (targetVerticalShift - verticalCameraShift) * verticalBlendRate;
 
-                CameraAccessor.invokeMove(camera, -raevyxCameraZoom, 0, 0);
+                moveBackWithCollision(camera, raevyxCameraZoom);
                 CameraAccessor.invokeMove(camera, 0, verticalCameraShift, raevyxCameraShift);
 
                 float nulljawTargetPitch = 15.0f;
@@ -343,7 +343,7 @@ public class NeoForgeClientEventHandler {
                         Mth.clamp(nulljawPitch + nulljawCameraPitch, -90.0f, 90.0f)
                 );
             } else {
-                CameraAccessor.invokeMove(camera, -15F, 0, 0);
+                moveBackWithCollision(camera, 15F);
                 raevyxCameraShift = 0.0;
                 verticalCameraShift = 0.0;
                 nulljawCameraPitch = 0.0f;
@@ -354,7 +354,7 @@ public class NeoForgeClientEventHandler {
             stegonautCameraZoomTarget = 8F;
             float blendRate = 0.05F;
             stegonautCameraZoom += (stegonautCameraZoomTarget - stegonautCameraZoom) * blendRate;
-            CameraAccessor.invokeMove(camera, -stegonautCameraZoom, 0, 0);
+            moveBackWithCollision(camera, stegonautCameraZoom);
         } else if (!(player.getVehicle() instanceof Stegonaut)) {
             stegonautCameraZoom = 8F;
             stegonautCameraZoomTarget = 8F;
@@ -397,5 +397,10 @@ public class NeoForgeClientEventHandler {
             randomTremorOffsets[1] = (Math.random() - 0.5) * 2.0;
             randomTremorOffsets[2] = (Math.random() - 0.5) * 2.0;
         }
+    }
+
+    private static void moveBackWithCollision(Camera camera, float desiredBackDistance) {
+        float safeBackDistance = Math.max(0.0f, CameraAccessor.invokeGetMaxZoom(camera, desiredBackDistance));
+        CameraAccessor.invokeMove(camera, -safeBackDistance, 0.0, 0.0);
     }
 }

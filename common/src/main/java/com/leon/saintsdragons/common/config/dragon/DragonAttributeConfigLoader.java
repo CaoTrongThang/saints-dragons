@@ -78,7 +78,7 @@ public final class DragonAttributeConfigLoader extends SimpleJsonResourceReloadL
 
         if (IS_FORGE) {
             try {
-                Class<?> configClass = Class.forName("com.leon.saintsdragons.forge.platform.ForgeDragonAttributesConfig");
+                Class<?> configClass = resolvePlatformAttributeConfigClass();
                 maxHealth = (double) configClass.getField("CINDERVANE_MAX_HEALTH").get(null).getClass().getMethod("get").invoke(configClass.getField("CINDERVANE_MAX_HEALTH").get(null));
                 armor = (double) configClass.getField("CINDERVANE_ARMOR").get(null).getClass().getMethod("get").invoke(configClass.getField("CINDERVANE_ARMOR").get(null));
                 flyingSpeed = (double) configClass.getField("CINDERVANE_FLYING_SPEED").get(null).getClass().getMethod("get").invoke(configClass.getField("CINDERVANE_FLYING_SPEED").get(null));
@@ -167,7 +167,7 @@ public final class DragonAttributeConfigLoader extends SimpleJsonResourceReloadL
 
         if (IS_FORGE) {
             try {
-                Class<?> configClass = Class.forName("com.leon.saintsdragons.forge.platform.ForgeDragonAttributesConfig");
+                Class<?> configClass = resolvePlatformAttributeConfigClass();
                 maxHealth = (double) configClass.getField("RAEVYX_MAX_HEALTH").get(null).getClass().getMethod("get").invoke(configClass.getField("RAEVYX_MAX_HEALTH").get(null));
                 armor = (double) configClass.getField("RAEVYX_ARMOR").get(null).getClass().getMethod("get").invoke(configClass.getField("RAEVYX_ARMOR").get(null));
                 flyingSpeed = (double) configClass.getField("RAEVYX_FLYING_SPEED").get(null).getClass().getMethod("get").invoke(configClass.getField("RAEVYX_FLYING_SPEED").get(null));
@@ -263,7 +263,7 @@ public final class DragonAttributeConfigLoader extends SimpleJsonResourceReloadL
 
         if (IS_FORGE) {
             try {
-                Class<?> configClass = Class.forName("com.leon.saintsdragons.forge.platform.ForgeDragonAttributesConfig");
+                Class<?> configClass = resolvePlatformAttributeConfigClass();
                 maxHealth = (double) configClass.getField("NULLJAW_MAX_HEALTH").get(null).getClass().getMethod("get").invoke(configClass.getField("NULLJAW_MAX_HEALTH").get(null));
                 armor = (double) configClass.getField("NULLJAW_ARMOR").get(null).getClass().getMethod("get").invoke(configClass.getField("NULLJAW_ARMOR").get(null));
                 bitePhase1Damage = (double) configClass.getField("NULLJAW_BITE_PHASE1_DAMAGE").get(null).getClass().getMethod("get").invoke(configClass.getField("NULLJAW_BITE_PHASE1_DAMAGE").get(null));
@@ -361,7 +361,7 @@ public final class DragonAttributeConfigLoader extends SimpleJsonResourceReloadL
 
         if (IS_FORGE) {
             try {
-                Class<?> configClass = Class.forName("com.leon.saintsdragons.forge.platform.ForgeDragonAttributesConfig");
+                Class<?> configClass = resolvePlatformAttributeConfigClass();
                 maxHealth = (double) configClass.getField("IGNIVORUS_MAX_HEALTH").get(null).getClass().getMethod("get").invoke(configClass.getField("IGNIVORUS_MAX_HEALTH").get(null));
                 armor = (double) configClass.getField("IGNIVORUS_ARMOR").get(null).getClass().getMethod("get").invoke(configClass.getField("IGNIVORUS_ARMOR").get(null));
                 flyingSpeed = (double) configClass.getField("IGNIVORUS_FLYING_SPEED").get(null).getClass().getMethod("get").invoke(configClass.getField("IGNIVORUS_FLYING_SPEED").get(null));
@@ -472,7 +472,7 @@ public final class DragonAttributeConfigLoader extends SimpleJsonResourceReloadL
 
         if (IS_FORGE) {
             try {
-                Class<?> configClass = Class.forName("com.leon.saintsdragons.forge.platform.ForgeDragonAttributesConfig");
+                Class<?> configClass = resolvePlatformAttributeConfigClass();
                 maxHealth = (double) configClass.getField("STEGONAUT_MAX_HEALTH").get(null).getClass().getMethod("get")
                         .invoke(configClass.getField("STEGONAUT_MAX_HEALTH").get(null));
                 armor = (double) configClass.getField("STEGONAUT_ARMOR").get(null).getClass().getMethod("get")
@@ -612,12 +612,6 @@ public final class DragonAttributeConfigLoader extends SimpleJsonResourceReloadL
                 backfillWildFlyingSpeedMultiplier(path, entry.getKey(), entry.getValue());
                 continue;
             }
-            if (!source.has("hints")) {
-                JsonObject hints = defaultHints(entry.getKey());
-                if (hints != null && !hints.entrySet().isEmpty()) {
-                    source.add("hints", hints);
-                }
-            }
             writeConfigFile(path, source);
         }
 
@@ -686,14 +680,6 @@ public final class DragonAttributeConfigLoader extends SimpleJsonResourceReloadL
             json.add("extra", extraJson);
         }
 
-        // Friendly hints for players editing the Forge JSON files
-        if (!json.has("hints")) {
-            JsonObject hints = defaultHints(id);
-            if (hints != null && !hints.entrySet().isEmpty()) {
-                json.add("hints", hints);
-            }
-        }
-
         return json;
     }
 
@@ -714,6 +700,14 @@ public final class DragonAttributeConfigLoader extends SimpleJsonResourceReloadL
         this.configs = ImmutableMap.copyOf(buildDefaultConfigs());
     }
 
+    private static Class<?> resolvePlatformAttributeConfigClass() throws ClassNotFoundException {
+        try {
+            return Class.forName("com.leon.saintsdragons.neoforge.platform.NeoForgeDragonAttributesConfig");
+        } catch (ClassNotFoundException ignored) {
+            return Class.forName("com.leon.saintsdragons.forge.platform.ForgeDragonAttributesConfig");
+        }
+    }
+
     private static void ensureLegacyTamingFlag(ResourceLocation id, JsonObject json) {
         if (!requiresLegacyTamingFlag(id)) {
             return;
@@ -730,12 +724,6 @@ public final class DragonAttributeConfigLoader extends SimpleJsonResourceReloadL
         if (!extraJson.has("legacy_taming")) {
             extraJson.addProperty("legacy_taming", false);
             changed = true;
-        }
-        if (changed && !json.has("hints")) {
-            JsonObject hints = defaultHints(id);
-            if (hints != null && !hints.entrySet().isEmpty()) {
-                json.add("hints", hints);
-            }
         }
     }
 
@@ -1023,52 +1011,4 @@ public final class DragonAttributeConfigLoader extends SimpleJsonResourceReloadL
         return base;
     }
 
-    private static JsonObject defaultHints(ResourceLocation id) {
-        JsonObject hints = new JsonObject();
-        // Shared taming guidance
-        hints.addProperty("taming_chance_base", "Lower is easier: 1 = 100% per feed, 100 = 1% per feed");
-        hints.addProperty("taming_chance_chicken", "Lower is easier: 1 = 100% per feed, 100 = 1% per feed");
-        hints.addProperty("taming_chance_beef", "Lower is easier: 1 = 100% per feed, 100 = 1% per feed");
-        hints.addProperty("taming_chance_hearty", "Lower is easier: 1 = 100% per feed, 100 = 1% per feed");
-        hints.addProperty("taming_chance", "Lower is easier: 1 = 100% per attempt, 100 = 1% per attempt");
-        hints.addProperty("taming_chance_tropical", "Lower is easier: 1 = 100% per feed, 100 = 1% per feed");
-        hints.addProperty("legacy_taming", "true = simple food taming, false = special mechanics (rodeo/low-health)");
-        hints.addProperty("egg_hatch_chance_normal", "Lower = faster (1 = every random tick)");
-        hints.addProperty("egg_hatch_chance_thunder", "Lower = faster during thunderstorms");
-        hints.addProperty("egg_storm_instant_chance", "1 in N chance to instantly hatch when placed during a storm");
-        hints.addProperty("egg_drop_chance", "Chance (0-1) for females to drop an egg on death");
-        hints.addProperty("egg_loot_pillager_outpost", "Chance (0-1) for egg in pillager outpost chests");
-        hints.addProperty("egg_loot_shipwreck_treasure", "Chance (0-1) for egg in shipwreck treasure chests");
-        hints.addProperty("egg_loot_ancient_city", "Chance (0-1) for egg in ancient city chests");
-        hints.addProperty("egg_loot_bastion_treasure", "Chance (0-1) for egg in bastion treasure chests");
-        hints.addProperty("egg_loot_nether_bridge", "Chance (0-1) for egg in nether fortress chests");
-        hints.addProperty("aggressive_wild", "true = wild dragons aggro on sight, false = only retaliate");
-        hints.addProperty("griefing_enabled", "true = this dragon can break/destroy blocks (global dragonGriefingEnabled must also be true)");
-        hints.addProperty("reactive_terrain_clearing_on_damage", "true = clear soft obstructing blocks when hurt (requires mobGriefing)");
-        hints.addProperty("reactive_terrain_clearing_on_damage_tamed", "true = tamed dragons can also clear on hurt (off = safer bases)");
-        hints.addProperty("taming_stun_health", "Health threshold for taming stun (0 = disable stun)");
-        hints.addProperty("wild_flying_speed_multiplier", "Scales AI flight speed only for untamed dragons (1 = default, ridden flight unchanged)");
-        hints.addProperty("summon_storm_cooldown_ticks", "Cooldown for Summon Storm (20 ticks = 1 second)");
-        hints.addProperty("summon_storm_supercharge_ticks", "How long Summon Storm supercharge lasts (20 ticks = 1 second)");
-        hints.addProperty("summon_storm_supercharge_damage_multiplier", "Damage multiplier applied while supercharged (1 = normal damage)");
-        hints.addProperty("summon_storm_duration_ticks", "How long thunderstorm weather is enforced (20 ticks = 1 second)");
-
-        if (id.equals(NULLJAW_ID)) {
-            hints.addProperty("swim_speed", "Min 0.1, Max 5.0");
-        } else if (id.equals(CINDERVANE_ID)) {
-            hints.addProperty("fire_body_explosion_damage", "Direct blast damage on Fire Body crash impact");
-            hints.addProperty("fire_body_self_damage_on_crash", "Self-damage applied to Cindervane after Fire Body crash impact");
-        } else if (id.equals(IGNIVORUS_ID)) {
-            hints.addProperty("ultimate_penalty_health", "Typical 1-10000");
-            hints.addProperty("fire_breath_flame_spawn_multiplier", "0 = disable flame entities, 1 = default");
-            hints.addProperty("fire_breath_flame_speed_multiplier", "Scales flame projectile speed (1 = default)");
-            hints.addProperty("fire_breath_flame_lifetime_multiplier", "Scales flame lifetime ticks (1 = default)");
-            hints.addProperty("fire_breath_ignite_block_chance", "0 = never ignite, 1 = always ignite");
-            hints.addProperty("phase2_toggle_on_chance", "Chance (0-1) to switch from phase 1 to phase 2 when grounded");
-            hints.addProperty("phase2_toggle_off_chance", "Chance (0-1) to switch from phase 2 back to phase 1 when grounded");
-            hints.addProperty("phase2_decision_min_ticks", "Minimum ticks between phase switch checks (20 ticks = 1 second)");
-            hints.addProperty("phase2_decision_max_ticks", "Maximum ticks between phase switch checks (20 ticks = 1 second)");
-        }
-        return hints;
-    }
 }

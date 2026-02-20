@@ -30,4 +30,12 @@ public final class BinderComponentUtil {
     public static String getBoundDragonName(ItemStack stack) {
         return getData(stack).dragonName().orElse(null);
     }
+
+    public static boolean matchesBoundDragon(ItemStack stack, UUID dragonUuid) {
+        if (dragonUuid == null) {
+            return false;
+        }
+        BinderData data = getData(stack);
+        return data.isBound() && data.dragonUuid().map(dragonUuid::equals).orElse(false);
+    }
 }

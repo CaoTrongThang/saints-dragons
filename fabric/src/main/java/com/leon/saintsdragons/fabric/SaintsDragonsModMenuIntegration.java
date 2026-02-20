@@ -14,8 +14,10 @@ import me.shedaniel.clothconfig2.api.ConfigCategory;
 import me.shedaniel.clothconfig2.api.ConfigEntryBuilder;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
+import net.minecraft.world.phys.AABB;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -400,13 +402,13 @@ public class SaintsDragonsModMenuIntegration implements ModMenuApi {
         entries.add(entryBuilder.startDoubleField(Component.translatable("config.saintsdragons.attributes.cindervane.max_health"), buffer.maxHealth)
                 .setDefaultValue(defaults.maxHealth())
                 .setMin(1.0D)
-                .setMax(10000.0D)
+                .setMax(100000.0D)
                 .setSaveConsumer(value -> buffer.maxHealth = value)
                 .build());
         entries.add(entryBuilder.startDoubleField(Component.translatable("config.saintsdragons.attributes.cindervane.armor"), buffer.armor)
                 .setDefaultValue(defaults.armor())
                 .setMin(0.0D)
-                .setMax(10000.0D)
+                .setMax(100000.0D)
                 .setSaveConsumer(value -> buffer.armor = value)
                 .build());
         entries.add(entryBuilder.startDoubleField(Component.translatable("config.saintsdragons.attributes.cindervane.flying_speed"), buffer.flyingSpeed)
@@ -424,31 +426,31 @@ public class SaintsDragonsModMenuIntegration implements ModMenuApi {
         entries.add(entryBuilder.startDoubleField(Component.translatable("config.saintsdragons.attributes.cindervane.bite_damage"), buffer.biteDamage)
                 .setDefaultValue(defaults.abilityDamage("bite", 12.0D))
                 .setMin(0.0D)
-                .setMax(100.0D)
+                .setMax(100000.0D)
                 .setSaveConsumer(value -> buffer.biteDamage = value)
                 .build());
         entries.add(entryBuilder.startDoubleField(Component.translatable("config.saintsdragons.attributes.cindervane.slash_grab_hit1_damage"), buffer.slashGrabHit1Damage)
                 .setDefaultValue(defaults.abilityDamage("slash_grab_hit1", 5.0D))
                 .setMin(0.0D)
-                .setMax(100.0D)
+                .setMax(100000.0D)
                 .setSaveConsumer(value -> buffer.slashGrabHit1Damage = value)
                 .build());
         entries.add(entryBuilder.startDoubleField(Component.translatable("config.saintsdragons.attributes.cindervane.slash_grab_hit2_damage"), buffer.slashGrabHit2Damage)
                 .setDefaultValue(defaults.abilityDamage("slash_grab_hit2", 7.0D))
                 .setMin(0.0D)
-                .setMax(100.0D)
+                .setMax(100000.0D)
                 .setSaveConsumer(value -> buffer.slashGrabHit2Damage = value)
                 .build());
         entries.add(entryBuilder.startDoubleField(Component.translatable("config.saintsdragons.attributes.cindervane.volley_damage"), buffer.volleyDamage)
                 .setDefaultValue(defaults.abilityDamage("magma_volley", 20.0D))
                 .setMin(0.0D)
-                .setMax(100.0D)
+                .setMax(100000.0D)
                 .setSaveConsumer(value -> buffer.volleyDamage = value)
                 .build());
         entries.add(entryBuilder.startDoubleField(Component.translatable("config.saintsdragons.attributes.cindervane.fire_body_damage"), buffer.fireBodyDamage)
                 .setDefaultValue(defaults.abilityDamage("fire_body", 3.0D))
                 .setMin(0.0D)
-                .setMax(100.0D)
+                .setMax(100000.0D)
                 .setSaveConsumer(value -> buffer.fireBodyDamage = value)
                 .build());
         entries.add(entryBuilder.startDoubleField(Component.translatable("config.saintsdragons.attributes.cindervane.taming_base"), buffer.tamingChanceBase)
@@ -478,13 +480,13 @@ public class SaintsDragonsModMenuIntegration implements ModMenuApi {
         entries.add(entryBuilder.startDoubleField(Component.translatable("config.saintsdragons.attributes.cindervane.fire_body_explosion_damage"), buffer.fireBodyExplosionDamage)
                 .setDefaultValue(defaults.extraDouble("fire_body_explosion_damage", 200.0D))
                 .setMin(0.0D)
-                .setMax(1000.0D)
+                .setMax(100000.0D)
                 .setSaveConsumer(value -> buffer.fireBodyExplosionDamage = value)
                 .build());
         entries.add(entryBuilder.startDoubleField(Component.translatable("config.saintsdragons.attributes.cindervane.fire_body_self_damage_on_crash"), buffer.fireBodySelfDamageOnCrash)
                 .setDefaultValue(defaults.extraDouble("fire_body_self_damage_on_crash", 40.0D))
                 .setMin(0.0D)
-                .setMax(1000.0D)
+                .setMax(100000.0D)
                 .setSaveConsumer(value -> buffer.fireBodySelfDamageOnCrash = value)
                 .build());
         entries.add(entryBuilder.startBooleanToggle(Component.translatable("config.saintsdragons.attributes.cindervane.aggressive_wild"), buffer.aggressiveWild)
@@ -515,31 +517,31 @@ public class SaintsDragonsModMenuIntegration implements ModMenuApi {
         entries.add(entryBuilder.startDoubleField(Component.translatable("config.saintsdragons.attributes.stegonaut.max_health"), buffer.maxHealth)
                 .setDefaultValue(defaults.maxHealth())
                 .setMin(1.0D)
-                .setMax(10000.0D)
+                .setMax(100000.0D)
                 .setSaveConsumer(value -> buffer.maxHealth = value)
                 .build());
         entries.add(entryBuilder.startDoubleField(Component.translatable("config.saintsdragons.attributes.stegonaut.armor"), buffer.armor)
                 .setDefaultValue(defaults.armor())
                 .setMin(0.0D)
-                .setMax(10000.0D)
+                .setMax(100000.0D)
                 .setSaveConsumer(value -> buffer.armor = value)
                 .build());
         entries.add(entryBuilder.startDoubleField(Component.translatable("config.saintsdragons.attributes.stegonaut.bite_damage"), buffer.biteDamage)
                 .setDefaultValue(defaults.abilityDamage("bite", 5.0D))
                 .setMin(0.0D)
-                .setMax(100.0D)
+                .setMax(100000.0D)
                 .setSaveConsumer(value -> buffer.biteDamage = value)
                 .build());
         entries.add(entryBuilder.startDoubleField(Component.translatable("config.saintsdragons.attributes.stegonaut.chin_slam_damage"), buffer.chinSlamDamage)
                 .setDefaultValue(defaults.abilityDamage("chin_slam", 8.0D))
                 .setMin(0.0D)
-                .setMax(100.0D)
+                .setMax(100000.0D)
                 .setSaveConsumer(value -> buffer.chinSlamDamage = value)
                 .build());
         entries.add(entryBuilder.startDoubleField(Component.translatable("config.saintsdragons.attributes.stegonaut.ground_eating_damage"), buffer.groundEatingDamage)
                 .setDefaultValue(defaults.abilityDamage("ground_eating", 10.0D))
                 .setMin(0.0D)
-                .setMax(100.0D)
+                .setMax(100000.0D)
                 .setSaveConsumer(value -> buffer.groundEatingDamage = value)
                 .build());
         entries.add(entryBuilder.startDoubleField(Component.translatable("config.saintsdragons.attributes.stegonaut.taming_base"), buffer.tamingChanceBase)
@@ -594,13 +596,13 @@ public class SaintsDragonsModMenuIntegration implements ModMenuApi {
         entries.add(entryBuilder.startDoubleField(Component.translatable("config.saintsdragons.attributes.raevyx.max_health"), buffer.maxHealth)
                 .setDefaultValue(defaults.maxHealth())
                 .setMin(1.0D)
-                .setMax(10000.0D)
+                .setMax(100000.0D)
                 .setSaveConsumer(value -> buffer.maxHealth = value)
                 .build());
         entries.add(entryBuilder.startDoubleField(Component.translatable("config.saintsdragons.attributes.raevyx.armor"), buffer.armor)
                 .setDefaultValue(defaults.armor())
                 .setMin(0.0D)
-                .setMax(10000.0D)
+                .setMax(100000.0D)
                 .setSaveConsumer(value -> buffer.armor = value)
                 .build());
         entries.add(entryBuilder.startDoubleField(Component.translatable("config.saintsdragons.attributes.raevyx.flying_speed"), buffer.flyingSpeed)
@@ -618,25 +620,25 @@ public class SaintsDragonsModMenuIntegration implements ModMenuApi {
         entries.add(entryBuilder.startDoubleField(Component.translatable("config.saintsdragons.attributes.raevyx.bite_damage"), buffer.biteDamage)
                 .setDefaultValue(defaults.abilityDamage("bite", 15.0D))
                 .setMin(0.0D)
-                .setMax(100.0D)
+                .setMax(100000.0D)
                 .setSaveConsumer(value -> buffer.biteDamage = value)
                 .build());
         entries.add(entryBuilder.startDoubleField(Component.translatable("config.saintsdragons.attributes.raevyx.beam_damage"), buffer.beamDamage)
                 .setDefaultValue(defaults.abilityDamage("lightning_beam", 35.0D))
                 .setMin(0.0D)
-                .setMax(100.0D)
+                .setMax(100000.0D)
                 .setSaveConsumer(value -> buffer.beamDamage = value)
                 .build());
         entries.add(entryBuilder.startDoubleField(Component.translatable("config.saintsdragons.attributes.raevyx.horn_damage"), buffer.hornDamage)
                 .setDefaultValue(defaults.abilityDamage("horn_gore", 15.0D))
                 .setMin(0.0D)
-                .setMax(100.0D)
+                .setMax(100000.0D)
                 .setSaveConsumer(value -> buffer.hornDamage = value)
                 .build());
         entries.add(entryBuilder.startDoubleField(Component.translatable("config.saintsdragons.attributes.raevyx.dash_damage"), buffer.dashDamage)
                 .setDefaultValue(defaults.abilityDamage("dash", 10.0D))
                 .setMin(0.0D)
-                .setMax(200.0D)
+                .setMax(100000.0D)
                 .setSaveConsumer(value -> buffer.dashDamage = value)
                 .build());
         entries.add(entryBuilder.startDoubleField(Component.translatable("config.saintsdragons.attributes.raevyx.taming_base"), buffer.tamingChanceBase)
@@ -767,13 +769,13 @@ public class SaintsDragonsModMenuIntegration implements ModMenuApi {
         entries.add(entryBuilder.startDoubleField(Component.translatable("config.saintsdragons.attributes.nulljaw.max_health"), buffer.maxHealth)
                 .setDefaultValue(defaults.maxHealth())
                 .setMin(1.0D)
-                .setMax(10000.0D)
+                .setMax(100000.0D)
                 .setSaveConsumer(value -> buffer.maxHealth = value)
                 .build());
         entries.add(entryBuilder.startDoubleField(Component.translatable("config.saintsdragons.attributes.nulljaw.armor"), buffer.armor)
                 .setDefaultValue(defaults.armor())
                 .setMin(0.0D)
-                .setMax(10000.0D)
+                .setMax(100000.0D)
                 .setSaveConsumer(value -> buffer.armor = value)
                 .build());
         entries.add(entryBuilder.startDoubleField(Component.translatable("config.saintsdragons.attributes.nulljaw.swim_speed"), buffer.swimSpeed)
@@ -875,13 +877,13 @@ public class SaintsDragonsModMenuIntegration implements ModMenuApi {
         entries.add(entryBuilder.startDoubleField(Component.translatable("config.saintsdragons.attributes.ignivorus.max_health"), buffer.maxHealth)
                 .setDefaultValue(defaults.maxHealth())
                 .setMin(1.0D)
-                .setMax(10000.0D)
+                .setMax(100000.0D)
                 .setSaveConsumer(value -> buffer.maxHealth = value)
                 .build());
         entries.add(entryBuilder.startDoubleField(Component.translatable("config.saintsdragons.attributes.ignivorus.armor"), buffer.armor)
                 .setDefaultValue(defaults.armor())
                 .setMin(0.0D)
-                .setMax(10000.0D)
+                .setMax(100000.0D)
                 .setSaveConsumer(value -> buffer.armor = value)
                 .build());
         entries.add(entryBuilder.startDoubleField(Component.translatable("config.saintsdragons.attributes.ignivorus.flying_speed"), buffer.flyingSpeed)
@@ -899,61 +901,61 @@ public class SaintsDragonsModMenuIntegration implements ModMenuApi {
         entries.add(entryBuilder.startDoubleField(Component.translatable("config.saintsdragons.attributes.ignivorus.bite_damage"), buffer.biteDamage)
                 .setDefaultValue(defaults.abilityDamage("bite", 50.0D))
                 .setMin(0.0D)
-                .setMax(200.0D)
+                .setMax(100000.0D)
                 .setSaveConsumer(value -> buffer.biteDamage = value)
                 .build());
         entries.add(entryBuilder.startDoubleField(Component.translatable("config.saintsdragons.attributes.ignivorus.body_slam_damage"), buffer.bodySlamDamage)
                 .setDefaultValue(defaults.abilityDamage("body_slam", 40.0D))
                 .setMin(0.0D)
-                .setMax(200.0D)
+                .setMax(100000.0D)
                 .setSaveConsumer(value -> buffer.bodySlamDamage = value)
                 .build());
         entries.add(entryBuilder.startDoubleField(Component.translatable("config.saintsdragons.attributes.ignivorus.leap_slam_damage"), buffer.leapSlamDamage)
                 .setDefaultValue(defaults.abilityDamage("leap_slam", 50.0D))
                 .setMin(0.0D)
-                .setMax(200.0D)
+                .setMax(100000.0D)
                 .setSaveConsumer(value -> buffer.leapSlamDamage = value)
                 .build());
         entries.add(entryBuilder.startDoubleField(Component.translatable("config.saintsdragons.attributes.ignivorus.fire_breath_damage"), buffer.fireBreathDamage)
                 .setDefaultValue(defaults.abilityDamage("fire_breath", 80.0D))
                 .setMin(0.0D)
-                .setMax(200.0D)
+                .setMax(100000.0D)
                 .setSaveConsumer(value -> buffer.fireBreathDamage = value)
                 .build());
         entries.add(entryBuilder.startDoubleField(Component.translatable("config.saintsdragons.attributes.ignivorus.fireball_damage"), buffer.fireballDamage)
                 .setDefaultValue(defaults.abilityDamage("fireball", 70.0D))
                 .setMin(0.0D)
-                .setMax(200.0D)
+                .setMax(100000.0D)
                 .setSaveConsumer(value -> buffer.fireballDamage = value)
                 .build());
         entries.add(entryBuilder.startDoubleField(Component.translatable("config.saintsdragons.attributes.ignivorus.magma_pillar_damage"), buffer.magmaPillarDamage)
                 .setDefaultValue(defaults.abilityDamage("magma_pillar", 18.0D))
                 .setMin(0.0D)
-                .setMax(200.0D)
+                .setMax(100000.0D)
                 .setSaveConsumer(value -> buffer.magmaPillarDamage = value)
                 .build());
         entries.add(entryBuilder.startDoubleField(Component.translatable("config.saintsdragons.attributes.ignivorus.wing_swipe_damage"), buffer.wingSwipeDamage)
                 .setDefaultValue(defaults.abilityDamage("wing_swipe", 15.0D))
                 .setMin(0.0D)
-                .setMax(200.0D)
+                .setMax(100000.0D)
                 .setSaveConsumer(value -> buffer.wingSwipeDamage = value)
                 .build());
         entries.add(entryBuilder.startDoubleField(Component.translatable("config.saintsdragons.attributes.ignivorus.stomp_damage"), buffer.stompDamage)
                 .setDefaultValue(defaults.abilityDamage("stomp", 18.0D))
                 .setMin(0.0D)
-                .setMax(200.0D)
+                .setMax(100000.0D)
                 .setSaveConsumer(value -> buffer.stompDamage = value)
                 .build());
         entries.add(entryBuilder.startDoubleField(Component.translatable("config.saintsdragons.attributes.ignivorus.bulldoze_damage"), buffer.bulldozeDamage)
                 .setDefaultValue(defaults.abilityDamage("bulldoze", 10.0D))
                 .setMin(0.0D)
-                .setMax(200.0D)
+                .setMax(100000.0D)
                 .setSaveConsumer(value -> buffer.bulldozeDamage = value)
                 .build());
         entries.add(entryBuilder.startDoubleField(Component.translatable("config.saintsdragons.attributes.ignivorus.ultimate_damage"), buffer.ultimateDamage)
                 .setDefaultValue(defaults.abilityDamage("ultimate", 200.0D))
                 .setMin(0.0D)
-                .setMax(10000.0D)
+                .setMax(100000.0D)
                 .setSaveConsumer(value -> buffer.ultimateDamage = value)
                 .build());
         entries.add(entryBuilder.startDoubleField(Component.translatable("config.saintsdragons.attributes.ignivorus.ultimate_penalty"), buffer.ultimatePenalty)
@@ -1233,6 +1235,44 @@ public class SaintsDragonsModMenuIntegration implements ModMenuApi {
                 )
         );
         loader.overwriteConfig(DragonAttributeConfigLoader.IGNIVORUS_ID, updatedIgnivorus);
+
+        applyAttributesToLoadedDragons();
+    }
+
+    private static void applyAttributesToLoadedDragons() {
+        Minecraft minecraft = Minecraft.getInstance();
+        if (minecraft == null) {
+            return;
+        }
+        var server = minecraft.getSingleplayerServer();
+        if (server == null) {
+            return;
+        }
+
+        for (var level : server.getAllLevels()) {
+            AABB bounds = new AABB(
+                    level.getWorldBorder().getMinX(),
+                    level.getMinBuildHeight(),
+                    level.getWorldBorder().getMinZ(),
+                    level.getWorldBorder().getMaxX(),
+                    level.getMaxBuildHeight(),
+                    level.getWorldBorder().getMaxZ()
+            );
+
+            for (var dragon : level.getEntitiesOfClass(com.leon.saintsdragons.server.entity.base.DragonEntity.class, bounds)) {
+                if (dragon instanceof com.leon.saintsdragons.server.entity.dragons.cindervane.Cindervane cindervane) {
+                    cindervane.applyConfiguredAttributes();
+                } else if (dragon instanceof com.leon.saintsdragons.server.entity.dragons.raevyx.Raevyx raevyx) {
+                    raevyx.applyConfiguredAttributes();
+                } else if (dragon instanceof com.leon.saintsdragons.server.entity.dragons.nulljaw.Nulljaw nulljaw) {
+                    nulljaw.applyConfiguredAttributes();
+                } else if (dragon instanceof com.leon.saintsdragons.server.entity.dragons.ignivorus.Ignivorus ignivorus) {
+                    ignivorus.applyConfiguredAttributes();
+                } else if (dragon instanceof com.leon.saintsdragons.server.entity.dragons.stegonaut.Stegonaut stegonaut) {
+                    stegonaut.applyConfiguredAttributes();
+                }
+            }
+        }
     }
 
     private static final class CindervaneAttributeBuffer {

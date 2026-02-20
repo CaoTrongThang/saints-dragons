@@ -4,8 +4,12 @@ import com.leon.saintsdragons.common.SaintsDragonsCommon;
 import com.leon.saintsdragons.common.config.dragon.DragonAttributeConfigLoader;
 import com.leon.saintsdragons.neoforge.init.NeoForgeBrewingRecipes;
 import com.leon.saintsdragons.neoforge.loot.ModLootModifiers;
+import com.leon.saintsdragons.neoforge.mixin.RangedAttributeAccessor;
 import com.leon.saintsdragons.neoforge.world.AddDragonsBiomeModifier;
 import com.mojang.serialization.MapCodec;
+import net.minecraft.world.entity.ai.attributes.Attribute;
+import net.minecraft.world.entity.ai.attributes.Attributes;
+import net.minecraft.world.entity.ai.attributes.RangedAttribute;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.ModContainer;
 import net.neoforged.fml.common.Mod;
@@ -25,6 +29,7 @@ import java.util.function.Supplier;
 
 @Mod(SaintsDragonsCommon.MOD_ID)
 public class SaintsDragonsNeoForge {
+    private static final double ATTRIBUTE_CAP = 100000.0D;
     private static final DeferredRegister<MapCodec<? extends BiomeModifier>> BIOME_MODIFIERS =
             DeferredRegister.create(NeoForgeRegistries.Keys.BIOME_MODIFIER_SERIALIZERS, SaintsDragonsCommon.MOD_ID);
 
@@ -53,6 +58,8 @@ public class SaintsDragonsNeoForge {
                 com.leon.saintsdragons.neoforge.platform.NeoForgeDragonAttributesConfig.ATTRIBUTES_SPEC,
                 "saintsdragons-attributes.toml");
 
+        raiseVanillaAttributeCaps();
+
         // Register custom brewing recipes
         NeoForge.EVENT_BUS.addListener(NeoForgeBrewingRecipes::register);
 
@@ -66,6 +73,25 @@ public class SaintsDragonsNeoForge {
         NeoForge.EVENT_BUS.addListener(this::onAddReloadListeners);
 
         SaintsDragonsCommon.init();
+    }
+
+    private static void raiseVanillaAttributeCaps() {
+        raiseAttributeCap(Attributes.MAX_HEALTH.value(), "MAX_HEALTH");
+        raiseAttributeCap(Attributes.ARMOR.value(), "ARMOR");
+    }
+
+    private static void raiseAttributeCap(Attribute attribute, String name) {
+        if (!(attribute instanceof RangedAttribute ranged)) {
+            return;
+        }
+
+        RangedAttributeAccessor accessor = (RangedAttributeAccessor) ranged;
+        if (accessor.saintsdragons$getMaxValue() >= ATTRIBUTE_CAP) {
+            return;
+        }
+
+        accessor.saintsdragons$setMaxValue(ATTRIBUTE_CAP);
+        SaintsDragonsCommon.LOGGER.info("Raised {} attribute cap to {}", name, ATTRIBUTE_CAP);
     }
 
     private void onAddReloadListeners(AddReloadListenerEvent event) {

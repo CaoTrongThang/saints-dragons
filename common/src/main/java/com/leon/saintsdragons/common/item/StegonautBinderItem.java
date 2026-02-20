@@ -2,6 +2,7 @@ package com.leon.saintsdragons.common.item;
 
 import com.leon.saintsdragons.common.component.BinderData;
 import com.leon.saintsdragons.common.item.util.BinderComponentUtil;
+import com.leon.saintsdragons.server.data.DragonCodexSavedData;
 import com.leon.saintsdragons.server.entity.dragons.stegonaut.Stegonaut;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
@@ -107,6 +108,9 @@ public class StegonautBinderItem extends Item {
                 drakeData
         );
         BinderComponentUtil.setData(newStack, data);
+        if (player.level() instanceof ServerLevel serverLevel && ownerId != null) {
+            DragonCodexSavedData.get(serverLevel).setDragonBoundState(ownerId, drake.getUUID(), true);
+        }
         drake.remove(net.minecraft.world.entity.Entity.RemovalReason.DISCARDED);
 
         player.displayClientMessage(Component.translatable("saintsdragons.message.stegonaut_captured", drake.getName().getString()), true);
@@ -153,6 +157,8 @@ public class StegonautBinderItem extends Item {
         data.customNameComponent().ifPresent(newDrake::setCustomName);
 
         serverLevel.addFreshEntity(newDrake);
+        UUID codexOwnerId = ownerUUID != null ? ownerUUID : player.getUUID();
+        DragonCodexSavedData.get(serverLevel).setDragonBoundState(codexOwnerId, newDrake.getUUID(), false);
 
         BinderComponentUtil.setData(stack, BinderData.EMPTY);
 

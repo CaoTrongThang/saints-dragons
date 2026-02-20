@@ -9,4 +9,5 @@ public interface CameraAccessor {
     void saintsdragons$invokeSetRotation(float yaw, float pitch);
     float saintsdragons$invokeGetXRot();
     float saintsdragons$invokeGetYRot();
+    float saintsdragons$invokeGetMaxZoom(float desiredDistance);
 }

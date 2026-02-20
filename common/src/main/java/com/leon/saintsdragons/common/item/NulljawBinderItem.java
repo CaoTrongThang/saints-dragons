@@ -3,6 +3,7 @@ package com.leon.saintsdragons.common.item;
 import com.leon.saintsdragons.common.component.BinderData;
 import com.leon.saintsdragons.common.item.util.BinderComponentUtil;
 import com.leon.saintsdragons.common.registry.ModEntities;
+import com.leon.saintsdragons.server.data.DragonCodexSavedData;
 import com.leon.saintsdragons.server.entity.dragons.nulljaw.Nulljaw;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
@@ -108,6 +109,9 @@ public class NulljawBinderItem extends Item {
                 dragonData
         );
         BinderComponentUtil.setData(newStack, data);
+        if (player.level() instanceof ServerLevel serverLevel && ownerId != null) {
+            DragonCodexSavedData.get(serverLevel).setDragonBoundState(ownerId, dragon.getUUID(), true);
+        }
         dragon.remove(net.minecraft.world.entity.Entity.RemovalReason.DISCARDED);
 
         player.displayClientMessage(Component.translatable("saintsdragons.message.nulljaw_captured", dragon.getName().getString()), true);
@@ -159,6 +163,8 @@ public class NulljawBinderItem extends Item {
         data.customNameComponent().ifPresent(newDragon::setCustomName);
 
         serverLevel.addFreshEntity(newDragon);
+        UUID codexOwnerId = ownerUUID != null ? ownerUUID : player.getUUID();
+        DragonCodexSavedData.get(serverLevel).setDragonBoundState(codexOwnerId, newDragon.getUUID(), false);
 
         BinderComponentUtil.setData(stack, BinderData.EMPTY);
 

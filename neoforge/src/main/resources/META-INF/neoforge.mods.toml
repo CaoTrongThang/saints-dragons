@@ -1,6 +1,6 @@
 modLoader = "javafml"
 loaderVersion = "[4,)"
-license = "LGPLv3"
+license = "MIT"
 issueTrackerURL = "https://github.com/LilRicefield/saints-dragons/issues"
 
 [[mods]]
@@ -8,7 +8,8 @@ modId = "saintsdragons"
 version = "${version}"
 displayName = "Saint's Dragons"
 authors = "Leon Saint"
-description = "Adds animated, AI-driven dragons or wyverns to Minecraft."
+logoFile = "assets/saintsdragons/saintsdragons.png"
+description = "Adds animated dragons or wyverns or whatever the heck you wanna call them flying reptiles to Minecraft."
 
 [[mixins]]
 config = "saintsdragons-neoforge.mixins.json"

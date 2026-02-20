@@ -165,7 +165,7 @@ public class FabricClientEventHandler {
 
                 // Apply the smoothed zoom and lateral shift using the mixin accessor
                 CameraAccessor cameraAccessor = (CameraAccessor) camera;
-                cameraAccessor.saintsdragons$invokeMove(-raevyxCameraZoom, 0, 0);
+                moveBackWithCollision(cameraAccessor, raevyxCameraZoom);
                 // Apply lateral and vertical shifts
                 cameraAccessor.saintsdragons$invokeMove(0, verticalCameraShift, raevyxCameraShift);
                 // Slight downward tilt for better forward visibility
@@ -229,7 +229,7 @@ public class FabricClientEventHandler {
             // Apply the smoothed zoom and lateral shift using the mixin accessor
             CameraAccessor cameraAccessor = (CameraAccessor) camera;
             // Move camera: back (zoom), no vertical, lateral shift based on banking
-            cameraAccessor.saintsdragons$invokeMove(-cindervaneCameraZoom, 0, 0);
+            moveBackWithCollision(cameraAccessor, cindervaneCameraZoom);
             // Apply lateral and vertical shifts
             cameraAccessor.saintsdragons$invokeMove(0, verticalCameraShift, cindervaneCameraShift);
             // Slight downward tilt for better forward visibility
@@ -298,7 +298,7 @@ public class FabricClientEventHandler {
 
             // Apply the smoothed zoom using the mixin accessor
             CameraAccessor cameraAccessor = (CameraAccessor) camera;
-            cameraAccessor.saintsdragons$invokeMove(-ignivorusCameraZoom, 0, 0);
+            moveBackWithCollision(cameraAccessor, ignivorusCameraZoom);
             // Apply lateral and vertical shifts
             cameraAccessor.saintsdragons$invokeMove(0, verticalCameraShift, ignivorusCameraShift);
             // Slight downward tilt for better forward visibility
@@ -340,7 +340,7 @@ public class FabricClientEventHandler {
                 double verticalBlendRate = 0.12;
                 verticalCameraShift += (targetVerticalShift - verticalCameraShift) * verticalBlendRate;
 
-                cameraAccessor.saintsdragons$invokeMove(-raevyxCameraZoom, 0, 0);
+                moveBackWithCollision(cameraAccessor, raevyxCameraZoom);
                 cameraAccessor.saintsdragons$invokeMove(0, verticalCameraShift, raevyxCameraShift);
 
                 float nulljawTargetPitch = 6.0f;
@@ -351,7 +351,7 @@ public class FabricClientEventHandler {
                 float clampedPitch = Mth.clamp(currentPitch + nulljawCameraPitch, -90.0f, 90.0f);
                 cameraAccessor.saintsdragons$invokeSetRotation(currentYaw, clampedPitch);
             } else {
-                cameraAccessor.saintsdragons$invokeMove(-15F, 0, 0);
+                moveBackWithCollision(cameraAccessor, 15F);
                 raevyxCameraShift = 0.0;
                 verticalCameraShift = 0.0;
                 nulljawCameraPitch = 0.0f;
@@ -363,7 +363,7 @@ public class FabricClientEventHandler {
             float blendRate = 0.05F;
             stegonautCameraZoom += (stegonautCameraZoomTarget - stegonautCameraZoom) * blendRate;
             CameraAccessor cameraAccessor = (CameraAccessor) camera;
-            cameraAccessor.saintsdragons$invokeMove(-stegonautCameraZoom, 0, 0);
+            moveBackWithCollision(cameraAccessor, stegonautCameraZoom);
         } else if (!(player.getVehicle() instanceof Stegonaut)) {
             stegonautCameraZoom = 8F;
             stegonautCameraZoomTarget = 8F;
@@ -407,5 +407,10 @@ public class FabricClientEventHandler {
             randomTremorOffsets[1] = (Math.random() - 0.5) * 2.0;
             randomTremorOffsets[2] = (Math.random() - 0.5) * 2.0;
         }
+    }
+
+    private static void moveBackWithCollision(CameraAccessor cameraAccessor, float desiredBackDistance) {
+        float safeBackDistance = Math.max(0.0f, cameraAccessor.saintsdragons$invokeGetMaxZoom(desiredBackDistance));
+        cameraAccessor.saintsdragons$invokeMove(-safeBackDistance, 0.0, 0.0);
     }
 }
