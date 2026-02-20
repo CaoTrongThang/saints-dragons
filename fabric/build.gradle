@@ -81,8 +81,7 @@ tasks {
     }
 
     shadowJar {
-        exclude("com/leon/saintsdragons/fabric/**",
-                "architectury.common.json", ".cache/**", "data/saintsdragons/neoforge/**",
+        exclude("architectury.common.json", ".cache/**", "data/saintsdragons/neoforge/**",
                 "data/neoforge/**")
         archiveClassifier.set("dev-shadow")
     }
@@ -98,6 +97,7 @@ processResources {
 
     inputs.property 'version', project.version
     inputs.property 'cloth_config_version', rootProject.cloth_config_version
+    inputs.property 'architectury_api_version', rootProject.architectury_api_version
 
     filesMatching('fabric.mod.json') {
         expand(
@@ -105,7 +105,8 @@ processResources {
                 minecraft_version: rootProject.minecraft_version,
                 fabric_loader_version: rootProject.fabric_loader_version,
                 fabric_api_version: rootProject.fabric_api_version,
-                cloth_config_version: rootProject.cloth_config_version
+                cloth_config_version: rootProject.cloth_config_version,
+                architectury_api_version: rootProject.architectury_api_version
         )
     }
 
@@ -115,6 +116,7 @@ processResources {
 shadowJar {
     configurations = [project.configurations.shadowBundle]
     archiveClassifier = 'dev-shadow'
+    from sourceSets.main.output
 }
 
 remapJar {
