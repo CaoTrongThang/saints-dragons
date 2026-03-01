@@ -36,6 +36,11 @@ public abstract class ServerGamePacketListenerMixin {
     @Inject(method = "handleInteract", at = @At("HEAD"), cancellable = true)
     private void saintsdragons$onHandleInteract(ServerboundInteractPacket packet, CallbackInfo ci) {
         ServerLevel level = this.player.serverLevel();
+        if (!level.getServer().isSameThread()) {
+            // Vanilla will hand this packet off to the main server thread.
+            // Do not consume it here, otherwise normal entity interactions are dropped.
+            return;
+        }
 
         // Get the entity ID from the packet using our accessor
         int entityId = ((ServerboundInteractPacketAccessor) packet).getEntityId();
@@ -47,12 +52,12 @@ public abstract class ServerGamePacketListenerMixin {
             packet.dispatch(new ServerboundInteractPacket.Handler() {
                 @Override
                 public void onInteraction(InteractionHand hand) {
-                    // Intentionally ignore multipart right-click interaction.
+                    directPart.interact(player, hand);
                 }
 
                 @Override
                 public void onInteraction(InteractionHand hand, Vec3 pos) {
-                    // Intentionally ignore multipart right-click interaction.
+                    directPart.interactAt(player, pos, hand);
                 }
 
                 @Override
@@ -64,7 +69,7 @@ public abstract class ServerGamePacketListenerMixin {
             return;
         }
 
-        if (vanillaEntity == null) {
+        if (vanillaEntity == null || !saintsdragons$isPlausibleVanillaTarget(vanillaEntity)) {
             // Vanilla couldn't find it - the client might be targeting a PartEntity
             // Since client/server have different part IDs, we need to raycast to find the hit part
             NeoForgeDragonPart hitPart = saintsdragons$findHitPartEntity(level);
@@ -74,12 +79,12 @@ public abstract class ServerGamePacketListenerMixin {
                 packet.dispatch(new ServerboundInteractPacket.Handler() {
                     @Override
                     public void onInteraction(InteractionHand hand) {
-                        // Intentionally ignore multipart right-click interaction.
+                        hitPart.interact(player, hand);
                     }
 
                     @Override
                     public void onInteraction(InteractionHand hand, Vec3 pos) {
-                        // Intentionally ignore multipart right-click interaction.
+                        hitPart.interactAt(player, pos, hand);
                     }
 
                     @Override
@@ -93,6 +98,15 @@ public abstract class ServerGamePacketListenerMixin {
             }
         }
         // If vanillaEntity != null, let vanilla handle it normally
+    }
+
+    @Unique
+    private boolean saintsdragons$isPlausibleVanillaTarget(Entity entity) {
+        Vec3 eyePos = player.getEyePosition();
+        Vec3 lookVec = player.getLookAngle();
+        Vec3 reachPos = eyePos.add(lookVec.scale(ATTACK_REACH));
+        AABB targetBox = entity.getBoundingBox().inflate(0.35D);
+        return targetBox.clip(eyePos, reachPos).isPresent();
     }
 
     /**

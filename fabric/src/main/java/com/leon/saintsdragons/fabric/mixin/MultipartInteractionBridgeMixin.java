@@ -66,7 +66,7 @@ public abstract class MultipartInteractionBridgeMixin {
             return true;
         }
 
-        if (vanillaEntity == null) {
+        if (vanillaEntity == null || !saintsdragons$isPlausibleVanillaTarget(vanillaEntity)) {
             FabricDragonPart hitPart = saintsdragons$findHitPartEntity(level);
 
             if (hitPart != null) {
@@ -90,6 +90,15 @@ public abstract class MultipartInteractionBridgeMixin {
         }
 
         return false;
+    }
+
+    @Unique
+    private boolean saintsdragons$isPlausibleVanillaTarget(Entity entity) {
+        Vec3 eyePos = player.getEyePosition();
+        Vec3 lookVec = player.getLookAngle();
+        Vec3 reachPos = eyePos.add(lookVec.scale(ATTACK_REACH));
+        AABB targetBox = entity.getBoundingBox().inflate(0.35D);
+        return targetBox.clip(eyePos, reachPos).isPresent();
     }
 
     @Unique

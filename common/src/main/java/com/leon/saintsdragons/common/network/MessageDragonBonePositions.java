@@ -90,8 +90,9 @@ public record MessageDragonBonePositions(
         // Find the entity in the server world
         Entity entity = player.serverLevel().getEntity(msg.entityId());
         if (entity instanceof com.leon.saintsdragons.server.entity.dragons.ignivorus.Ignivorus ignivorus) {
-            // Only accept bone updates for the dragon the sender is actively controlling.
-            if (player.getVehicle() != ignivorus || !ignivorus.canBeControlledBy(player)) {
+            // Allow nearby clients tracking the dragon to provide locator updates so multipart
+            // hitboxes stay accurate even when the dragon is not being ridden.
+            if (player.distanceToSqr(ignivorus) > 128.0D * 128.0D) {
                 return;
             }
             for (Map.Entry<String, Vec3> entry : msg.bonePositions().entrySet()) {
