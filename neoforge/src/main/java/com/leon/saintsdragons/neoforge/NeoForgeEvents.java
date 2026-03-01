@@ -2,11 +2,16 @@ package com.leon.saintsdragons.neoforge;
 
 import com.leon.saintsdragons.common.SaintsDragonsCommon;
 import com.leon.saintsdragons.common.init.CommonModEvents;
+import com.leon.saintsdragons.common.registry.ModPotions;
+import net.minecraft.core.component.DataComponents;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.commands.CommandBuildContext;
 import net.minecraft.commands.Commands;
 import net.minecraft.world.entity.SpawnPlacements;
 import net.minecraft.world.item.CreativeModeTabs;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
+import net.minecraft.world.item.alchemy.PotionContents;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.event.BuildCreativeModeTabContentsEvent;
@@ -45,5 +50,25 @@ public final class NeoForgeEvents {
                 event.accept(itemSupplier.get());
             }
         });
+
+        if (event.getTabKey() == CreativeModeTabs.TOOLS_AND_UTILITIES
+                || event.getTabKey() == CreativeModeTabs.SEARCH) {
+            event.getParentEntries().removeIf(NeoForgeEvents::isHiddenVanillaPotionVariant);
+            event.getSearchEntries().removeIf(NeoForgeEvents::isHiddenVanillaPotionVariant);
+        }
+    }
+
+    private static boolean isHiddenVanillaPotionVariant(ItemStack stack) {
+        if (stack == null || stack.isEmpty()) {
+            return false;
+        }
+
+        if (!stack.is(Items.POTION) && !stack.is(Items.SPLASH_POTION) && !stack.is(Items.LINGERING_POTION)) {
+            return false;
+        }
+
+        PotionContents contents = stack.getOrDefault(DataComponents.POTION_CONTENTS, PotionContents.EMPTY);
+        return contents.is(BuiltInRegistries.POTION.wrapAsHolder(ModPotions.NULLJAW_TIDEGUARD.get()))
+                || contents.is(BuiltInRegistries.POTION.wrapAsHolder(ModPotions.SEARING.get()));
     }
 }

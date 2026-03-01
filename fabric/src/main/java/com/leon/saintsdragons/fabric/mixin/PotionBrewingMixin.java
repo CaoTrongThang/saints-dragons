@@ -20,6 +20,16 @@ public final class PotionBrewingMixin {
         return ingredient.is(ModItems.NULLJAW_SCALE.get()) || ingredient.is(ModItems.IGNIVORUS_TOOTH.get());
     }
 
+    private boolean isSaintsCustomPotion(ItemStack stack) {
+        PotionContents contents = stack.getOrDefault(DataComponents.POTION_CONTENTS, PotionContents.EMPTY);
+        return contents.is(BuiltInRegistries.POTION.wrapAsHolder(ModPotions.NULLJAW_TIDEGUARD.get()))
+                || contents.is(BuiltInRegistries.POTION.wrapAsHolder(ModPotions.SEARING.get()));
+    }
+
+    private boolean isVanillaContainerConversionIngredient(ItemStack ingredient) {
+        return ingredient.is(Items.GUNPOWDER) || ingredient.is(Items.DRAGON_BREATH);
+    }
+
     @Inject(method = "isIngredient", at = @At("HEAD"), cancellable = true)
     private void saintsdragons$allowCustomPotionIngredients(
             ItemStack ingredient,
@@ -36,6 +46,11 @@ public final class PotionBrewingMixin {
             ItemStack ingredient,
             CallbackInfoReturnable<Boolean> cir
     ) {
+        if (isSaintsCustomPotion(input) && isVanillaContainerConversionIngredient(ingredient)) {
+            cir.setReturnValue(false);
+            return;
+        }
+
         if (!isCustomRecipeIngredient(ingredient)) {
             return;
         }
@@ -55,6 +70,11 @@ public final class PotionBrewingMixin {
             ItemStack input,
             CallbackInfoReturnable<ItemStack> cir
     ) {
+        if (isSaintsCustomPotion(input) && isVanillaContainerConversionIngredient(ingredient)) {
+            cir.setReturnValue(input.copy());
+            return;
+        }
+
         PotionContents potionContents = input.getOrDefault(DataComponents.POTION_CONTENTS, PotionContents.EMPTY);
         if (!potionContents.is(Potions.AWKWARD) || !input.is(Items.POTION)) {
             return;

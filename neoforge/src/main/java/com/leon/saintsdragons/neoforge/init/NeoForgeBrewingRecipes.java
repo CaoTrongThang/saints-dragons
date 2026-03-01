@@ -18,11 +18,11 @@ public final class NeoForgeBrewingRecipes {
     public static void register(RegisterBrewingRecipesEvent event) {
         ItemStack awkwardPotion = PotionContents.createItemStack(Items.POTION, Potions.AWKWARD);
         ItemStack tideguardPotion = PotionContents.createItemStack(
-                Items.POTION,
+                ModItems.POTION_OF_TIDEGUARD.get(),
                 BuiltInRegistries.POTION.wrapAsHolder(ModPotions.NULLJAW_TIDEGUARD.get())
         );
         ItemStack searingPotion = PotionContents.createItemStack(
-                Items.POTION,
+                ModItems.POTION_OF_SEARING.get(),
                 BuiltInRegistries.POTION.wrapAsHolder(ModPotions.SEARING.get())
         );
 
