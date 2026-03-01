@@ -29,6 +29,20 @@ public abstract class MultipartInteractionBridgeMixin {
     @Inject(method = "handleInteract", at = @At("HEAD"), cancellable = true)
     private void saintsdragons$onHandleInteract(ServerboundInteractPacket packet, CallbackInfo ci) {
         ServerLevel level = this.player.serverLevel();
+        if (!level.getServer().isSameThread()) {
+            // Vanilla will hand this packet off to the main server thread.
+            // Do not consume it here, otherwise normal entity interactions are dropped.
+            return;
+        }
+
+        if (this.saintsdragons$handleMultipartInteract(packet)) {
+            ci.cancel();
+        }
+    }
+
+    @Unique
+    private boolean saintsdragons$handleMultipartInteract(ServerboundInteractPacket packet) {
+        ServerLevel level = this.player.serverLevel();
         int entityId = ((ServerboundInteractPacketIdAccessor) packet).getEntityId();
         Entity vanillaEntity = level.getEntity(entityId);
 
@@ -36,10 +50,12 @@ public abstract class MultipartInteractionBridgeMixin {
             packet.dispatch(new ServerboundInteractPacket.Handler() {
                 @Override
                 public void onInteraction(InteractionHand hand) {
+                    directPart.interact(player, hand);
                 }
 
                 @Override
                 public void onInteraction(InteractionHand hand, Vec3 pos) {
+                    directPart.interactAt(player, pos, hand);
                 }
 
                 @Override
@@ -47,8 +63,7 @@ public abstract class MultipartInteractionBridgeMixin {
                     player.attack(directPart);
                 }
             });
-            ci.cancel();
-            return;
+            return true;
         }
 
         if (vanillaEntity == null) {
@@ -58,20 +73,23 @@ public abstract class MultipartInteractionBridgeMixin {
                 packet.dispatch(new ServerboundInteractPacket.Handler() {
                     @Override
                     public void onInteraction(InteractionHand hand) {
+                        hitPart.interact(player, hand);
                     }
 
                     @Override
                     public void onInteraction(InteractionHand hand, Vec3 pos) {
+                        hitPart.interactAt(player, pos, hand);
                     }
                     @Override
                     public void onAttack() {
                         player.attack(hitPart);
                     }
                 });
-
-                ci.cancel();
+                return true;
             }
         }
+
+        return false;
     }
 
     @Unique

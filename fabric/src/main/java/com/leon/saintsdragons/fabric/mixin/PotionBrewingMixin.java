@@ -16,12 +16,22 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(PotionBrewing.class)
 public final class PotionBrewingMixin {
-    private static boolean isCustomRecipeIngredient(ItemStack ingredient) {
+    private boolean isCustomRecipeIngredient(ItemStack ingredient) {
         return ingredient.is(ModItems.NULLJAW_SCALE.get()) || ingredient.is(ModItems.IGNIVORUS_TOOTH.get());
     }
 
+    @Inject(method = "isIngredient", at = @At("HEAD"), cancellable = true)
+    private void saintsdragons$allowCustomPotionIngredients(
+            ItemStack ingredient,
+            CallbackInfoReturnable<Boolean> cir
+    ) {
+        if (isCustomRecipeIngredient(ingredient)) {
+            cir.setReturnValue(true);
+        }
+    }
+
     @Inject(method = "hasMix", at = @At("HEAD"), cancellable = true)
-    private static void saintsdragons$blockAwkwardSplashAndLingering(
+    private void saintsdragons$blockAwkwardSplashAndLingering(
             ItemStack input,
             ItemStack ingredient,
             CallbackInfoReturnable<Boolean> cir
@@ -32,16 +42,15 @@ public final class PotionBrewingMixin {
 
         PotionContents potionContents = input.getOrDefault(DataComponents.POTION_CONTENTS, PotionContents.EMPTY);
         if (!potionContents.is(Potions.AWKWARD)) {
+            cir.setReturnValue(false);
             return;
         }
 
-        if (!input.is(Items.POTION)) {
-            cir.setReturnValue(false);
-        }
+        cir.setReturnValue(input.is(Items.POTION));
     }
 
     @Inject(method = "mix", at = @At("HEAD"), cancellable = true)
-    private static void saintsdragons$customPotionItemOutput(
+    private void saintsdragons$customPotionItemOutput(
             ItemStack ingredient,
             ItemStack input,
             CallbackInfoReturnable<ItemStack> cir
