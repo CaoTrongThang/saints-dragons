@@ -5,17 +5,13 @@ import com.leon.saintsdragons.common.init.CommonModEvents;
 import com.leon.saintsdragons.common.registry.ModPotions;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.commands.CommandBuildContext;
-import net.minecraft.commands.Commands;
-import net.minecraft.world.entity.SpawnPlacements;
-import net.minecraft.world.item.CreativeModeTabs;
+import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.alchemy.PotionContents;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.event.BuildCreativeModeTabContentsEvent;
-import net.neoforged.neoforge.event.RegisterCommandsEvent;
 import net.neoforged.neoforge.event.entity.EntityAttributeCreationEvent;
 import net.neoforged.neoforge.event.entity.RegisterSpawnPlacementsEvent;
 
@@ -51,10 +47,19 @@ public final class NeoForgeEvents {
             }
         });
 
-        if (event.getTabKey() == CreativeModeTabs.TOOLS_AND_UTILITIES
-                || event.getTabKey() == CreativeModeTabs.SEARCH) {
-            event.getParentEntries().removeIf(NeoForgeEvents::isHiddenVanillaPotionVariant);
-            event.getSearchEntries().removeIf(NeoForgeEvents::isHiddenVanillaPotionVariant);
+        java.util.List<ItemStack> toRemove = new java.util.ArrayList<>();
+        for (ItemStack stack : event.getParentEntries()) {
+            if (isHiddenVanillaPotionVariant(stack)) {
+                toRemove.add(stack);
+            }
+        }
+        for (ItemStack stack : event.getSearchEntries()) {
+            if (isHiddenVanillaPotionVariant(stack)) {
+                toRemove.add(stack);
+            }
+        }
+        for (ItemStack stack : toRemove) {
+            event.remove(stack, CreativeModeTab.TabVisibility.PARENT_AND_SEARCH_TABS);
         }
     }
 

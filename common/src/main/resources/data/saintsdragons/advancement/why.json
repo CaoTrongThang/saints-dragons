@@ -2,7 +2,8 @@
   "parent": "minecraft:story/root",
   "display": {
     "icon": {
-      "item": "minecraft:egg"
+      "count": 1,
+      "id": "minecraft:egg"
     },
     "title": {
       "translate": "advancement.saintsdragons.why.title"

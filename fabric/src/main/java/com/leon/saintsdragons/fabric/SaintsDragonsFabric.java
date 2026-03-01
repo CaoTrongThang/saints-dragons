@@ -1,7 +1,6 @@
 package com.leon.saintsdragons.fabric;
 
 import com.leon.saintsdragons.common.SaintsDragonsCommon;
-import com.leon.saintsdragons.common.config.dragon.DragonAttributeConfigLoader;
 import com.leon.saintsdragons.common.init.CommonBrewingRecipes;
 import com.leon.saintsdragons.common.init.CommonModEvents;
 import com.leon.saintsdragons.common.registry.ModPotions;
@@ -21,7 +20,6 @@ import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.server.packs.PackType;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.SpawnPlacements;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
@@ -29,7 +27,6 @@ import net.minecraft.world.entity.ai.attributes.RangedAttribute;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.alchemy.PotionContents;
-import net.minecraft.world.level.levelgen.Heightmap;
 
 public final class SaintsDragonsFabric implements ModInitializer {
     private static final double ATTRIBUTE_CAP = 100000.0D;
@@ -55,9 +52,25 @@ public final class SaintsDragonsFabric implements ModInitializer {
 
         // Hide vanilla bottle variants for custom potions from vanilla tabs/search.
         ItemGroupEvents.modifyEntriesEvent(net.minecraft.world.item.CreativeModeTabs.TOOLS_AND_UTILITIES)
-                .register(entries -> entries.getDisplayStacks().removeIf(SaintsDragonsFabric::isHiddenVanillaPotionVariant));
+                .register(entries -> {
+                    entries.getDisplayStacks().removeIf(SaintsDragonsFabric::isHiddenVanillaPotionVariant);
+                    entries.getSearchTabStacks().removeIf(SaintsDragonsFabric::isHiddenVanillaPotionVariant);
+                });
+        ItemGroupEvents.modifyEntriesEvent(net.minecraft.world.item.CreativeModeTabs.FOOD_AND_DRINKS)
+                .register(entries -> {
+                    entries.getDisplayStacks().removeIf(SaintsDragonsFabric::isHiddenVanillaPotionVariant);
+                    entries.getSearchTabStacks().removeIf(SaintsDragonsFabric::isHiddenVanillaPotionVariant);
+                });
+        ItemGroupEvents.modifyEntriesEvent(net.minecraft.world.item.CreativeModeTabs.COMBAT)
+                .register(entries -> {
+                    entries.getDisplayStacks().removeIf(SaintsDragonsFabric::isHiddenVanillaPotionVariant);
+                    entries.getSearchTabStacks().removeIf(SaintsDragonsFabric::isHiddenVanillaPotionVariant);
+                });
         ItemGroupEvents.modifyEntriesEvent(net.minecraft.world.item.CreativeModeTabs.SEARCH)
-                .register(entries -> entries.getSearchTabStacks().removeIf(SaintsDragonsFabric::isHiddenVanillaPotionVariant));
+                .register(entries -> {
+                    entries.getDisplayStacks().removeIf(SaintsDragonsFabric::isHiddenVanillaPotionVariant);
+                    entries.getSearchTabStacks().removeIf(SaintsDragonsFabric::isHiddenVanillaPotionVariant);
+                });
 
         CommandRegistrationCallback.EVENT.register((dispatcher, registryAccess, environment) ->
                 CommonModEvents.registerCommands(dispatcher));
